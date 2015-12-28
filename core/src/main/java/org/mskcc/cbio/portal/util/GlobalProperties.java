@@ -32,16 +32,21 @@
 
 package org.mskcc.cbio.portal.util;
 
-import org.mskcc.cbio.portal.servlet.QueryBuilder;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.util.*;
-import java.net.URL;
+import org.mskcc.cbio.portal.servlet.QueryBuilder;
 
 
 /**
@@ -68,13 +73,13 @@ public class GlobalProperties {
     public static final String INCLUDE_NETWORKS = "include_networks";
     public static final String GOOGLE_ANALYTICS_PROFILE_ID = "google_analytics_profile_id";
     public static final String GENOMESPACE = "genomespace";
-
     public static final String APP_NAME = "app.name";
     public static final String DEFAULT_APP_NAME = "public_portal";
     
     public static final String APP_VERSION = "app.version";
 
     public static final String SKIN_TITLE = "skin.title";
+    public static final String HARVEST_URL = "harvest.url";
     public static final String DEFAULT_SKIN_TITLE = "cBioPortal for Cancer Genomics";
     public static final String SKIN_BLURB = "skin.blurb";
     // blurb default
@@ -319,6 +324,10 @@ public class GlobalProperties {
     {
         String skinTitle = properties.getProperty(SKIN_TITLE);
         return (skinTitle == null) ? DEFAULT_SKIN_TITLE : skinTitle;
+    }
+    
+    public static String getHarvestUrl(){
+    	return properties.getProperty(HARVEST_URL);
     }
     // updated function to use a default if nothing is specified
     public static String getBlurb()
