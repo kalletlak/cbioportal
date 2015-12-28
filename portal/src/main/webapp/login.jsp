@@ -43,6 +43,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <jsp:include page="WEB-INF/jsp/global/css_include.jsp" flush="true" />
 <jsp:include page="WEB-INF/jsp/global/js_include.jsp" flush="true" />
+<jsp:include page="WEB-INF/jsp/global/js_include_analytics_and_email.jsp" flush="true" />
 <%
     String authenticationMethod = GlobalProperties.authenticationMethod();
     if (authenticationMethod.equals("openid")) {

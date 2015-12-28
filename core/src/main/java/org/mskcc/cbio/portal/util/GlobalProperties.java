@@ -121,6 +121,10 @@ public class GlobalProperties {
     // properties for showing the right logo in the header_bar and default logo
     public static final String SKIN_RIGHT_LOGO = "skin.right_logo";
     public static final String DEFAULT_SKIN_RIGHT_LOGO = "images/mskcc_logo_3d_grey.jpg";
+    
+    // properties for showing the left logo in the header_bar and default logo
+    public static final String SKIN_LEFT_LOGO = "skin.left_logo";
+    public static final String DEFAULT_SKIN_LEFT_LOGO = "images/cbioportal_logo.png";
 
     // properties for hiding/showing tabs in the header navigation bar
     public static final String SKIN_SHOW_WEB_API_TAB = "skin.show_web_api_tab";
@@ -404,6 +408,13 @@ public class GlobalProperties {
     {
         String rightLogo = properties.getProperty(SKIN_RIGHT_LOGO);
         return (rightLogo == null) ? DEFAULT_SKIN_RIGHT_LOGO : "images/" + rightLogo;
+    }
+    
+    // function for retrieving the left logo, used by the header_bar
+    public static String getLeftLogo()
+    {
+        String leftLogo = properties.getProperty(SKIN_LEFT_LOGO);
+        return (leftLogo == null) ? DEFAULT_SKIN_LEFT_LOGO : "images/" + leftLogo;
     }
 
     // function for retrieving the footer text
