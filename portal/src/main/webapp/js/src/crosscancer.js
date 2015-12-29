@@ -130,18 +130,18 @@
 				var disp = response['HAS_TVN_DATA']?'inline':'none';
                 _this.$el.html(_this.template($.extend({}, _this.model, {"has_trmVsnrml_view": disp})));
 
-                $("#tabs").tabs({ active: this.model.tab == "mutation" ? 1 : 0 }).show();
+                $("#tabs").tabs({ active: _this.model.tab == "mutation" ? 1 : 0 }).show();
 
-                var priority = this.model.priority;
+                var priority = _this.model.priority;
                 if(priority == 2) {
                     $("#cc-mutations-link").parent().hide();
                 } else {
                     $("#cc-mutations-link").parent().show();
                 }
 
-                var genes = this.model.genes;
-                var orgQuery = this.model.genes;
-		var study_list = this.model.study_list;
+                var genes = _this.model.genes;
+                var orgQuery = _this.model.genes;
+		var study_list = _this.model.study_list;
 
                 var studies = new Studies({
                     gene_list: genes,
