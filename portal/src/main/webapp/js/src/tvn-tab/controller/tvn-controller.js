@@ -226,16 +226,16 @@ app
 													.keys(normal_data);
 											if (_.keys(normal_data).length > 1)
 												$scope.normalsSelectionHide = false;
-											if (initFlag) {
-												showCheckBoxes(
-														$scope.selectedGeneOption,
-														$scope.selectedNormalDataset);
-												$scope.selectedNormalDataset = $scope.normalDatasetOptions[0];
-											}
 											tvnBoxPlot.initialize(
 													isCrossCancer, normal_data,
 													$scope.selectedGeneOption,
 													$scope.zScoreCheck, null);
+											if (initFlag) {
+												$scope.selectedNormalDataset = $scope.normalDatasetOptions[0];
+												showCheckBoxes(
+														$scope.selectedGeneOption,
+														$scope.selectedNormalDataset);
+											}
 											tvnBoxPlot
 													.loadPlot(
 															$scope.selectedGeneOption,
