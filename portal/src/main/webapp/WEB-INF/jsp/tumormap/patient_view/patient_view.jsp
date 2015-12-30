@@ -406,6 +406,7 @@ var caseIds = <%=jsonCaseIds%>;
 var patientId = '<%=patientID%>';
 var cancerStudyName = "<%=cancerStudy.getName()%>";
 var cancerStudyId = '<%=cancerStudy.getCancerStudyStableId()%>';
+var linkToHarvest = '<%=cancerStudy.isLinkToHarvest()%>';
 var genomicEventObs =  new GenomicEventObserver(<%=showMutations%>,<%=showCNA%>, hasCnaSegmentData);
 var drugType = drugType?'<%=drugType%>':null;
 var clinicalDataMap = <%=jsonClinicalData%>;
@@ -910,7 +911,11 @@ function guessClinicalData(clinicalData, paramNames) {
     }
     return null;
 }
-
+function addSampletoSession(that){
+	cbio.util.addSampleToSession($(that).parent().find('a').text());
+	$(that).prop("disabled",true);
+				
+	}
 function outputClinicalData() {
     var n=caseIds.length;
     if (n>0) initCaseMetaData();
@@ -969,8 +974,10 @@ function outputClinicalData() {
         var info = [];
         info = info.concat(formatDiseaseInfo(_.omit(clinicalDataMap[caseId], Object.keys(patientInfo))));
         sample_recs += info.join(",&nbsp;");
-        sample_recs += "</a><span class='sample-record-delimiter'>, </span></div>";
-
+        sample_recs += "</a><span class='sample-record-delimiter'>, </span>";
+        if(linkToHarvest=='true')
+        	sample_recs += "&nbsp;<input type='button' class='btn1' style='margin-left:20px; padding:2px;' value='Add to bucket' onClick='addSampletoSession(this)'>";
+        sample_recs += "</div>";
         if ((n > nr_in_head && i == nr_in_head-1) || (n <= nr_in_head && i == n-1)) {
             head_recs = sample_recs;
             sample_recs = "";
