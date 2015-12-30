@@ -1,6 +1,20 @@
-/** Copyright (c) 2014 Childrens Hospital of Philadelphia.
- * 
+/*
+ * This file is part of cBioPortal.
+ *
+ * cBioPortal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mskcc.cbio.portal.dao;
 
 import java.util.TreeMap;
@@ -11,11 +25,12 @@ import java.util.TreeMap;
  */
 
 /**
- * @author kalletlak
+ * @author Karthik Kalletla
  * 
  */
 public class TumorVsNormalUtil {
-	private static DaoTumorVsNormal daoTumorVsNormal = DaoTumorVsNormal.getInstance();
+	private static DaoTumorVsNormal daoTumorVsNormal = DaoTumorVsNormal
+			.getInstance();
 
 	/**
 	 * 
@@ -27,11 +42,11 @@ public class TumorVsNormalUtil {
 	 * @param technology
 	 * @return TreeMap
 	 */
-	public static TreeMap<String,TreeMap<String, TreeMap<String, String>>> getNormals(String geneid,
-			int technology) {
-		TreeMap<String,TreeMap<String, TreeMap<String, String>>> beans = daoTumorVsNormal
+	public static TreeMap<String, TreeMap<String, TreeMap<String, String>>> getNormals(
+			String geneid, int technology) {
+		TreeMap<String, TreeMap<String, TreeMap<String, String>>> normalSamplesMap = daoTumorVsNormal
 				.getNormalsByCancerStudyAndGeneId(geneid, technology);
-		return beans;
+		return normalSamplesMap;
 	}
-	
+
 }

@@ -539,9 +539,18 @@ public final class DaoCancerStudy {
         cancerStudy.setCitation(rs.getString("CITATION"));
         cancerStudy.setGroups(rs.getString("GROUPS"));
         cancerStudy.setShortName(rs.getString("SHORT_NAME"));
-        cancerStudy.setLinkToHarvest(rs.getBoolean("LINK_TO_HARVEST"));
+        try{
+        	cancerStudy.setLinkToHarvest(rs.getBoolean("LINK_TO_HARVEST"));
+        }catch(SQLException exception){
+        	//TODO: When LINK_TO_HARVEST not found
+        }
         cancerStudy.setInternalId(rs.getInt("CANCER_STUDY_ID"));
-        cancerStudy.setNormalsMapping(rs.getBoolean("NORMALS_TISSUE_MAPPING"));
+        try{
+            cancerStudy.setNormalsMapping(rs.getBoolean("NORMALS_TISSUE_MAPPING"));
+        }catch(SQLException exception){
+        	//TODO: When NORMALS_TISSUE_MAPPING not found
+        }
+   
         return cancerStudy;
     }
 

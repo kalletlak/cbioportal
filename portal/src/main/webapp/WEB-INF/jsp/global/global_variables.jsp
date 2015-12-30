@@ -177,7 +177,7 @@
     patientSetName = patientSetName.replaceAll("'", "\\'");
     patientSetName = patientSetName.replaceAll("\"", "\\\"");
     //START of new changes
-    boolean has_trmVsnrml_view = TVNUtil.hasTVNData(cancerTypeId);
+    boolean has_trmVsnrml_view = cancerStudy.isNormalsMapping();
     //END of new changes
 
     //check if show co-expression tab

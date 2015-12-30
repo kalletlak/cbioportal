@@ -149,11 +149,12 @@ public class GeneticProfileReader {
       if (showProfileInAnalysisTabStr != null && showProfileInAnalysisTabStr.equalsIgnoreCase("FALSE")) {
          showProfileInAnalysisTab = false;
       }
-      
+      //check if the profile is mapped to any normal dataset
       String normalMappingSet = properties.getProperty("normal_mapping_set");
       int normalMappingID = -1;
       if(normalMappingSet != null){
     	  try {
+    		  //check if the normal dataset is present, else throw IllegalArgumentException
 			boolean isNormalDatasetPresent = DaoTumorVsNormal.isTechnologyPresent(normalMappingSet.toLowerCase());
 			if(isNormalDatasetPresent){
 				normalMappingID = DaoTumorVsNormal.getNormalMappingID(normalMappingSet.toLowerCase());

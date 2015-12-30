@@ -406,6 +406,9 @@ public class QueryBuilder extends HttpServlet {
         // Map user selected samples Ids to patient Ids
         HashMap<String, String> patientSampleIdMap = new HashMap<String, String>();
         CancerStudy selectedCancerStudy = DaoCancerStudy.getCancerStudyByStableId(cancerStudyStableId);
+		// check if there is bio-repository url, if yes check whether the cancer
+		// study have linking to the repository else set LINK_TO_HARVEST to
+		// false
         if(GlobalProperties.getHarvestUrl()!=null){
         	request.setAttribute(LINK_TO_HARVEST, selectedCancerStudy.isLinkToHarvest());
         }else{

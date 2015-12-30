@@ -1,6 +1,20 @@
-/** Copyright (c) 2015 Childrens Hospital of Philadelphia.
- * 
- */
+/*
+ * This file is part of cBioPortal.
+ *
+ * cBioPortal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package org.mskcc.cbio.portal.dao;
 
 import java.sql.Connection;
@@ -19,12 +33,12 @@ import org.mskcc.cbio.portal.model.CanonicalGene;
 
 /**
  * This class creates DAO to tumor vs normals data
- *
- */
-/**
- * @author kalletlak
+ * 
+ * 
+ * @author Karthik Kalletla
  * 
  */
+
 public class DaoTumorVsNormal {
 	private static DaoTumorVsNormal daoTumorVsNormal = null;
 	private static final String DELIM = ",";
@@ -93,11 +107,10 @@ public class DaoTumorVsNormal {
 					String sampleParts[] = samples.trim().split(DELIM);
 					if (sampleParts.length > 1) {
 						TreeMap<String, String> linkedHashMap = new TreeMap<String, String>();
-						for(String sample:sampleParts){
-							linkedHashMap.put(sample,
-									sampleMap.get(sample));
+						for (String sample : sampleParts) {
+							linkedHashMap.put(sample, sampleMap.get(sample));
 						}
-						
+
 						normalsMap.put(tissue, linkedHashMap);
 					}
 				}
@@ -166,8 +179,8 @@ public class DaoTumorVsNormal {
 	 * @param substring
 	 * @return int
 	 */
-	
-	public static int getNormalMappingID(String technology){
+
+	public static int getNormalMappingID(String technology) {
 		int mappingID = -1;
 		PreparedStatement pstmt = null;
 		Connection con = null;
@@ -189,10 +202,11 @@ public class DaoTumorVsNormal {
 			e.printStackTrace();
 		} finally {
 			JdbcUtil.closeAll(DaoTumorVsNormal.class, con, pstmt, rs);
-		}	
-				
+		}
+
 		return mappingID;
 	}
+
 	public int deleteNrmlDataWithTechnology(String technology) {
 		PreparedStatement pstmt = null;
 		Connection con = null;
@@ -202,7 +216,7 @@ public class DaoTumorVsNormal {
 			con = JdbcUtil.getDbConnection(DaoTumorVsNormal.class);
 			mappingID = getNormalMappingID(technology);
 
-			if (mappingID !=-1) {
+			if (mappingID != -1) {
 				String[] sqls = {
 						"DELETE FROM normals_sample_data WHERE NORMALS_MAPPING_ID = ?",
 						"DELETE FROM normals_sample_mapping WHERE NORMALS_MAPPING_ID = ?",
@@ -225,7 +239,7 @@ public class DaoTumorVsNormal {
 			JdbcUtil.closeAll(DaoTumorVsNormal.class, con, pstmt, rs);
 		}
 		return mappingID;
-		
+
 	}
 
 	/**
@@ -287,7 +301,7 @@ public class DaoTumorVsNormal {
 				try {
 					createTables();
 				} catch (SQLException e1) {
-					
+
 					if (LOG.isInfoEnabled()) {
 						LOG.info("Error creating table.");
 						LOG.info("isTechnologyPresent(), Error trace: "

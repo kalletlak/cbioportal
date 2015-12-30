@@ -1,3 +1,20 @@
+/*
+ * This file is part of cBioPortal.
+ *
+ * cBioPortal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mskcc.cbio.portal.servlet;
 
 import java.io.IOException;
@@ -15,7 +32,18 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 
+/**
+ * Add/ Delete sample from session
+ * 
+ * @author Karthik Kalletla
+ * 
+ */
 public class SamplesSessionJSON extends HttpServlet {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse) throws ServletException,
@@ -26,27 +54,29 @@ public class SamplesSessionJSON extends HttpServlet {
 	protected void doPost(HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse) throws ServletException,
 			IOException {
-		HttpSession s=httpServletRequest.getSession(true);
+		HttpSession session = httpServletRequest.getSession(true);
 		String sample = httpServletRequest.getParameter("sample");
-		Set<String> temp = new HashSet<String>();
+		Set<String> samplesSet = new HashSet<String>();
 		String operation = httpServletRequest.getParameter("operation");
-		Set<String> selectedSmaples = (Set<String>) s.getAttribute("selectedSamples");
-		if(operation.equals("add")){
-		if(selectedSmaples==null){
-			temp.add(sample);
-			s.setAttribute("selectedSamples", temp);
-		}else{
-			temp.addAll(selectedSmaples);
-			temp.add(sample);
-			s.removeAttribute("selectedSamples");
-			s.setAttribute("selectedSamples", temp);
-		}
-		}else if (operation.equals("delete")){
+		@SuppressWarnings("unchecked")
+		Set<String> selectedSmaples = (Set<String>) session
+				.getAttribute("selectedSamples");
+		if (operation.equals("add")) {
+			if (selectedSmaples == null) {
+				samplesSet.add(sample);
+				session.setAttribute("selectedSamples", samplesSet);
+			} else {
+				samplesSet.addAll(selectedSmaples);
+				samplesSet.add(sample);
+				session.removeAttribute("selectedSamples");
+				session.setAttribute("selectedSamples", samplesSet);
+			}
+		} else if (operation.equals("delete")) {
 			selectedSmaples.remove(sample);
-			s.removeAttribute("selectedSamples");
-			s.setAttribute("selectedSamples", selectedSmaples);
+			session.removeAttribute("selectedSamples");
+			session.setAttribute("selectedSamples", selectedSmaples);
 		}
-	
+
 		httpServletResponse.setContentType("application/json");
 		PrintWriter out = httpServletResponse.getWriter();
 		ObjectMapper mapper = new ObjectMapper();

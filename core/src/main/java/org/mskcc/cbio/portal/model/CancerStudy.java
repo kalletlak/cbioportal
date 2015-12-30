@@ -64,8 +64,8 @@ public class CancerStudy {
     private String citation;
     private Set<String> groups;
     private String shortName;
-    private boolean linkToHarvest;
-    private boolean normalsMapping;
+    private boolean linkToHarvest = false; // required for linking to bio-repository
+    private boolean normalsMapping = false; // required for tumor vs normals comparison plot
     
 
     /**

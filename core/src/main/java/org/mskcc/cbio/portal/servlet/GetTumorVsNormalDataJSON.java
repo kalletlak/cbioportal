@@ -1,6 +1,20 @@
-/** Copyright (c) 2015 Childrens Hospital of Philadelphia.
- * 
+/*
+ * This file is part of cBioPortal.
+ *
+ * cBioPortal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mskcc.cbio.portal.servlet;
 
 import java.io.IOException;
@@ -41,22 +55,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class returns object required for tumor vs normal 
- * visualization tab for a single cancer dataset study.
+ * This class returns object required for tumor vs normal visualization tab for
+ * a single cancer dataset study.
  * 
- *  Key points : 
- *	1. Separate logic for profiles with rna_seq and microarray data since in the database rna_ser is raw count and microarray data is log'ed
- *	2. profiles with rna_seq data has an option to show raw values, log'ed values or z-scored values
- *	3. profiles with microarray data shows only z-scored values
- *
- * @param cancer_study_id,genetic_profile_id,case_set_id,
- * 		  case_ids_key,zscore_flag, gene
+ * Key points : 1. Separate logic for profiles with rna_seq and microarray data
+ * since in the database rna_ser is raw count and microarray data is log'ed 2.
+ * profiles with rna_seq data has an option to show raw values, log'ed values or
+ * z-scored values 3. profiles with microarray data shows only z-scored values
+ * 
+ * @param cancer_study_id
+ *            ,genetic_profile_id,case_set_id, case_ids_key,zscore_flag, gene
  * @return JSON objects of Tumors and Normals
  * 
- *
- */
-/**
- * @author kalletlak
+ * 
+ * @author Karthik Kalletla
  * 
  */
 public class GetTumorVsNormalDataJSON extends HttpServlet {

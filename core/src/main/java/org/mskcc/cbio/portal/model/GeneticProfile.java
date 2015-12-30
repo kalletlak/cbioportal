@@ -47,7 +47,7 @@ public class GeneticProfile {
     private String profileDescription;
     private String targetLine;
     private boolean showProfileInAnalysisTab;
-    private int normalTissueMappingID;
+    private int normalTissueMappingID = -1;// required for tumor vs normal comparison plot
 
     public GeneticProfile() {
       super();

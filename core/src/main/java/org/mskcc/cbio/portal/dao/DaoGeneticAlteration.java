@@ -199,6 +199,8 @@ public class DaoGeneticAlteration {
                 HashMap<Integer, String> mapSampleValue = new HashMap<Integer, String>();
                 long entrez = rs.getLong("ENTREZ_GENE_ID");
                 String values = rs.getString("VALUES");
+                /*added .trim() to avoid error when using application in windows OS
+                (Since in windows ',\n' at end is considered as another value) */
                 String valueParts[] = values.trim().split(DELIM);
                 for (int i=0; i<valueParts.length; i++) {
                     String value = valueParts[i];
