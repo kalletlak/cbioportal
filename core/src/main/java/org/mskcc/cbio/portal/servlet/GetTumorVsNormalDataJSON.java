@@ -19,6 +19,7 @@ package org.mskcc.cbio.portal.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -300,6 +301,10 @@ public class GetTumorVsNormalDataJSON extends HttpServlet {
 			e.printStackTrace();
 			finalResultObject = new JSONObject();
 			LOGGER.error("Caught DaoException: " + e.getMessage());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			finalResultObject = new JSONObject();
+			LOGGER.error("Caught SQLException: " + e.getMessage());
 		}
 		httpServletResponse.setContentType("application/json");
 		PrintWriter out = httpServletResponse.getWriter();

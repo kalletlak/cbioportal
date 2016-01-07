@@ -20,6 +20,7 @@ package org.mskcc.cbio.portal.scripts;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +48,6 @@ public class ImportTumorVsNrmlData {
 		try {
 
 			MySQLbulkLoader.bulkLoadOn();
-			String tableName = "normals_sample_data";
 			String headerLine = br.readLine();
 			String parts[] = headerLine.split("\t");
 			int lenParts = parts.length;
@@ -108,8 +108,7 @@ public class ImportTumorVsNrmlData {
 										+ "and all tab-delimited data associated with it!");
 							} else
 								for (CanonicalGene gene1 : genes) {
-									daoTumorVsNormal.addNormalDatum(tableName,
-											mappingID, gene1, values);
+									daoTumorVsNormal.addNormalDatum(mappingID, gene1, values);
 								}
 						}
 					}
@@ -124,6 +123,8 @@ public class ImportTumorVsNrmlData {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}catch(SQLException e){
+			e.printStackTrace();
 		}
 		return 0;
 	}
@@ -131,7 +132,6 @@ public class ImportTumorVsNrmlData {
 	public void importNormalSampleMapping(BufferedReader br1, int mappingID,
 			ProgressMonitor pMonitor) throws IOException, DaoException {
 		MySQLbulkLoader.bulkLoadOn();
-		String tableName = "normals_sample_mapping";
 		pMonitor.setCurrentMessage("Imorting Normal Samples Mapping data");
 		String line = br1.readLine();
 		DaoTumorVsNormal daoTumorVsNormal = DaoTumorVsNormal.getInstance();
@@ -139,7 +139,7 @@ public class ImportTumorVsNrmlData {
 			String parts[] = line.split(":");
 			String tissue = parts[0];
 			String samples[] = parts[1].trim().split("\t", -1);
-			daoTumorVsNormal.addNormalSampleMapingDatum(tableName, mappingID,
+			daoTumorVsNormal.addNormalSampleMapingDatum(mappingID,
 					tissue, samples);
 			line = br1.readLine();
 		}

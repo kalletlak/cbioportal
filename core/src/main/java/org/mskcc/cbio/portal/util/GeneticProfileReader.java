@@ -155,9 +155,10 @@ public class GeneticProfileReader {
       if(normalMappingSet != null){
     	  try {
     		  //check if the normal dataset is present, else throw IllegalArgumentException
-			boolean isNormalDatasetPresent = DaoTumorVsNormal.isTechnologyPresent(normalMappingSet.toLowerCase());
+    		  DaoTumorVsNormal daoTumorVsNormal= DaoTumorVsNormal.getInstance();
+			boolean isNormalDatasetPresent = daoTumorVsNormal.isTechnologyPresent(normalMappingSet.toLowerCase());
 			if(isNormalDatasetPresent){
-				normalMappingID = DaoTumorVsNormal.getNormalMappingID(normalMappingSet.toLowerCase());
+				normalMappingID = daoTumorVsNormal.getNormalMappingID(normalMappingSet.toLowerCase());
 			}else{
 				  throw new IllegalArgumentException("Normal Mapping dataste not found : "+normalMappingSet);
 			}

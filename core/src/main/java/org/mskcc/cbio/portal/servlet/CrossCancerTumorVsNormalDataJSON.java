@@ -19,6 +19,7 @@ package org.mskcc.cbio.portal.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -380,6 +381,8 @@ public class CrossCancerTumorVsNormalDataJSON extends HttpServlet {
 		} catch (DaoException e) {
 			throw new ServletException(e);
 		} catch (ProtocolException e) {
+			throw new ServletException(e);
+		} catch (SQLException e) {
 			throw new ServletException(e);
 		} finally {
 			writer.close();

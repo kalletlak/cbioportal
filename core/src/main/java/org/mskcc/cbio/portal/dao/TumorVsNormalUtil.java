@@ -17,6 +17,7 @@
 
 package org.mskcc.cbio.portal.dao;
 
+import java.sql.SQLException;
 import java.util.TreeMap;
 
 /**
@@ -41,9 +42,10 @@ public class TumorVsNormalUtil {
 	 * @param geneid
 	 * @param technology
 	 * @return TreeMap
+	 * @throws SQLException 
 	 */
 	public static TreeMap<String, TreeMap<String, TreeMap<String, String>>> getNormals(
-			String geneid, int technology) {
+			String geneid, int technology) throws SQLException {
 		TreeMap<String, TreeMap<String, TreeMap<String, String>>> normalSamplesMap = daoTumorVsNormal
 				.getNormalsByCancerStudyAndGeneId(geneid, technology);
 		return normalSamplesMap;

@@ -55,9 +55,10 @@ public class DaoTumorVsNormal {
 	 * @param String
 	 *            technology
 	 * @return TreeMap<String, TreeMap<String, TreeMap<String, String>>>
+	 * @throws SQLException 
 	 */
 	public TreeMap<String, TreeMap<String, TreeMap<String, String>>> getNormalsByCancerStudyAndGeneId(
-			String geneid, int technology) {
+			String geneid, int technology) throws SQLException {
 		TreeMap<String, TreeMap<String, String>> normalsMap = new TreeMap<String, TreeMap<String, String>>();
 		TreeMap<String, TreeMap<String, TreeMap<String, String>>> normalsFinalMap = new TreeMap<String, TreeMap<String, TreeMap<String, String>>>();
 
@@ -118,6 +119,7 @@ public class DaoTumorVsNormal {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
 			JdbcUtil.closeAll(DaoTumorVsNormal.class, con, pstmt, rs);
 		}
@@ -129,9 +131,10 @@ public class DaoTumorVsNormal {
 	 * 
 	 * @param technology
 	 * @return LinkedHashMap<String, String>
+	 * @throws SQLException 
 	 */
 	private LinkedHashMap<String, String> getNormalTissueSampleMap(
-			int technology) {
+			int technology) throws SQLException {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -148,6 +151,7 @@ public class DaoTumorVsNormal {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
 			JdbcUtil.closeAll(DaoTumorVsNormal.class, con, pstmt, rs);
 		}
@@ -178,9 +182,10 @@ public class DaoTumorVsNormal {
 	 * 
 	 * @param substring
 	 * @return int
+	 * @throws SQLException 
 	 */
 
-	public static int getNormalMappingID(String technology) {
+	public int getNormalMappingID(String technology) throws SQLException {
 		int mappingID = -1;
 		PreparedStatement pstmt = null;
 		Connection con = null;
@@ -200,6 +205,7 @@ public class DaoTumorVsNormal {
 			con.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
 			JdbcUtil.closeAll(DaoTumorVsNormal.class, con, pstmt, rs);
 		}
@@ -207,7 +213,7 @@ public class DaoTumorVsNormal {
 		return mappingID;
 	}
 
-	public int deleteNrmlDataWithTechnology(String technology) {
+	public int deleteNrmlDataWithTechnology(String technology) throws SQLException {
 		PreparedStatement pstmt = null;
 		Connection con = null;
 		ResultSet rs = null;
@@ -234,37 +240,11 @@ public class DaoTumorVsNormal {
 			pstmt.close();
 			con.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw e;
 		} finally {
 			JdbcUtil.closeAll(DaoTumorVsNormal.class, con, pstmt, rs);
 		}
 		return mappingID;
-
-	}
-
-	/**
-	 * This method inserts normal data into the database
-	 * 
-	 * @param String
-	 *            tableName
-	 * @param String
-	 *            geneSymbol
-	 * @param String
-	 *            stableID
-	 * @param String
-	 *            value
-	 * @param String
-	 *            differentiator
-	 * @param String
-	 *            technology
-	 */
-	public void addNormalDatum(String tableName, String geneSymbol,
-			String stableID, String value, String differentiator,
-			String technology) {
-		if (MySQLbulkLoader.isBulkLoad()) {
-			MySQLbulkLoader.getMySQLbulkLoader(tableName).insertRecord(
-					geneSymbol, stableID, value, differentiator, technology);
-		}
 
 	}
 
@@ -276,7 +256,7 @@ public class DaoTumorVsNormal {
 	 * @return boolean
 	 * @throws SQLException
 	 */
-	public static boolean isTechnologyPresent(String technologyName)
+	public boolean isTechnologyPresent(String technologyName)
 			throws SQLException {
 		PreparedStatement pstmt = null;
 		Connection con = null;
@@ -326,7 +306,7 @@ public class DaoTumorVsNormal {
 	 * @param gene
 	 * @param values
 	 */
-	public void addNormalDatum(String tableName, int mappingID,
+	public void addNormalDatum(int mappingID,
 			CanonicalGene gene, String[] values) {
 		StringBuffer valueBuffer = new StringBuffer();
 		for (String value : values) {
@@ -338,7 +318,7 @@ public class DaoTumorVsNormal {
 			valueBuffer.append(value).append(DELIM);
 		}
 		if (MySQLbulkLoader.isBulkLoad()) {
-			MySQLbulkLoader.getMySQLbulkLoader(tableName).insertRecord(
+			MySQLbulkLoader.getMySQLbulkLoader("normals_sample_data").insertRecord(
 					String.valueOf(mappingID), gene.getHugoGeneSymbolAllCaps(),
 					valueBuffer.toString());
 		}
@@ -353,14 +333,14 @@ public class DaoTumorVsNormal {
 	 * @param tissueName
 	 * @param sampleIds
 	 */
-	public void addNormalSampleMapingDatum(String tableName, int mappingID,
+	public void addNormalSampleMapingDatum(int mappingID,
 			String tissueName, String[] sampleIds) {
 		StringBuffer valueBuffer = new StringBuffer();
 		for (String value : sampleIds) {
 			valueBuffer.append(value).append(DELIM);
 		}
 		if (MySQLbulkLoader.isBulkLoad()) {
-			MySQLbulkLoader.getMySQLbulkLoader(tableName).insertRecord(
+			MySQLbulkLoader.getMySQLbulkLoader("normals_sample_mapping").insertRecord(
 					"DEFAULT", String.valueOf(mappingID), tissueName,
 					valueBuffer.toString());
 		}
@@ -372,8 +352,9 @@ public class DaoTumorVsNormal {
 	 * @param technologyName
 	 * @param sampleIds
 	 * @return int
+	 * @throws SQLException 
 	 */
-	public int insertNormalSampleList(String technologyName, String[] sampleIds) {
+	public int insertNormalSampleList(String technologyName, String[] sampleIds) throws SQLException {
 		PreparedStatement pstmt = null;
 		Connection con = null;
 		ResultSet rs = null;
@@ -405,8 +386,7 @@ public class DaoTumorVsNormal {
 			con.close();
 			return mappingID;
 		} catch (SQLException e) {
-			e.printStackTrace();
-			return mappingID;
+			throw e;
 		} finally {
 			JdbcUtil.closeAll(DaoTumorVsNormal.class, con, pstmt, rs);
 		}
