@@ -1,6 +1,6 @@
 var tvnBoxPlot = (function() {
 	var maxY = 0;
-	var minY = 0;
+	var minY = 0.1;
 	var singleBoxData = {
 		x : 0,
 		low : 0,
@@ -135,12 +135,13 @@ var tvnBoxPlot = (function() {
 
 	function initialize(isCrossCancer, dataSet, geneName, zScoreCheck,
 			thresholdValue) {
-		maxY = 0;
-		minY = 0;
+		
 		$
 				.each(
 						dataSet,
 						function(key, val) {
+							maxY = 0;
+							minY = 0.1;
 							if (isCrossCancer)
 								checkBoxes[geneName + '-' + key] = val['SHOW_ZSCORE_CHECKBOX'];
 							var _boxPlotSeriesData = [];

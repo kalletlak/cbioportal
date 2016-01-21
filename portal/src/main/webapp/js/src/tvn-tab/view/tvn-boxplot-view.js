@@ -458,8 +458,8 @@ var boxPlot = (function() {
         }
       });
       val = Math.log(chartContainer.yAxis[0].plotLinesAndBands[0].options.value) / Math.log(2);
-	  chartContainer.yAxis[0].setTitle({ text: chartContainer.options.yAxis[0].title.text + ' (log2)' },false);
-	  chartContainer.yAxis[0].setExtremes(Math.log(chartContainer.yAxis[0].getExtremes().dataMin+0.1) / Math.log(2),Math.log(chartContainer.yAxis[0].getExtremes().dataMax) / Math.log(2),false);
+      chartContainer.yAxis[0].setTitle({ text: chartContainer.options.yAxis[0].title.text + ' (log2)' },false);
+      chartContainer.yAxis[0].setExtremes(Math.log(chartContainer.yAxis[0].options.min) / Math.log(2),Math.log(chartContainer.yAxis[0].options.max) / Math.log(2),false);
     } else {
       $.each(chartContainer.series, function(key, val) {
         if (val.type == 'boxplot') {
@@ -479,10 +479,10 @@ var boxPlot = (function() {
         }
       });
       val = Math.pow(2, chartContainer.yAxis[0].plotLinesAndBands[0].options.value);
-	  var yTitle = chartContainer.options.yAxis[0].title.text;
-	  yTitle = yTitle.substring(0,yTitle.indexOf(" (log2)"));
-       chartContainer.yAxis[0].setTitle({ text: yTitle},false);
-	   chartContainer.yAxis[0].setExtremes(Math.pow(2, chartContainer.yAxis[0].getExtremes().dataMin),Math.pow(2, chartContainer.yAxis[0].getExtremes().dataMax),false);
+      var yTitle = chartContainer.options.yAxis[0].title.text;
+      yTitle = yTitle.substring(0,yTitle.indexOf(" (log2)"));
+      chartContainer.yAxis[0].setTitle({ text: yTitle},false);
+      chartContainer.yAxis[0].setExtremes(chartContainer.yAxis[0].options.min,chartContainer.yAxis[0].options.max,false);
     }
     addPlotLine(val);
     chartContainer.redraw();
