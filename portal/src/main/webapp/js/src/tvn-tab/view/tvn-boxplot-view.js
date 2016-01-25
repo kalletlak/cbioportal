@@ -1,5 +1,6 @@
 var boxPlot = (function() {
   var significanceValues = [];
+  var visible = 0;
   var categoryNames = [];
   var chartContainer = "";
   var cutofflabel = "";
@@ -24,8 +25,8 @@ var boxPlot = (function() {
         H.addEvent(chart, 'click', function(e) {
           var flag = e.target.textContent != "";
           if (!flag) {
-		  chart.showLoading();
-		 
+      chart.showLoading();
+     
           //  var startTime = new Date();
             //chart.showLoading("Loading...");
             var cutoff = e.yAxis[0].value;
@@ -56,6 +57,7 @@ var boxPlot = (function() {
 
   var initializePlot = function(mainTitle, xAxistitle, yAxisTitle, xAxisCategories, isCrossCancer, dataSeries, secondaryAxisTitle,minY,maxY, pValues) {
     categoryNames = xAxisCategories;
+    visible = dataSeries.length/2;
     $('plots_box').html("");
     chartContainer = new Highcharts.Chart({
       chart: {
@@ -150,20 +152,20 @@ var boxPlot = (function() {
           }
         }
       },
-	  lang:{
-      	loading:""
+    lang:{
+        loading:""
       },
       loading: {
-		hideDuration: 0,
+    hideDuration: 0,
         showDuration: 0,
-	  	style: {
-			backgroundImage: "url('images/ajax-loader.gif')",
-			backgroundColor: 'gray',
-			'backgroundRepeat': 'no-repeat',
-			'backgroundPosition': 'center', 
-			opacity: .8
-		 } 
-	  },
+      style: {
+      backgroundImage: "url('images/ajax-loader.gif')",
+      backgroundColor: 'gray',
+      'backgroundRepeat': 'no-repeat',
+      'backgroundPosition': 'center', 
+      opacity: .8
+     } 
+    },
       credits: {
         enabled: false
       },
@@ -179,7 +181,7 @@ var boxPlot = (function() {
         categories: xAxisCategories,
         labels: {
           formatter: function() {
-            return this.value.replace(" ", '<br />');
+            return this.value.toString().replace(" ", '<br />');
           },
           align: 'center',
           autoRotation: false,
@@ -199,8 +201,8 @@ var boxPlot = (function() {
         title: {
           text: yAxisTitle
         },
-		min:minY,
-		max:maxY,
+    min:minY,
+    max:maxY,
         endOnTick: true,
         gridLineWidth: 0,
         plotLines: [{
@@ -223,10 +225,10 @@ var boxPlot = (function() {
         symbolWidth: 0,
         // itemWidth: 80,
         /*itemStyle:{
-					width: '80px',
-					fontSize: '10px',
-					fontFamily: 'Verdana, sans-serif',
-					textOverflow: 'ellipsis'
+          width: '80px',
+          fontSize: '10px',
+          fontFamily: 'Verdana, sans-serif',
+          textOverflow: 'ellipsis'
             }*/
 
       },
@@ -295,16 +297,15 @@ var boxPlot = (function() {
                     return false;
                   }
                 });
-
-                this.chart.xAxis[0].setExtremes(0, null, false);
-              } else {
+                 //this.chart.xAxis[0].setExtremes(0, null,false);
+                visible--;
+               } else {
+                 visible++;
                 $.each(this.chart.series, function(key, val) {
                   if (((val.visible) || (val.xData == location)) && (val.type == 'boxplot')) {
                     categoryNames.push(val.name);
                     tempsignificanceValues.push(significanceValues[key]);
-
-                    if ((val.visible) && (parseInt(val.xData) >= location)) {
-
+                    if ((val.visible) && (parseInt(val.xData) > location)) {
                       val.data[0].update({
                         x: parseInt(val.data[0].x) + 1
                       }, false);
@@ -315,6 +316,20 @@ var boxPlot = (function() {
                         }, false);
                       });
 
+                    }else if (parseInt(val.xData) == location) {
+                      var xVal = parseInt(val.data[0].x);
+                      val.data[0].update({
+                        x: parseInt(categoryNames.length-1)
+                      }, false);
+
+                      $.each(val.linkedSeries[0].data, function(key1, val1) {
+                        var updatedVal = val1.x-xVal;
+                        updatedVal = updatedVal+parseFloat(categoryNames.length-1);
+                        val1.update({
+                          x: updatedVal
+                        }, false);
+                      });
+
                     }
                   } else if ((val.type == 'scatter')) {
                     return false;
@@ -322,8 +337,18 @@ var boxPlot = (function() {
                 });
                 this.setVisible(true, false);
               }
+              if(visible<=8){
+                  this.chart.scroller.scrollbar.hide();
+                  this.chart.scroller.scrollbarGroup.hide();
+                  this.chart.xAxis[0].setExtremes(0,visible-1,false);
+              }else{
+                  this.chart.scroller.scrollbar.show();
+                  this.chart.scroller.scrollbarGroup.show();
+                  this.chart.xAxis[0].setExtremes(0, 8,false);
+              }
               this.chart.xAxis[0].setCategories(categoryNames, false);
               this.chart.xAxis[1].setCategories(tempsignificanceValues, false);
+
               this.chart.redraw();
               this.chart.hideLoading();
              // console.log("execution time : " + ((new Date()).getTime() - startTime));
@@ -486,7 +511,7 @@ var boxPlot = (function() {
     }
     addPlotLine(val);
     chartContainer.redraw();
-	chartContainer.hideLoading();
+    chartContainer.hideLoading();
   };
 
   function thresholdChange(thresholdValue) {
@@ -509,7 +534,7 @@ var boxPlot = (function() {
       }
     });
     chartContainer.redraw();
-	chartContainer.hideLoading();
+    chartContainer.hideLoading();
    // console.log("execution time : " + ((new Date()).getTime() - startTime));
   }
 
