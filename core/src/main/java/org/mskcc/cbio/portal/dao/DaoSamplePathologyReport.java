@@ -39,7 +39,7 @@ public class DaoSamplePathologyReport {
 		ResultSet rs = null;
 		Map<String, String> samplesReportMap = new HashMap<String, String>();
 		try {
-			con = JdbcUtil.getDbConnection(DaoSample.class);
+			con = JdbcUtil.getDbConnection(DaoSamplePathologyReport.class);
 			pstmt = con
 					.prepareStatement("SELECT * FROM sample_pathology_report");
 			rs = pstmt.executeQuery();
@@ -50,7 +50,7 @@ public class DaoSamplePathologyReport {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			JdbcUtil.closeAll(DaoSample.class, con, pstmt, rs);
+			JdbcUtil.closeAll(DaoSamplePathologyReport.class, con, pstmt, rs);
 		}
 		return samplesReportMap;
 	}
