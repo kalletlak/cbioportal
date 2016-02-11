@@ -162,6 +162,14 @@
                       <IMG alt="Google+" src="images/login/googleplus_signin.png"  />
                     </button>
                   </p>
+                  <form name='loginForm' action="<c:url value='/j_security_check_for_employee'/>" method="post">
+					<table>
+						<tr>
+          					<td><input name="submit" type="submit" value="submit" /></td>
+        				</tr>
+      				</table>
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+				  </form>
                 </fieldset>
 
                 <% } else if (authenticationMethod.equals("ad")){ %>

@@ -67,6 +67,7 @@
 
         <!-- used for google+ authentication (spring social) -->
         <custom-filter ref="socialAuthenticationFilter" before="PRE_AUTH_FILTER" />
+        <custom-filter ref="guestUserAuthenticationFilter" before="FORM_LOGIN_FILTER" />
 
         <!--  logout actions -->      
         <logout logout-success-url="/login.jsp?logout_success=true" delete-cookies="JSESSIONID"/>
@@ -88,11 +89,27 @@
         <b:property name="defaultFailureUrl" value="/login.jsp?login_error=true" />
         <b:property name="postLoginUrl" value="/index.do" />
     </b:bean>
+    
+    <b:bean id="guestUserAuthenticationFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+    	<b:property name="authenticationManager" ref="authenticationManager"/>
+    	<b:property name="filterProcessesUrl" value="/j_security_check_for_employee"/>
+    	<b:property name="authenticationSuccessHandler">
+        	<b:bean class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+            	<b:property name="defaultTargetUrl" value="/index.do" />
+        	</b:bean>
+   		</b:property>
+    	<b:property name="authenticationFailureHandler">
+        	<b:bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+            	<b:property name="defaultFailureUrl" value="/login.jsp?login_error=true" />
+        	</b:bean>
+    	</b:property>
+	</b:bean>
 
     <authentication-manager alias="authenticationManager">
         <authentication-provider user-service-ref="userDetailsService">
         </authentication-provider>
         <authentication-provider ref="socialAuthenticationProvider"/>
+        <authentication-provider ref="guestUserAuthenticationProvider"/>
     </authentication-manager>
     
     <!-- beans used to compare token returned by authentication-provider against portal user db tables -->
@@ -104,6 +121,10 @@
     <b:bean id="socialAuthenticationProvider" class="org.springframework.social.security.SocialAuthenticationProvider">
         <b:constructor-arg index="0" ref="usersConnectionRepository" />
         <b:constructor-arg index="1" ref="socialUserDetailsService" />
+    </b:bean>
+    
+    <b:bean id="guestUserAuthenticationProvider" class="org.mskcc.cbio.portal.authentication.guestuser.GuestUserAuthenticationProvider">
+        <b:constructor-arg ref="portalUserDAO"/>
     </b:bean>
     
     <b:bean id="socialUserDetailsService" class="org.mskcc.cbio.portal.authentication.googleplus.GoogleplusUserDetailsService">
