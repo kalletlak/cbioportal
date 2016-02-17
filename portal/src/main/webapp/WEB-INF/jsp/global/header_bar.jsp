@@ -45,7 +45,6 @@
 	String tagLineImage = (authenticationMethod.equals("saml")) ?
 		"/" + GlobalProperties.getTagLineImage() : GlobalProperties.getTagLineImage();
 	pageContext.setAttribute("tagLineImage", tagLineImage);
-
     // retrieve right-logo from global properties. Based on the tagLineImage code.
     String rightLogo = (authenticationMethod.equals("saml")) ?
             "/" + GlobalProperties.getRightLogo() : GlobalProperties.getRightLogo();

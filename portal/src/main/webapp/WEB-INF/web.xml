@@ -593,5 +593,41 @@
         <url-pattern>/oranalysis.do</url-pattern>
     </servlet-mapping>
     
-
+   <!-- START newly added -->
+ 	<servlet>
+        <servlet-name>GetTumorVsNormalDataJSON</servlet-name>
+        <servlet-class>org.mskcc.cbio.portal.servlet.GetTumorVsNormalDataJSON</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetTumorVsNormalDataJSON</servlet-name>
+        <url-pattern>/getTumorVsNormalData.json</url-pattern>
+    </servlet-mapping>
+     <servlet>
+        <servlet-name>SamplesSession</servlet-name>
+        <servlet-class>org.mskcc.cbio.portal.servlet.SamplesSessionJSON</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SamplesSession</servlet-name>
+        <url-pattern>/sessionSamples.json</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+        <servlet-name>CrossCancerTumorVsNormalDataJSON</servlet-name>
+        <servlet-class>org.mskcc.cbio.portal.servlet.CrossCancerTumorVsNormalDataJSON</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CrossCancerTumorVsNormalDataJSON</servlet-name>
+        <url-pattern>/crossCancerTVNData.json</url-pattern>
+    </servlet-mapping>
+    
+        <servlet>
+        <servlet-name>hasTVNData</servlet-name>
+        <servlet-class>org.mskcc.cbio.portal.servlet.HasTVNData</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>hasTVNData</servlet-name>
+        <url-pattern>/hasTVNData.json</url-pattern>
+    </servlet-mapping>
+	<!-- END newly added -->
+	
 </web-app>

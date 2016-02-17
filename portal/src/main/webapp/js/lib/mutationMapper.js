@@ -12408,7 +12408,11 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 				vars.caseId = caseIdFormat.text;
 				vars.caseIdClass = caseIdFormat.style;
 				vars.caseIdTip = caseIdFormat.tip;
-
+				if((window.PortalGlobals!=null)&&(window.PortalGlobals.isLinktoharvest()=='true')){
+					vars.buttonDisplay = 'block';
+				}else{
+					vars.buttonDisplay = 'none';
+				}
 				var templateFn = BackboneTemplateCache.getTemplateFn("mutation_table_case_id_template");
 				return templateFn(vars);
 			},
@@ -12817,6 +12821,15 @@ function MutationDetailsTable(options, gene, mutationUtil, dataProxies)
 					}
 				});
 			},
+			"caseId":function(dataTable, dispatcher, mutationUtil, gene) {
+				$(dataTable).find('.btn2').off("click").on("click", function(evt) {
+						var sampleId = $(this).parent().find('a').text();
+						cbio.util.addSampleToSession($.trim(sampleId))
+						$(this).attr('title','');
+						$(this).addClass('disable-add-sample');
+						$(this).prop("disabled",true);
+					});
+				},
 			"igvLink": function(dataTable, dispatcher, mutationUtil, gene) {
 				// add click listener for each igv link to get the actual parameters
 				// from another servlet

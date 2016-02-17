@@ -129,5 +129,12 @@
         show: {event: "mouseover"},
         hide: {fixed:true, delay: 100, event: "mouseout"},
         position: {my:'left bottom',at:'top right',viewport: $(window)}
-    })
+    });
+	var addSampletoSession = function(evt) {
+		var sampleId = $(evt).parent().find('a').text();
+		cbio.util.addSampleToSession($.trim(sampleId));
+		$(evt).attr('title', '');
+		$(evt).addClass('disable-add-sample');
+		$(evt).prop("disabled", true);
+	};
 </script>

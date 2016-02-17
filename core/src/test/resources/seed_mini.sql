@@ -72,8 +72,8 @@ INSERT INTO "type_of_cancer" ("TYPE_OF_CANCER_ID","NAME","CLINICAL_TRIAL_KEYWORD
 INSERT INTO "type_of_cancer" ("TYPE_OF_CANCER_ID","NAME","CLINICAL_TRIAL_KEYWORDS","DEDICATED_COLOR","SHORT_NAME","PARENT") VALUES ('brca','Breast Invasive Carcinoma','breast,breast invasive','HotPink','Breast','tissue');
 
 -- cancer_study
-INSERT INTO "cancer_study" ("CANCER_STUDY_ID", "CANCER_STUDY_IDENTIFIER", "TYPE_OF_CANCER_ID", "NAME", "SHORT_NAME", "DESCRIPTION", "PUBLIC", "PMID", "CITATION", "GROUPS") 
-VALUES (1,'study_tcga_pub','brca','Breast Invasive Carcinoma (TCGA, Nature 2012)','BRCA (TCGA)','<a href=\"http://cancergenome.nih.gov/\">The Cancer Genome Atlas (TCGA)</a> Breast Invasive Carcinoma project. 825 cases.<br><i>Nature 2012.</i> <a href=\"http://tcga-data.nci.nih.gov/tcga/\">Raw data via the TCGA Data Portal</a>.',1,'23000897','TCGA, Nature 2012','SU2C-PI3K;PUBLIC;GDAC');
+INSERT INTO "cancer_study" ("CANCER_STUDY_ID", "CANCER_STUDY_IDENTIFIER", "TYPE_OF_CANCER_ID", "NAME", "SHORT_NAME", "DESCRIPTION", "PUBLIC", "PMID", "CITATION", "GROUPS","LINK_TO_HARVEST","NORMALS_TISSUE_MAPPING") 
+VALUES (1,'study_tcga_pub','brca','Breast Invasive Carcinoma (TCGA, Nature 2012)','BRCA (TCGA)','<a href=\"http://cancergenome.nih.gov/\">The Cancer Genome Atlas (TCGA)</a> Breast Invasive Carcinoma project. 825 cases.<br><i>Nature 2012.</i> <a href=\"http://tcga-data.nci.nih.gov/tcga/\">Raw data via the TCGA Data Portal</a>.',1,'23000897','TCGA, Nature 2012','SU2C-PI3K;PUBLIC;GDAC',false,true);
 
 -- gene
 INSERT INTO "gene" ("ENTREZ_GENE_ID","HUGO_GENE_SYMBOL","TYPE","CYTOBAND","LENGTH") VALUES (207,'AKT1','protein-coding','14q32.32',10838);

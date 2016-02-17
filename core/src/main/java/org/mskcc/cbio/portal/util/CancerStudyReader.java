@@ -92,17 +92,33 @@ public class CancerStudyReader {
         if ( typeOfCancer == null) {
             throw new IllegalArgumentException("type of cancer is not specified.");
         }
-        
+      
         String shortName = properties.getProperty("short_name");
         if ( typeOfCancer == null) {
+        	  //TODO: dead code
             throw new IllegalArgumentException("short_name is not specified.");
         }
 
+        //check if there is link to biorepository
+        String harvestLink = properties.getProperty("link_to_harvest");
+        boolean linkToHarvest = false;
+        if(harvestLink != null &&(harvestLink.equalsIgnoreCase("TRUE")) && (GlobalProperties.getHarvestUrl()!=null)){
+     	   linkToHarvest = true;
+        }
+      //check if it has tumor vs normal comparison plot
+        String TVNData = properties.getProperty("has_tvn_data");
+        boolean hasTVNData = false;
+        if(TVNData != null &&(TVNData.equalsIgnoreCase("TRUE"))){
+     	   hasTVNData = true;
+        }
+        
         CancerStudy cancerStudy = new CancerStudy(name, description, cancerStudyIdentifier,
                                                   typeOfCancer, publicStudy(properties));
         cancerStudy.setPmid(properties.getProperty("pmid"));
         cancerStudy.setCitation(properties.getProperty("citation"));
         cancerStudy.setGroups(properties.getProperty("groups"));
+        cancerStudy.setLinkToHarvest(linkToHarvest);
+        cancerStudy.setNormalsMapping(hasTVNData);
         cancerStudy.setShortName(shortName);
 
         return cancerStudy;

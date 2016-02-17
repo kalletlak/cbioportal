@@ -197,6 +197,7 @@ if (cancerStudyViewError!=null) {
 
 <script type="text/javascript">
 var cancerStudyId = '<%=cancerStudy.getCancerStudyStableId()%>';
+var linkToHarvest = '<%=cancerStudy.isLinkToHarvest()%>';
 var cancerStudyName = '<%=StringEscapeUtils.escapeJavaScript(cancerStudy.getName())%>';
 var mutationProfileId = <%=mutationProfileStableId==null%>?null:'<%=mutationProfileStableId%>';
 var cnaProfileId = <%=cnaProfileStableId==null%>?null:'<%=cnaProfileStableId%>';

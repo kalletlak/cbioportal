@@ -121,20 +121,27 @@
             template: _.template($("#cross-cancer-main-tmpl").html()),
 
             render: function() {
-                this.$el.html(this.template(this.model));
+			var _this = this;
+			var tvnData={
+				cancer_study_list : _this.model.study_list
+			};
+			$.getJSON("hasTVNData.json", tvnData).done(function( response ) {
+				
+				var disp = response['HAS_TVN_DATA']?'inline':'none';
+                _this.$el.html(_this.template($.extend({}, _this.model, {"has_trmVsnrml_view": disp})));
 
-                $("#tabs").tabs({ active: this.model.tab == "mutation" ? 1 : 0 }).show();
+                $("#tabs").tabs({ active: _this.model.tab == "mutation" ? 1 : 0 }).show();
 
-                var priority = this.model.priority;
+                var priority = _this.model.priority;
                 if(priority == 2) {
                     $("#cc-mutations-link").parent().hide();
                 } else {
                     $("#cc-mutations-link").parent().show();
                 }
 
-                var genes = this.model.genes;
-                var orgQuery = this.model.genes;
-		var study_list = this.model.study_list;
+                var genes = _this.model.genes;
+                var orgQuery = _this.model.genes;
+		var study_list = _this.model.study_list;
 
                 var studies = new Studies({
                     gene_list: genes,
@@ -1184,12 +1191,32 @@
 
                             // end of mutation details
                             window.crossCancerMutationProxy = proxy;
+                            //START cross cancer tvn plot
+							var tmrvsnrml_tab_init = false;
+							$(tabs).bind("tabsactivate", function(event, ui) {
+								if (ui.newTab.text().trim().toLowerCase() === "tumor vs normals") {
+									if (tmrvsnrml_tab_init === false) {
+										angular.element(document).ready(function() {
+											angular.bootstrap(document, ['menu']);
+										});
+										var scope = angular.element($("#tvn-spec")).scope();
+										scope.$apply(function () {
+											scope.crossCancerData(true,genes,study_list);
+										});
+										tmrvsnrml_tab_init = true;
+									} else {
+										$(window).trigger("resize");
+									}
+								}
+							});
+							//END cross cancer tvn plot
                         });
                     },
 		    type: 'POST',
 		    data: {gene_list: genes, data_priority:priority, cancer_study_list:study_list}
                 }); // Done with the histogram
 
+		});
                 $("#customize-controls .close-customize a").click(function(e) {
                     e.preventDefault();
                     $("#customize-controls").slideToggle();

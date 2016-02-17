@@ -44,6 +44,7 @@ var DataTable = function() {
         tableId,
         tableContainerId,
         dataType = [],
+        isLinkToharvest = false,
         dataTableNumericFilter = [],
         permenentDisabledId = [], //Define which column is perment diabled
 
@@ -68,7 +69,7 @@ var DataTable = function() {
         tableContainerId = _tableContainerId;
         attr = _data.attr;
         arr = _data.arr;
-        
+        isLinkToharvest = _data.isLinkToharvest;        
         attrLength = attr.length;
         arrLength = arr.length;
         
@@ -229,7 +230,9 @@ var DataTable = function() {
                     _specialChar = ['(',')','/','?','+'];
 
                 if ( _attrId === 'CASE_ID'){
-                    _tmpValue = "<a href='case.do?sample_id=" + 
+                	if(isLinkToharvest)
+                    	_tmpValue+= "<input class='btn2' style='display: block; float: left;' type='image' src='images/details_open.png' alt='Add to Bucket' title='Add to Bucket' >";
+                    _tmpValue += "<a href='case.do?sample_id=" + 
                     _value['CASE_ID'] + "&cancer_study_id=" +
                     StudyViewParams.params.studyId + "' target='_blank'><span style='color: #2986e2'>" + 
                     _value['CASE_ID'] + "</span></a></strong>";
@@ -383,6 +386,12 @@ var DataTable = function() {
                 .prop('disabled',true);
          
         });
+        $('.DTFC_LeftWrapper, .dataTables_scrollBody').delegate(".btn2",'click',function(){
+			cbio.util.addSampleToSession($(this).parent().find('span').text());
+			$(this).prop("disabled",true);
+			$(this).addClass('disable-add-sample');
+			$(this).attr('title','');
+		});
         
         $(".dataTableReset")
             .append("<a><span class='hidden' title='Reset Chart'>RESET</span></a>");

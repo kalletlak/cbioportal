@@ -40,7 +40,8 @@ $(document).ready(function(){
         cnaProfileId: cnaProfileId,
         mutationProfileId: mutationProfileId,
         caseSetId: caseSetId,
-        hasMutSig: hasMutSig
+        hasMutSig: hasMutSig,
+		linkToHarvest: linkToHarvest
     };
     
     var loadingJSCallBackFunc = function(){

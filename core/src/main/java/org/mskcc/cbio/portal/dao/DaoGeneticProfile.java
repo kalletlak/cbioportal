@@ -93,11 +93,11 @@ public final class DaoGeneticProfile {
         int rows = 0;
         try {
             con = JdbcUtil.getDbConnection(DaoGeneticProfile.class);
-
+            //Added new column NORMALS_MAPPING_ID which would be used in tumor vs normal visualization
             pstmt = con.prepareStatement
                     ("INSERT INTO genetic_profile (`STABLE_ID`, `CANCER_STUDY_ID`, `GENETIC_ALTERATION_TYPE`," +
-                            "`DATATYPE`, `NAME`, `DESCRIPTION`, `SHOW_PROFILE_IN_ANALYSIS_TAB`) " +
-                            "VALUES (?,?,?,?,?,?,?)");
+                            "`DATATYPE`, `NAME`, `DESCRIPTION`, `SHOW_PROFILE_IN_ANALYSIS_TAB`, `NORMALS_MAPPING_ID`) " +
+                            "VALUES (?,?,?,?,?,?,?,?)");
             pstmt.setString(1, profile.getStableId());
             pstmt.setInt(2, profile.getCancerStudyId());
             pstmt.setString(3, profile.getGeneticAlterationType().toString());
@@ -105,6 +105,7 @@ public final class DaoGeneticProfile {
             pstmt.setString(5, profile.getProfileName());
             pstmt.setString(6, profile.getProfileDescription());
             pstmt.setBoolean(7, profile.showProfileInAnalysisTab());
+            pstmt.setInt(8, profile.getNormalTissueMappingID());
             rows = pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DaoException(e);
@@ -213,6 +214,13 @@ public final class DaoGeneticProfile {
                 (GeneticAlterationType.getType(rs.getString("GENETIC_ALTERATION_TYPE")));
 		profileType.setDatatype(rs.getString("DATATYPE"));
         profileType.setGeneticProfileId(rs.getInt("GENETIC_PROFILE_ID"));
+        try{
+        	profileType.setNormalTissueMappingID(rs.getInt("NORMALS_MAPPING_ID"));
+        }catch(SQLException exception){
+        	//TODO: When NORMALS_MAPPING_ID not found
+        }
+   
+      
         return profileType;
     }
 
@@ -242,5 +250,30 @@ public final class DaoGeneticProfile {
         } finally {
             JdbcUtil.closeAll(DaoGeneticProfile.class, con, pstmt, rs);
         }
+    }
+    /**
+     * Method to update NORMALS_MAPPING_ID column value in genetic_profile table when normal dataset is reloaded
+     * @param oldMappingID
+     * @param newmappingID
+     * @throws DaoException
+     */
+	public static void updateGeneticPorfileMappingIDs(int oldMappingID,
+			int newmappingID) throws DaoException {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            con = JdbcUtil.getDbConnection(DaoGeneticProfile.class);
+            pstmt = con.prepareStatement("UPDATE genetic_profile SET NORMALS_MAPPING_ID=? WHERE NORMALS_MAPPING_ID=?");
+            pstmt.setInt(1, newmappingID);
+            pstmt.setInt(2, oldMappingID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            JdbcUtil.closeAll(DaoGeneticProfile.class, con, pstmt, rs);
+        }
+        
+        reCache();
     }
 }

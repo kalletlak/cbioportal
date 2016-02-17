@@ -86,6 +86,7 @@ public class PortalMetaDataJSON extends HttpServlet {
         ret.put("name", cancerStudy.getName());
         ret.put("type_of_cancer", cancerStudy.getTypeOfCancerId());
         ret.put("description", cancerStudy.getDescription());
+        ret.put("is_adult_cancer", cancerStudy.isAdultCancer());
 	ArrayList<PatientList> caseSets = GetPatientLists.getPatientLists(cancerStudy.getCancerStudyStableId());
 	int numSamples = 0;
 	for (PatientList pl: caseSets) {

@@ -54,6 +54,10 @@ drop table IF EXISTS entity_link;
 drop table IF EXISTS entity;
 drop table IF EXISTS cancer_study;
 drop table IF EXISTS type_of_cancer;
+
+drop table IF EXISTS normals_sample_list;
+drop table IF EXISTS normals_sample_data;
+drop table IF EXISTS normals_sample_mapping;
 -- --------------------------------------------------------
 
 --
@@ -87,6 +91,8 @@ CREATE TABLE `cancer_study` (
   `GROUPS` varchar(200) DEFAULT NULL,
   `STATUS` int(1) DEFAULT NULL,
   `IMPORT_DATE` datetime DEFAULT NULL,
+  `LINK_TO_HARVEST` tinyint(1) NOT NULL DEFAULT '0',
+  `NORMALS_TISSUE_MAPPING` binary(1) NOT NULL DEFAULT '0',
   PRIMARY KEY  (`CANCER_STUDY_ID`),
   UNIQUE (`CANCER_STUDY_IDENTIFIER`),
   FOREIGN KEY (`TYPE_OF_CANCER_ID`) REFERENCES `type_of_cancer` (`TYPE_OF_CANCER_ID`)
@@ -251,6 +257,7 @@ CREATE TABLE `genetic_profile` (
   `NAME` varchar(255) NOT NULL,
   `DESCRIPTION` mediumtext,
   `SHOW_PROFILE_IN_ANALYSIS_TAB` binary(1) NOT NULL,
+  `NORMALS_MAPPING_ID` int(11) NOT NULL DEFAULT '-1',
   PRIMARY KEY  (`GENETIC_PROFILE_ID`),
   UNIQUE (`STABLE_ID`),
   FOREIGN KEY (`CANCER_STUDY_ID`) REFERENCES `cancer_study` (`CANCER_STUDY_ID`) ON DELETE CASCADE
@@ -755,4 +762,26 @@ CREATE TABLE `clinical_event_data` (
   `KEY` varchar(255) NOT NULL,
   `VALUE` varchar(5000) NOT NULL,
   FOREIGN KEY (`CLINICAL_EVENT_ID`) REFERENCES `clinical_event` (`CLINICAL_EVENT_ID`) ON DELETE CASCADE
+);
+
+CREATE TABLE `normals_sample_data` (
+  `NORMALS_MAPPING_ID` int(11) NOT NULL,
+  `HUGO_GENE_SYMBOL` varchar(255) NOT NULL,
+  `VALUES` longtext NOT NULL,
+  KEY `QUICK_LOOK_UP` (`NORMALS_MAPPING_ID`,`HUGO_GENE_SYMBOL`)
+);
+
+CREATE TABLE `normals_sample_list` (
+  `NORMALS_MAPPING_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `TECHNOLOGY_NAME` varchar(50) NOT NULL,
+  `ORDERED_SAMPLE_LIST` longtext NOT NULL,
+  PRIMARY KEY (`NORMALS_MAPPING_ID`)
+);
+
+CREATE TABLE `normals_sample_mapping` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NORMALS_MAPPING_ID` int(11) NOT NULL,
+  `TISSUE` varchar(255) NOT NULL DEFAULT '',
+  `SAMPLES` longtext NOT NULL,
+  PRIMARY KEY (`ID`)
 );

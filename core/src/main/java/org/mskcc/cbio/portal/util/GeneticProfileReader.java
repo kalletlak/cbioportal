@@ -35,6 +35,7 @@ package org.mskcc.cbio.portal.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import org.mskcc.cbio.portal.dao.*;
@@ -148,6 +149,23 @@ public class GeneticProfileReader {
       if (showProfileInAnalysisTabStr != null && showProfileInAnalysisTabStr.equalsIgnoreCase("FALSE")) {
          showProfileInAnalysisTab = false;
       }
+      //check if the profile is mapped to any normal dataset
+      String normalMappingSet = properties.getProperty("normal_mapping_set");
+      int normalMappingID = -1;
+      if(normalMappingSet != null){
+    	  try {
+    		  //check if the normal dataset is present, else throw IllegalArgumentException
+    		  DaoTumorVsNormal daoTumorVsNormal= DaoTumorVsNormal.getInstance();
+			boolean isNormalDatasetPresent = daoTumorVsNormal.isTechnologyPresent(normalMappingSet.toLowerCase());
+			if(isNormalDatasetPresent){
+				normalMappingID = daoTumorVsNormal.getNormalMappingID(normalMappingSet.toLowerCase());
+			}else{
+				  throw new IllegalArgumentException("Normal Mapping dataste not found : "+normalMappingSet);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+      }
 
       profileDescription = profileDescription.replaceAll("\t", " ");
       GeneticAlterationType alterationType = GeneticAlterationType.getType(geneticAlterationTypeString);
@@ -161,6 +179,7 @@ public class GeneticProfileReader {
 	  geneticProfile.setDatatype(datatype);
       geneticProfile.setShowProfileInAnalysisTab(showProfileInAnalysisTab);
       geneticProfile.setTargetLine(properties.getProperty("target_line"));
+      geneticProfile.setNormalTissueMappingID(normalMappingID);
       return geneticProfile;
    }
 }

@@ -64,6 +64,9 @@ public class CancerStudy {
     private String citation;
     private Set<String> groups;
     private String shortName;
+    private boolean linkToHarvest = false; // required for linking to bio-repository
+    private boolean normalsMapping = false; // required for tumor vs normals comparison plot
+    private boolean isAdultCancer = false;
     
 
     /**
@@ -189,6 +192,28 @@ public class CancerStudy {
     public void setCitation(String citation) {
         this.citation = citation;
     }
+    public boolean isLinkToHarvest() {
+		return linkToHarvest;
+	}
+
+	public void setLinkToHarvest(boolean linkToHarvest) {
+		this.linkToHarvest = linkToHarvest;
+	}
+	public boolean isNormalsMapping() {
+		return normalsMapping;
+	}
+
+	public void setNormalsMapping(boolean normalsMapping) {
+		this.normalsMapping = normalsMapping;
+	}
+	
+    public boolean isAdultCancer() {
+		return isAdultCancer;
+	}
+
+	public void setAdultCancer(boolean isAdultCancer) {
+		this.isAdultCancer = isAdultCancer;
+	}
 
     /**
      * Gets the genetic profiles.
@@ -421,7 +446,7 @@ public class CancerStudy {
     public String toString() {
         return "CancerStudy [studyID=" + studyID + ", name=" + name + ", description="
                 + description + ", cancerStudyIdentifier=" + cancerStudyIdentifier
-                + ", typeOfCancerId=" + typeOfCancerId + ", publicStudy=" + publicStudy + "]";
+                + ", typeOfCancerId=" + typeOfCancerId + ", publicStudy=" + publicStudy + ", isAdultCancer=" + isAdultCancer + "]";
     }
 
     public boolean hasMutSigData() throws DaoException {

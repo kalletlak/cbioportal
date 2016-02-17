@@ -296,10 +296,11 @@
   -->
 
 <script type="text/template" id="mutation_table_case_id_template">
-	<a href='{{linkToPatientView}}' target='_blank'>
+	<a href='{{linkToPatientView}}' target='_blank' style='display: block; float: left; width: 150px'>
 		<b alt="{{caseIdTip}}"
 		   class="{{caseIdClass}}">{{caseId}}</b>
 	</a>
+<input class="btn2" style='display:{{buttonDisplay}};' type="image" title="Add to Bucket" alt="Add to Bucket" src="images/details_open.png">
 </script>
 
 <script type="text/template" id="mutation_table_cancer_study_template">
