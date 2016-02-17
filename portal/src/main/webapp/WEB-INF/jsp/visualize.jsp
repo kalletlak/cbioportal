@@ -163,6 +163,12 @@
             if (showCoexpTab) {
                 out.println ("<li><a href='#coexp' class='result-tab' id='coexp-result-tab'>Co-Expression</a></li>");
             }
+            //START of new changes
+            if (has_trmVsnrml_view) {%>
+            <%    out.println ("<li><a href='#tumor_vs_normals' class='result-tab' title='Tumor vs Normal visualization'>"
+                + "Tumor vs Normals</a></li>");
+            }
+            //END of new changes
             if (has_mrna || has_copy_no || showMutTab) {
                 out.println("<li><a href='#or_analysis' id='enrichments-result-tab' class='result-tab' style='height: 18px;'>Enrichments</a></li>");
             }
@@ -241,6 +247,9 @@
 
         <% if (showCoexpTab) { %>
             <%@ include file="co_expression.jsp" %>
+        <% } %>
+		<%  if (has_trmVsnrml_view) { %>
+           <%@ include file="tvn_tab.jsp" %>
         <% } %>
 
         <% if (has_mrna || has_copy_no || showMutTab) { %>

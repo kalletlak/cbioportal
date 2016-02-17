@@ -35,6 +35,7 @@
 <%@ page import="org.mskcc.cbio.portal.util.GlobalProperties" %>
 <%@ page import="org.mskcc.cbio.portal.util.XssRequestWrapper" %>
 
+<%@ page import="org.mskcc.cbio.portal.util.*" %>
 <%
     String siteTitle = GlobalProperties.getTitle();
     request.setAttribute(QueryBuilder.HTML_TITLE, siteTitle);
@@ -83,22 +84,9 @@
 <link href="css/mutationMapper.min.css?<%=GlobalProperties.getAppVersion()%>" type="text/css" rel="stylesheet" />
 <link href="css/crosscancer.css?<%=GlobalProperties.getAppVersion()%>" type="text/css" rel="stylesheet" />
 
-
-<%
-    // Means that user landed on this page with the old way.
-    if(geneList != null) {
-%>
-
-<%--
-<script type="text/javascript">
-    //var cancerStudyList = window.location.hash.split("/")[4];
-    //window.location.hash = window.location.hash || "crosscancer/overview/<%=dataPriority%>/<%=geneList%>/<%=cancerStudyList%>";
-</script>
---%>
-
-<%
-    }
-%>
+<script type="text/javascript" src="js/src/tvn-tab/controller/tvn-controller.js?<%=GlobalProperties.getAppVersion()%>"></script>
+<script type="text/javascript" src="js/src/tvn-tab/data/tvn-boxplot-data.js?<%=GlobalProperties.getAppVersion()%>"></script>
+<script type="text/javascript" src="js/src/tvn-tab/view/tvn-boxplot-view.js?<%=GlobalProperties.getAppVersion()%>"></script>
 
 <table>
     <tr>
@@ -193,6 +181,9 @@
             <li>
                 <a href="#cc-plots" id="cc-plots-link" title="Plots with mRNA expression data (TCGA provisional only)">Expression</a>
             </li>
+			<li style="display: {{has_trmVsnrml_view}};">
+                <a href="#cc-tvn" id="cc-tvn-link" title="Tumor(s) vs Normal tissue visualization">Tumor vs Normals</a>
+            </li>
             <li>
                 <a href="#cc-download" id="cc-download-link" title="Download all alterations or copy and paste into Excel">Download</a>
             </li>
@@ -268,6 +259,12 @@
         </div>
         <div class="section" id="cc-plots">
             <jsp:include page="cross_cancer_plots_tab.jsp" />
+        </div>
+		<div class="section" id="cc-tvn">
+
+		<div id="tvn_details" class="tvn-details-content" style="display: {{has_trmVsnrml_view}};">
+                     <%@ include file="tumor_vs_normal/tvn_tab_content.jsp" %>
+            </div>
         </div>
         <div class="section" id="cc-download">
             <div class='copy_tables'>

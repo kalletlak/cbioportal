@@ -40,7 +40,8 @@ var StudyViewParams = {
         cnaProfileId: "",
         mutationProfileId: "",
         caseSetId: "",
-        hasMutSig: ""
+        hasMutSig: "",
+        linkToHarvest:""
     },
     
     summaryParams: {

@@ -130,7 +130,9 @@ var CoexpPlotsProxy = (function() {
                             }
                         }); 
                     }
-                    dataArr.push(datum);   
+					if(window.PortalGlobals.isLinktoharvest()=='true')
+                    datum.qtip = datum.qtip +"<br><input type='button' id='plotview_addSample' class='btn1' style='margin-top:5px; padding:2px;font-size:10.5px' value='Add to bucket' onClick='addSampletoSession(this)'>";
+                    dataArr.push(datum);    
                 }             
             } else {
                 return true; //skip

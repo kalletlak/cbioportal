@@ -877,6 +877,8 @@ var scatterPlots = (function() {
                 });
             }
 
+			if(window.PortalGlobals.isLinktoharvest()=='true')
+            _content+="<br><input type='button' id='plotview_addSample' class='btn1' style='margin-top:5px; padding:2px;font-size:10.5px' value='Add to bucket' onClick='addSampletoSession(this)'>";
             $(this).qtip(
                 {
                     content: {text: _content},

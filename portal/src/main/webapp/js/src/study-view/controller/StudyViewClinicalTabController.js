@@ -46,7 +46,8 @@ var StudyViewClinicalTabController = (function(){
             'clinical-data-table-div',
             {
                 "arr": StudyViewProxy.getArrData(),
-                "attr": StudyViewProxy.getAttrData()
+                "attr": StudyViewProxy.getAttrData(),
+                "isLinkToharvest":StudyViewProxy.isLinkToHarvest()
             });
     }
     

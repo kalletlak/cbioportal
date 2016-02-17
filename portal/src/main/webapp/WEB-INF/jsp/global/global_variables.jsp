@@ -141,6 +141,7 @@
     ArrayList<String> mergedPatientList = mergedProfile.getCaseIdList();
     int mergedPatientListSize = mergedPatientList.size();
     String patientSetId = (String) request.getAttribute(QueryBuilder.CASE_SET_ID);
+	Boolean linkToHarvest = (Boolean) request.getAttribute(QueryBuilder.LINK_TO_HARVEST);
     String patientSetName = "";
     String patientSetDescription = "";
     for (PatientList patientSet:  patientSets) {
@@ -175,6 +176,9 @@
     patients = patients.replaceAll("\"", "\\\"");
     patientSetName = patientSetName.replaceAll("'", "\\'");
     patientSetName = patientSetName.replaceAll("\"", "\\\"");
+    //START of new changes
+    boolean has_trmVsnrml_view = TVNUtil.hasTVNData(cancerTypeId);
+    //END of new changes
 
     //check if show co-expression tab
     boolean showCoexpTab = false;
@@ -292,6 +296,7 @@
             return _geneList.split(/\s+/);
         },
         getGeneSetName: function() { return '<%=geneSetName%>'; },
+		isLinktoharvest:function(){return '<%=linkToHarvest%>';},
         getOqlString: (function() {     // raw gene list (as it is entered by the user, it may contain onco query language)
             var oql = '<%=oql%>'
                     .replace("&gt;", ">", "gm")

@@ -64,6 +64,8 @@ public class CancerStudy {
     private String citation;
     private Set<String> groups;
     private String shortName;
+    private boolean linkToHarvest;
+    private boolean normalsMapping;
     
 
     /**
@@ -189,6 +191,20 @@ public class CancerStudy {
     public void setCitation(String citation) {
         this.citation = citation;
     }
+    public boolean isLinkToHarvest() {
+		return linkToHarvest;
+	}
+
+	public void setLinkToHarvest(boolean linkToHarvest) {
+		this.linkToHarvest = linkToHarvest;
+	}
+	public boolean isNormalsMapping() {
+		return normalsMapping;
+	}
+
+	public void setNormalsMapping(boolean normalsMapping) {
+		this.normalsMapping = normalsMapping;
+	}
 
     /**
      * Gets the genetic profiles.

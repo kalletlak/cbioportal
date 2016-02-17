@@ -47,6 +47,7 @@ public class GeneticProfile {
     private String profileDescription;
     private String targetLine;
     private boolean showProfileInAnalysisTab;
+    private int normalTissueMappingID;
 
     public GeneticProfile() {
       super();
@@ -63,6 +64,14 @@ public class GeneticProfile {
       this.profileDescription = profileDescription;
       this.showProfileInAnalysisTab = showProfileInAnalysisTab;
    }
+   
+   public int getNormalTissueMappingID() {
+		return normalTissueMappingID;
+	}
+
+	public void setNormalTissueMappingID(int normalTissueMappingID) {
+		this.normalTissueMappingID = normalTissueMappingID;
+	}
 
    public int getGeneticProfileId() {
         return geneticProfileId;

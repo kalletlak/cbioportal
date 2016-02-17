@@ -612,6 +612,7 @@ var StudyViewProxy = (function() {
         getArrData: function(){ return obtainDataObject.arr;},
         getArrDataBySampleIds: getArrDataBySampleIds,
         getAttrData: function(){ return obtainDataObject.attr;},
+		isLinkToHarvest:function(){ return parObject.linkToHarvest=='true'?true:false;},
         getMutatedGenesData: getMutatedGenesData,
         getMutatedGeneDataBasedOnSampleIds: getMutatedGeneDataBasedOnSampleIds,
         getCNABasedOnSampleIds: getCNABasedOnSampleIds,

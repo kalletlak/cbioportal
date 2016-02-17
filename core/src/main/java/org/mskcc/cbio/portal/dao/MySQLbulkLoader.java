@@ -221,7 +221,7 @@ public class MySQLbulkLoader {
          
          // will throw error if attempts to overwrite primary keys in table (except for clinical data)
          String replace = (processingClinicalData()) ? " REPLACE" : "";
-         String command = "LOAD DATA LOCAL INFILE '" + tempFileName + "'" + replace + " INTO TABLE " + tableName;
+         String command = "LOAD DATA LOCAL INFILE '" + tempFileName.replace("\\", "\\\\") + "'" + replace + " INTO TABLE " + tableName;
          stmt.execute( command );
          int updateCount = stmt.getUpdateCount();
          System.out.println(""+updateCount+" records inserted into "+tableName);

@@ -116,6 +116,7 @@ public class QueryBuilder extends HttpServlet {
     public static final String SELECTED_PATIENT_SAMPLE_ID_MAP = "selected_patient_sample_id_map";
     private static final String DB_CONNECT_ERROR = ("An error occurred while trying to connect to the database." +
                                                     "  This could happen if the database does not contain any cancer studies.");
+    public static final String LINK_TO_HARVEST="LINK_TO_HARVEST";
 
 
     private static Log LOG = LogFactory.getLog(QueryBuilder.class);
@@ -405,6 +406,11 @@ public class QueryBuilder extends HttpServlet {
         // Map user selected samples Ids to patient Ids
         HashMap<String, String> patientSampleIdMap = new HashMap<String, String>();
         CancerStudy selectedCancerStudy = DaoCancerStudy.getCancerStudyByStableId(cancerStudyStableId);
+        if(GlobalProperties.getHarvestUrl()!=null){
+        	request.setAttribute(LINK_TO_HARVEST, selectedCancerStudy.isLinkToHarvest());
+        }else{
+        	request.setAttribute(LINK_TO_HARVEST, false);
+        }
         int cancerStudyInternalId = selectedCancerStudy.getInternalId();
         Iterator<String> itr = setOfSampleIds.iterator();
         while(itr.hasNext()){

@@ -98,11 +98,24 @@ public class CancerStudyReader {
             throw new IllegalArgumentException("short_name is not specified.");
         }
 
+        String harvestLink = properties.getProperty("link_to_harvest");
+        boolean linkToHarvest = false;
+        if(harvestLink != null &&(harvestLink.equalsIgnoreCase("TRUE")) && (GlobalProperties.getHarvestUrl()!=null)){
+     	   linkToHarvest = true;
+        }
+        String TVNData = properties.getProperty("has_tvn_data");
+        boolean hasTVNData = false;
+        if(TVNData != null &&(TVNData.equalsIgnoreCase("TRUE"))){
+     	   hasTVNData = true;
+        }
+        
         CancerStudy cancerStudy = new CancerStudy(name, description, cancerStudyIdentifier,
                                                   typeOfCancer, publicStudy(properties));
         cancerStudy.setPmid(properties.getProperty("pmid"));
         cancerStudy.setCitation(properties.getProperty("citation"));
         cancerStudy.setGroups(properties.getProperty("groups"));
+        cancerStudy.setLinkToHarvest(linkToHarvest);
+        cancerStudy.setNormalsMapping(hasTVNData);
         cancerStudy.setShortName(shortName);
 
         return cancerStudy;
