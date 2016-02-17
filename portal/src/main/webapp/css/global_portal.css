@@ -385,7 +385,8 @@ table td {
   font-size:14px;
   padding-bottom: 5px;
   border :1px;
-  /*padding: 10px 10px 10px 20px;*/
+  padding: 10px 10px 10px 20px;
+  display: block;
   color:black;
 }
 
@@ -1578,3 +1579,47 @@ ul.oncokb li {
 .qtip-content div.oncokb{
     padding-top: 5px;
 }
+
+.btn1 {
+	background: #c5deea;
+	background-image: -webkit-linear-gradient(top, #c5deea, #1974b8);
+	background-image: -moz-linear-gradient(top, #c5deea, #1974b8);
+	background-image: -ms-linear-gradient(top, #c5deea, #1974b8);
+	background-image: -o-linear-gradient(top, #c5deea, #1974b8);
+	background-image: linear-gradient(to bottom, #c5deea, #1974b8);
+	-webkit-border-radius: 6;
+	-moz-border-radius: 6;
+	border-radius: 6px;
+	font-family: Arial;
+	color: #ffffff;
+	font-size: 12px;
+	/*    height: 12px; */
+	padding: 5px;
+	border: solid #79b9e0 0px;
+	text-decoration: none;
+}
+
+.btn1:hover {
+	background: #bedeed;
+	background-image: -webkit-linear-gradient(top, #bedeed, #5cadd6);
+	background-image: -moz-linear-gradient(top, #bedeed, #5cadd6);
+	background-image: -ms-linear-gradient(top, #bedeed, #5cadd6);
+	background-image: -o-linear-gradient(top, #bedeed, #5cadd6);
+	background-image: linear-gradient(to bottom, #bedeed, #5cadd6);
+	text-decoration: none;
+}
+
+.btn1:disabled {
+	background: #bedeed;
+	background-image: -webkit-linear-gradient(top, #bedeed, #5cadd6);
+	background-image: -moz-linear-gradient(top, #bedeed, #5cadd6);
+	background-image: -ms-linear-gradient(top, #bedeed, #5cadd6);
+	background-image: -o-linear-gradient(top, #bedeed, #5cadd6);
+	background-image: linear-gradient(to bottom, #bedeed, #5cadd6);
+	text-decoration: none;
+}
+.disable-add-sample{
+				opacity: 0.4;
+				filter: alpha(opacity=40);
+				cursor : default;
+		}
