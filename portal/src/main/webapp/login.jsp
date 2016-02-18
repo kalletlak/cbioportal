@@ -162,7 +162,7 @@
                       <IMG alt="Google+" src="images/login/googleplus_signin.png"  />
                     </button>
                   </p>
-                  <form name='loginForm' action="<c:url value='/j_security_check_for_employee'/>" method="post">
+                  <form name='loginForm' action="<c:url value='/j_security_check_for_guestuser'/>" method="post">
 					<table>
 						<tr>
           					<td><input name="submit" type="submit" value="submit" /></td>

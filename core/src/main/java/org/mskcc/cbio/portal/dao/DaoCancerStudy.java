@@ -350,7 +350,7 @@ public final class DaoCancerStudy {
         } finally {
             JdbcUtil.closeAll(DaoCancerStudy.class, con, pstmt, rs);
         }
-
+        reCache();
         setImportDate(cancerStudy.getInternalId());
     }
 

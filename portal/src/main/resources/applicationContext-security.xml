@@ -92,7 +92,7 @@
     
     <b:bean id="guestUserAuthenticationFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
     	<b:property name="authenticationManager" ref="authenticationManager"/>
-    	<b:property name="filterProcessesUrl" value="/j_security_check_for_employee"/>
+    	<b:property name="filterProcessesUrl" value="/j_security_check_for_guestuser"/>
     	<b:property name="authenticationSuccessHandler">
         	<b:bean class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
             	<b:property name="defaultTargetUrl" value="/index.do" />
@@ -106,8 +106,8 @@
 	</b:bean>
 
     <authentication-manager alias="authenticationManager">
-        <authentication-provider user-service-ref="userDetailsService">
-        </authentication-provider>
+<!--         <authentication-provider user-service-ref="userDetailsService"> -->
+<!--         </authentication-provider> -->
         <authentication-provider ref="socialAuthenticationProvider"/>
         <authentication-provider ref="guestUserAuthenticationProvider"/>
     </authentication-manager>
