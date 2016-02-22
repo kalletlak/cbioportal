@@ -976,7 +976,7 @@ function outputClinicalData() {
         sample_recs += info.join(",&nbsp;");
         sample_recs += "</a><span class='sample-record-delimiter'>, </span>";
         if(linkToHarvest=='true')
-        	sample_recs += "&nbsp;<input type='button' class='btn1' style='margin-left:20px; padding:2px;' value='Add to bucket' onClick='addSampletoSession(this)'>";
+        	sample_recs += "<input type='button' class='btn1' style='margin-left:20px; padding:2px;' value='Add to bucket' onClick='addSampletoSession(this)'>";
         sample_recs += "</div>";
         if ((n > nr_in_head && i == nr_in_head-1) || (n <= nr_in_head && i == n-1)) {
             head_recs = sample_recs;

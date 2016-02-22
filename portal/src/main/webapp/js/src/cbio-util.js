@@ -368,12 +368,12 @@ cbio.util = (function() {
     function getLinkToSampleView(cancerStudyId, sampleId) {
         return "case.do?cancer_study_id=" + cancerStudyId + "&sample_id=" + sampleId;
     }
-    function addSampleToSession(that) {
-		  var data = {operation:"add",sample:that};
+    function addSampleToSession(sample) {
+		  var data = {operation:"add",sample:sample.trim()};
 			$.post('sessionSamples.json',data,function returnData(param) {
 		   if(param.returnString=="SUCCESS"){
 					
-					   var n = noty({ text : that+" Added to bucket",
+					   var n = noty({ text : sample.trim()+" Added to bucket",
 		            type        : 'information',
 		            layout      : 'topRight',
 		            theme       : 'defaultTheme',
