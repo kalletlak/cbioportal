@@ -41,6 +41,7 @@ import org.mskcc.cbio.portal.authentication.PortalUserDetails;
 import org.mskcc.cbio.portal.dao.PortalUserDAO;
 import org.mskcc.cbio.portal.model.User;
 import org.mskcc.cbio.portal.model.UserAuthorities;
+import org.mskcc.cbio.portal.util.DynamicState;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,6 +49,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * 
@@ -117,11 +119,29 @@ public class GuestUserAuthenticationProvider implements AuthenticationProvider {
                     e.printStackTrace();
                 }
     		}
-            final UserDetails principal = toReturn;
-            final Authentication auth = new UsernamePasswordAuthenticationToken(principal, password, grantedAuthorities);
-            return auth;
+        	
+        	if (toReturn == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("loadUserDetails(), user and/or user authorities is null, email: " + name);
+                }
+                DynamicState.INSTANCE.setCurrentUser("");
+                DynamicState.INSTANCE.setFailedUser(name);
+    			throw new UsernameNotFoundException("Error:  Unknown user or account disabled");
+    		}
+    		else {
+                if (log.isDebugEnabled()) {
+                    log.debug("loadUserDetails(), successfully authenticated user, email: " + name);
+                }
+                final UserDetails principal = toReturn;
+                final Authentication auth = new UsernamePasswordAuthenticationToken(principal, password, grantedAuthorities);
+                return auth;
+    		}
+        	
+           
         } else {
-            return null;
+        	 DynamicState.INSTANCE.setCurrentUser("");
+             DynamicState.INSTANCE.setFailedUser(name);
+        	throw new UsernameNotFoundException("Error:  Unknown user or account disabled");
         }
     }
 
