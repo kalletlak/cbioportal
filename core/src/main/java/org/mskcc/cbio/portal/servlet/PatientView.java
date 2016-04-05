@@ -478,7 +478,12 @@ public class PatientView extends HttpServlet {
             if (pathReport!=null) {
                 request.setAttribute(PATH_REPORT_URL, pathReport);
             }
-        }
+        } else if (patientId!=null){
+       	 String pathReport = getCBTTCpathologyReport(patientId);
+       	 if (pathReport!=null) {
+                request.setAttribute(PATH_REPORT_URL, pathReport);
+            }
+       }
     }
     
     private String getTissueImageIframeUrl(String cancerStudyId, String caseId) {
@@ -525,6 +530,8 @@ public class PatientView extends HttpServlet {
     // Map<TypeOfCancer, Map<CaseId, List<ImageName>>>
     private static Map<String,Map<String,String>> pathologyReports
             = new HashMap<String,Map<String,String>>();
+    private static Map<String,String> cbttc_pathologyReports
+    = new HashMap<String,String>();
     static final Pattern tcgaPathReportDirLinePattern = Pattern.compile("<a href=[^>]+>([^/]+/)</a>");
     static final Pattern tcgaPathReportPdfLinePattern = Pattern.compile("<a href=[^>]+>([^/]+\\.pdf)</a>");
     static final Pattern tcgaPathReportPattern = Pattern.compile("^(TCGA-..-....).+");
@@ -562,6 +569,15 @@ public class PatientView extends HttpServlet {
         }
         
         return map.get(caseId);
+    }
+    
+    private static String getCBTTCpathologyReport(String caseId){
+    	String link = cbttc_pathologyReports.get(caseId);
+         if (link==null) {
+        	 DaoSamplePathologyReport daoSamplePathologyReport = new DaoSamplePathologyReport();
+        	 cbttc_pathologyReports = daoSamplePathologyReport.getAllSamplesPathologyReport();
+         }
+    	 return cbttc_pathologyReports.get(caseId);
     }
     
     private static List<String> extractLinksByPattern(String reportsUrl, Pattern p) {
