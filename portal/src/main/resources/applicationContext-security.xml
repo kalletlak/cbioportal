@@ -109,7 +109,6 @@
 <!--         <authentication-provider user-service-ref="userDetailsService"> -->
 <!--         </authentication-provider> -->
         <authentication-provider ref="socialAuthenticationProvider"/>
-        <authentication-provider ref="guestUserAuthenticationProvider"/>
     </authentication-manager>
     
     <!-- beans used to compare token returned by authentication-provider against portal user db tables -->
@@ -122,11 +121,7 @@
         <b:constructor-arg index="0" ref="usersConnectionRepository" />
         <b:constructor-arg index="1" ref="socialUserDetailsService" />
     </b:bean>
-    
-    <b:bean id="guestUserAuthenticationProvider" class="org.mskcc.cbio.portal.authentication.guestuser.GuestUserAuthenticationProvider">
-        <b:constructor-arg ref="portalUserDAO"/>
-    </b:bean>
-    
+
     <b:bean id="socialUserDetailsService" class="org.mskcc.cbio.portal.authentication.googleplus.GoogleplusUserDetailsService">
         <b:constructor-arg index="0" ref="userDetailsService" />
     </b:bean>

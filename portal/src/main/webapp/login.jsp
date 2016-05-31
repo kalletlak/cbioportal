@@ -66,18 +66,6 @@
     String login_error = request.getParameter("login_error");
     String logout_success = request.getParameter("logout_success");
 %>
-<style type="text/css">
-.guest_button {
-    background: #c5deea linear-gradient(to bottom, #c5deea, #1974b8) repeat scroll 0 0;
-    border: 0 solid #79b9e0;
-    border-radius: 6px;
-    color: #ffffff;
-    font-family: Arial;
-    font-size: 12px;
-    padding: 5px;
-    text-decoration: none;
-}
-</style>
 </head>
 <body>
   <center>
@@ -174,10 +162,11 @@
                       <IMG alt="Google+" src="images/login/googleplus_signin.png"  />
                     </button>
                   </p>
-                  <form name='loginForm' action="<c:url value='/j_security_check_for_guestuser'/>" method="post">
-					<input class="guest_button" name="submit" type="submit" value="Login as guest" />
-					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-				  </form>
+                  <p>
+                  	<span style="color:#666666;font-family:verdana,arial,sans-serif;font-size:145%">To access the public cBioPortal site, please visit 
+                    	<a href="http://www.cbioportal.org/" target="_blank">cbioportal.org</a>
+                    </span>
+  				  </p>
                 </fieldset>
 
                 <% } else if (authenticationMethod.equals("ad")){ %>
