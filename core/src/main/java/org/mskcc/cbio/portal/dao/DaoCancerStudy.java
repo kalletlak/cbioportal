@@ -321,7 +321,7 @@ public final class DaoCancerStudy {
             pstmt = con.prepareStatement("INSERT INTO cancer_study " +
                     "( `CANCER_STUDY_IDENTIFIER`, `NAME`, "
                     + "`DESCRIPTION`, `PUBLIC`, `TYPE_OF_CANCER_ID`, "
-                    + "`PMID`, `CITATION`, `GROUPS`, `SHORT_NAME`, `LINK_TO_HARVEST`, `NORMALS_TISSUE_MAPPING` ) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                    + "`PMID`, `CITATION`, `GROUPS`, `SHORT_NAME`, `LINK_TO_HARVEST`, `NORMALS_TISSUE_MAPPING`, `IS_ADULT` ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                     Statement.RETURN_GENERATED_KEYS);
             pstmt.setString(1, stableId);
             pstmt.setString(2, cancerStudy.getName());
@@ -339,6 +339,7 @@ public final class DaoCancerStudy {
             pstmt.setString(9, cancerStudy.getShortName());
             pstmt.setBoolean(10, cancerStudy.isLinkToHarvest());
             pstmt.setBoolean(11, cancerStudy.isNormalsMapping());
+            pstmt.setBoolean(12, cancerStudy.isAdultCancer());
             pstmt.executeUpdate();
             rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
@@ -539,18 +540,10 @@ public final class DaoCancerStudy {
         cancerStudy.setCitation(rs.getString("CITATION"));
         cancerStudy.setGroups(rs.getString("GROUPS"));
         cancerStudy.setShortName(rs.getString("SHORT_NAME"));
-        try{
-        	cancerStudy.setLinkToHarvest(rs.getBoolean("LINK_TO_HARVEST"));
-        }catch(SQLException exception){
-        	//TODO: When LINK_TO_HARVEST not found
-        }
+        cancerStudy.setLinkToHarvest(rs.getBoolean("LINK_TO_HARVEST"));
         cancerStudy.setInternalId(rs.getInt("CANCER_STUDY_ID"));
-        try{
-            cancerStudy.setNormalsMapping(rs.getBoolean("NORMALS_TISSUE_MAPPING"));
-        }catch(SQLException exception){
-        	//TODO: When NORMALS_TISSUE_MAPPING not found
-        }
-   
+        cancerStudy.setNormalsMapping(rs.getBoolean("NORMALS_TISSUE_MAPPING"));
+        cancerStudy.setAdultCancer(rs.getBoolean("IS_ADULT"));
         return cancerStudy;
     }
 
