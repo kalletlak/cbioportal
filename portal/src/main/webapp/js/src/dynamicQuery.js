@@ -945,9 +945,10 @@ function addMetaDataToPage() {
     	var toReturn = {};
     	toReturn.jstree_data = [];
     	toReturn.flat_jstree_data = [];
+    	var node_queue_tmp = [].concat(node_queue);
     	var toInclude = type !== null ? (type ? 'adult_studies_count' : 'pediatric_studies_count') : 'desc_studies_count';
-        while (node_queue.length > 0) {
-    	    currNode = node_queue.shift();
+        while (node_queue_tmp.length > 0) {
+    	    currNode = node_queue_tmp.shift();
     	    if (currNode[toInclude] > 0) {
     		var name = splitAndCapitalize(metaDataJson.type_of_cancers[currNode.code] || currNode.code);
     		toReturn['jstree_data'].push({'id':currNode.code, 
@@ -983,7 +984,7 @@ function addMetaDataToPage() {
     			}
     			    
     		});
-    		node_queue = node_queue.concat(currNode.children);
+    		node_queue_tmp = node_queue_tmp.concat(currNode.children);
     	    }
         }
         return toReturn;
@@ -1265,6 +1266,8 @@ initialize_jstree(window.tab_index === "tab_download" ? flat_jstree_data : jstre
 		      
 		     $('#jstree').on('ready.jstree', function () {
 		          precomputed_search.query = false; // force re-search
+		          $("#select_single_study").val("all");
+                  $("#select_single_study").trigger('change');
 		      });
 		  });
 	  
