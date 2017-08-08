@@ -34,6 +34,7 @@ public class GeneticProfile implements Serializable {
     private String description;
     private Boolean showProfileInAnalysisTab;
     private CancerStudy cancerStudy;
+    private String normalsTissueReferenceId;
 
     public Integer getGeneticProfileId() {
         return geneticProfileId;
@@ -114,4 +115,14 @@ public class GeneticProfile implements Serializable {
     public void setCancerStudy(CancerStudy cancerStudy) {
         this.cancerStudy = cancerStudy;
     }
+
+	public String getNormalsTissueReferenceId() {
+		return normalsTissueReferenceId;
+	}
+
+	public void setNormalsTissueReferenceId(String normalsTissueReferenceId) {
+		this.normalsTissueReferenceId = normalsTissueReferenceId;
+	}
+    
+    
 }

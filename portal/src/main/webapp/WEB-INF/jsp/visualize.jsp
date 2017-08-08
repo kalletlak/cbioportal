@@ -186,6 +186,9 @@ window.onReactAppReady(function() {
                         if (disabledTabs.contains("bookmark")) {
                             showBookmarkTab = false;
                         }
+                        if (disabledTabs.contains("tvn")) {
+                        	showTvnTab = false;
+                        }
                         
                         if (paramName.equals(QueryBuilder.GENE_LIST)
                             && currentValue != null)
@@ -252,6 +255,9 @@ window.onReactAppReady(function() {
             }
             if (showCoexpTab) {
                 out.println ("<li><a href='#coexp' class='result-tab' id='coexp-result-tab'>Co-Expression</a></li>");
+            }
+            if (showTvnTab) {
+                out.println ("<li><a href='#tvn' class='result-tab' id='tvn-result-tab'>Tumor vs Normals</a></li>");
             }
             if (has_mrna || has_copy_no || showMutTab && showEnrichmentsTab) {
                 out.println("<li><a href='#enrichementTabDiv' id='enrichments-result-tab' class='result-tab'>Enrichments</a></li>");
@@ -344,6 +350,10 @@ window.onReactAppReady(function() {
 
         <% if (has_mrna || has_copy_no || showMutTab) { %>
             <%@ include file="enrichments_tab.jsp" %>
+        <% } %>
+        
+        <% if (showTvnTab) { %>
+            <%@ include file="tvn_tab.jsp" %>
         <% } %>
 
         <%@ include file="data_download.jsp" %>
