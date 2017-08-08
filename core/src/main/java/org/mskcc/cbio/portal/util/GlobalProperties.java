@@ -301,6 +301,12 @@ public class GlobalProperties {
     @Value("${frontend.url.runtime:}") 
     public void setFrontendUrlRuntime(String property) { frontendUrlRuntime = property; }
 
+    public static final String CAVATICA_EVENTS_URL = "cavatica.events.url";
+    
+    private static String cavaticaEventsURL;
+    @Value("${cavatica.events.url:}") // default is empty string
+    public void setCavaticaEventsURL(String property) { cavaticaEventsURL = property; }
+    
     private static String harvestUrl;
     @Value("${harvest.url:}") // default is empty string
     public void setHarvestUrl(String property) { harvestUrl = property; }
@@ -805,6 +811,10 @@ public class GlobalProperties {
     public static String getHarvestUrl()
     {
         return harvestUrl;
+    }
+    public static String getCavaticaEventsURL()
+    {
+        return cavaticaEventsURL;
     }
     
     public static String getPedcbioUtilsUrl()
