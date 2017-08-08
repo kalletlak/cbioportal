@@ -740,7 +740,6 @@ cbio.util = (function() {
         return def.promise();
     }
 
-
     function getDecimalExponents(data){
         //Copy the values, rather than operating on references to existing values
         if (!_.isArray(data) || data.length < 1) {//if data is not an array or is empty, return data
@@ -842,6 +841,43 @@ cbio.util = (function() {
         }
     }
 
+    function localStorageUtil(property, operation_type, sample) {
+        switch (operation_type) {
+          case 'add':
+              var _data_arr = JSON.parse(localStorage.getItem(property)) || [];
+              _data_arr.push(sample)
+              localStorage.setItem(property, JSON.stringify(Array.from(new Set(_data_arr))))
+              return true;
+              break;
+              
+          case 'delete':
+              var _data = Array.from(new Set(JSON.parse(localStorage.getItem(property)) || []));
+              var filtered_arr = _data.filter(function(el) {
+                return el !== sample;
+              });
+              localStorage.setItem(property, JSON.stringify(filtered_arr))
+              return true;
+              break;
+              
+          case 'check':
+              return Array.from(new Set(JSON.parse(localStorage.getItem(property)) || [])).indexOf(sample)>=0 || false;
+              break;
+              
+          case 'clear': 
+              localStorage.setItem(property, JSON.stringify([]))
+              return true;
+              break;
+              
+          case 'get':
+              return Array.from(new Set(JSON.parse(localStorage.getItem(property)) || []));
+              break;
+              
+          default: 
+              localStorage.setItem(property, JSON.stringify([]))
+              return true;
+        }
+    }
+    
     return {
         toPrecision: toPrecision,
         getObjectLength: getObjectLength,
@@ -871,7 +907,8 @@ cbio.util = (function() {
         makeCachedPromiseFunction: makeCachedPromiseFunction,
         getDatahubStudiesList: getDatahubStudiesList,
         showCombinedStudyNameAndDescription: showCombinedStudyNameAndDescription,
-        getDecimalExponents: getDecimalExponents
+        getDecimalExponents: getDecimalExponents,
+        localStorageUtil: localStorageUtil
     };
 
 })();

@@ -74,6 +74,14 @@
     boolean computeLogOddsRatio = true;
     Boolean mutationDetailLimitReached = (Boolean)request.getAttribute(QueryBuilder.MUTATION_DETAIL_LIMIT_REACHED);
     boolean showCoexpTab = false;
+    ArrayList<GeneticProfile> profileList = (ArrayList<GeneticProfile>) request.getAttribute(QueryBuilder.PROFILE_LIST_INTERNAL);
+    boolean showTvnTab = false;
+    for(GeneticProfile  geneticProfile : profileList){
+        if(geneticProfile.getNormalsTissueReferenceId() != null) {
+            showTvnTab = true;
+            break;
+        }
+    }
 
     //are we using session service for bookmarking?
     boolean useSessionServiceBookmark = !StringUtils.isBlank(GlobalProperties.getSessionServiceUrl());

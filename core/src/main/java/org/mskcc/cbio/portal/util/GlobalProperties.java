@@ -301,6 +301,14 @@ public class GlobalProperties {
     @Value("${frontend.url.runtime:}") 
     public void setFrontendUrlRuntime(String property) { frontendUrlRuntime = property; }
 
+    private static String harvestUrl;
+    @Value("${harvest.url:}") // default is empty string
+    public void setHarvestUrl(String property) { harvestUrl = property; }
+    
+    private static String pedcbioUtilsUrl;
+    @Value("${pedcbio_utils.url:}") // default is empty string
+    public void setPedcbioUtilsUrl(String property) { pedcbioUtilsUrl = property; }
+
     private static Log LOG = LogFactory.getLog(GlobalProperties.class);
     private static Properties portalProperties = initializeProperties(PORTAL_PROPERTIES_FILE_NAME);
     private static Properties mavenProperties = initializeProperties(MAVEN_PROPERTIES_FILE_NAME);
@@ -792,7 +800,16 @@ public class GlobalProperties {
         } else {
            return "";
         }
+    }
         
+    public static String getHarvestUrl()
+    {
+        return harvestUrl;
+    }
+    
+    public static String getPedcbioUtilsUrl()
+    {
+        return pedcbioUtilsUrl;
     }
  
     public static String getOncoKBApiUrl()
