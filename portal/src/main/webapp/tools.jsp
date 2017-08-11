@@ -63,17 +63,16 @@
     <jsp:attribute name="body_area">
         <h1>Visualize Your Data</h1>
 
-        <h2 id="download-and-install-a-local-version-of-cbioportal">1. Download and install a local version of cBioPortal</h2>
+        <h2 id="download-and-install-a-local-version-of-cbioportal">1. Download and install a local version of PedcBioPortal (instance of <a href="http://www.cbioportal.org">cBioPortal</a>)</h2>
         <ul>
-        <li>The source code of cBioPortal is available on <a href="https://github.com/cBioPortal/cbioportal">GitHub</a> under the terms of Affero GPL V3. </li>
+        <li>The source code of PedcBioPortal is available on <a href="https://github.com/d3b-center/pedcbioportal">GitHub</a> under the terms of Affero GPL V3. </li>
         <li>Please note that, installing a local version requires system administration skills, for example, installing and configuring Tomcat and MySQL. With limited resources, we cannot provide technical support on system administration.</li>
         </ul>
         
         <h2>2. We host data for you (academic use)</h2>
         <ul>
-            <li>Public data will be available to everyone. Suggestions on data sets are welcome.</li>
-            <li>Private data will be accessible by you and your collaborators.</li>
-            <li>Please <a href="mailto:cbioportal@cbio.mskcc.org?subject=Uploading public data">contact us</a> for details.</li>
+        		<li>Public data will be available to everyone who registers. Suggestions on data sets are welcome. Please <a href="mailto:support@d3b.center?subject=Uploading public data">contact us</a> for details.</li>
+			<li>Private data will be accessible by you and your collaborators. Please <a href="mailto:support@d3b.center?subject=Uploading private data">contact us</a> for details.</li>
         </ul>
         
         <hr>
