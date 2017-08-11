@@ -15,7 +15,7 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.inference.TTest;
 import org.cbioportal.model.Gene;
-import org.cbioportal.model.GeneticData;
+import org.cbioportal.model.GeneGeneticData;
 import org.cbioportal.model.GeneticProfile;
 import org.cbioportal.model.TumorVsNormalsData;
 import org.cbioportal.model.TumorVsNormalsDataSampleDataObject;
@@ -120,7 +120,7 @@ public class TumorVsNormalsDataServiceImpl implements TumorVsNormalsDataService 
 							&& geneticProfileData.getKey().getNormalsTissueReferenceId().equals(normalsReferenceId)))
 					.map(geneticProfileData -> {
 						TumorVsNormalsData tvnData = new TumorVsNormalsData();
-						List<GeneticData> values_temp;
+						List<GeneGeneticData> values_temp;
 						try {
 							values_temp = geneticDataService.fetchGeneticData(geneticProfileData.getKey().getStableId(),
 									geneticProfileData.getValue(),
@@ -135,7 +135,7 @@ public class TumorVsNormalsDataServiceImpl implements TumorVsNormalsDataService 
 							tvnData.setColor(typeOfCancer.getDedicatedColor());
 							tvnData.setStudyId(geneticProfileData.getKey().getCancerStudy().getCancerStudyIdentifier());
 							List<TumorVsNormalsDataSampleDataObject> tvnSampleDataObjects = new ArrayList<>();
-							for (GeneticData geneticData : values_temp) {
+							for (GeneGeneticData geneticData : values_temp) {
 								Double value = Double.parseDouble(geneticData.getValue());
 								tvnSampleDataObjects
 										.add(new TumorVsNormalsDataSampleDataObject(geneticData.getSampleId(), value));
