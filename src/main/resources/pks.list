@@ -24,7 +24,6 @@ gene_panel	INTERNAL_ID
 gene_panel_list	INTERNAL_ID	GENE_ID
 genetic_alteration	
 genetic_profile	GENETIC_PROFILE_ID
-genetic_profile_samples	GENETIC_PROFILE_ID
 gistic	GISTIC_ROI_ID
 gistic_to_gene	GISTIC_ROI_ID	ENTREZ_GENE_ID
 info	
