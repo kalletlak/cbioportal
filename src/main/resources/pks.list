@@ -1,0 +1,65 @@
+# meant to represent all primary keys irrespective of whether they're enforced at the database or only at the application level
+attribute_metadata	ATTR_ID
+authorities	
+cancer_study	CANCER_STUDY_ID
+clinical_attribute_meta	ATTR_ID	CANCER_STUDY_ID
+clinical_event	CLINICAL_EVENT_ID
+clinical_event_data	
+clinical_patient	INTERNAL_ID	ATTR_ID
+clinical_sample	INTERNAL_ID	ATTR_ID
+clinical_trial_keywords	PROTOCOLID	KEYWORD
+clinical_trials	PROTOCOLID
+cna_event	CNA_EVENT_ID
+copy_number_seg_file	SEG_FILE_ID
+copy_number_seg	SEG_ID
+cosmic_mutation	COSMIC_MUTATION_ID
+drug	DRUG_ID
+drug_interaction	
+entity_attribute	ENTITY_ID	ATTR_ID
+entity	INTERNAL_ID
+entity_link	INTERNAL_ID
+gene_alias	ENTREZ_GENE_ID	GENE_ALIAS
+gene	ENTREZ_GENE_ID
+gene_panel	INTERNAL_ID
+gene_panel_list	INTERNAL_ID	GENE_ID
+genetic_alteration	
+genetic_profile	GENETIC_PROFILE_ID
+genetic_profile_samples	GENETIC_PROFILE_ID
+gistic	GISTIC_ROI_ID
+gistic_to_gene	GISTIC_ROI_ID	ENTREZ_GENE_ID
+info	
+interaction	
+micro_rna	
+micro_rna_alteration	GENETIC_PROFILE_ID	MICRO_RNA_ID
+mutation_count	
+mutation_event	MUTATION_EVENT_ID
+mutation_frequency	
+mutation	MUTATION_EVENT_ID	GENETIC_PROFILE_ID	SAMPLE_ID
+mut_sig	CANCER_STUDY_ID	ENTREZ_GENE_ID
+normals_sample_data	
+normals_sample_list	NORMALS_MAPPING_ID
+normals_sample_mapping	ID
+patient	INTERNAL_ID
+patient_list	LIST_ID
+patient_list_list	LIST_ID	PATIENT_ID
+pdb_uniprot_alignment	ALIGNMENT_ID
+pdb_uniprot_residue_mapping	
+pfam_graphics	UNIPROT_ACC
+protein_array_cancer_study	PROTEIN_ARRAY_ID	CANCER_STUDY_ID
+protein_array_data	PROTEIN_ARRAY_ID	CANCER_STUDY_ID	SAMPLE_ID
+protein_array_info	PROTEIN_ARRAY_ID
+protein_array_target	PROTEIN_ARRAY_ID	ENTREZ_GENE_ID
+sample_cna_event	CNA_EVENT_ID	SAMPLE_ID	GENETIC_PROFILE_ID
+sample	INTERNAL_ID
+sample_list	LIST_ID
+sample_list_list	LIST_ID	SAMPLE_ID
+sample_pathology_report	STABLE_ID
+sample_profile	SAMPLE_ID	GENETIC_PROFILE_ID
+sanger_cancer_census	
+structural_variant	INTERNAL_ID
+technology_mapping	
+text_cache	HASH_KEY
+tumor_sample_data	
+type_of_cancer	TYPE_OF_CANCER_ID
+uniprot_id_mapping	UNIPROT_ID	ENTREZ_GENE_ID
+users	EMAIL
