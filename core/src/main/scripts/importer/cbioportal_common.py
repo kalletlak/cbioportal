@@ -720,15 +720,15 @@ def parse_metadata_file(filename,
     
     if meta_file_type == MetaFileTypes.EXPRESSION:
    		#TODO: need to update this. should set normal reference id depending on genetic_alteration_type and datatype
-	    if 'normals_tissue_reference_id' in META_FIELD_MAP[meta_file_type] and metaDictionary.get('normals_tissue_reference_id',False):
-	    	if metaDictionary['normals_tissue_reference_id'] not in ['gtex','hgu133plus2']:
+	    if 'normals_tissue_reference_id' in META_FIELD_MAP[meta_file_type] and meta_dictionary.get('normals_tissue_reference_id',False):
+	    	if meta_dictionary['normals_tissue_reference_id'] not in ['gtex','hgu133plus2']:
 	    		logger.error(
 	            "normal reference id is expected in ['gtex','hgu133plus2']",
 	            extra={'filename_': filename,
-	                   'cause': metaDictionary['normals_tissue_reference_id']})
+	                   'cause': meta_dictionary['normals_tissue_reference_id']})
 	        	# not a valid meta file in this study
 	        	meta_file_type = None
-	        	return metaDictionary, meta_file_type	
+	        	return meta_dictionary, meta_file_type	
         
     if meta_file_type in (MetaFileTypes.SEG, MetaFileTypes.GISTIC_GENES):
         if genome_name is not None and meta_dictionary['reference_genome_id'] != genome_name:
