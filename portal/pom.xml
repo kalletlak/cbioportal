@@ -105,9 +105,9 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>com.github.cbioportal</groupId>
+                  <groupId>com.github.kalletlak</groupId>
                   <artifactId>cbioportal-frontend</artifactId>
-                  <version>9e63cb454d72395a6c7bf5d686f6224d66010718</version>
+                  <version>fdb00b160a434a168e41d81576f42db6607f5312</version>
                   <type>jar</type>
                   <outputDirectory>.</outputDirectory>
                   <excludes>*index*</excludes>
