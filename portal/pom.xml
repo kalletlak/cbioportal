@@ -107,7 +107,7 @@
                 <artifactItem>
                   <groupId>com.github.kalletlak</groupId>
                   <artifactId>cbioportal-frontend</artifactId>
-                  <version>kk-rc1</version>
+                  <version>kk-rc1-SNAPSHOT</version>
                   <type>jar</type>
                   <outputDirectory>.</outputDirectory>
                   <excludes>*index*</excludes>
