@@ -86,11 +86,11 @@
 
     	var tvn_tab_init = false;
         if ($("#tvn").is(":visible")) {
-                	window.cbioportal_client.getGeneticProfiles({'study_id': [window.QuerySession.getCancerStudyIds()[0]]})
+                	window.cbioportal_client.getGeneticProfiles({'study_id': window.serverVars.cancerStudies})
                 .then(function(_genetic_profiles) {
                     window.tvn_datamanager = new
-                            TVNDataManager.init(window.QuerySession.getQueryGenes(), _genetic_profiles, window.QuerySession.getStudySampleMap());
-                    _tvn_instance.initializeOptions(window.tvn_datamanager.getGenes(), window.tvn_datamanager.getFilterOptionsData());
+                            TVNDataManager.initwindow.OQL.genes(window.serverVars.theQuery), _genetic_profiles, window.serverVars.studySampleObj);
+                    _tvn_instance.initializeOptions(window.OQL.genes(window.serverVars.theQuery), window.tvn_datamanager.getFilterOptionsData());
                 });
                     tvn_tab_init = true;
         } else {
@@ -99,11 +99,11 @@
         $("#tabs").bind("tabsactivate", function(event, ui) {
             if (ui.newTab.text().trim().toLowerCase() === "tumor vs normals") {
                 if (tvn_tab_init === false) {
-                	window.cbioportal_client.getGeneticProfiles({'study_id': [window.QuerySession.getCancerStudyIds()[0]]})
+                	window.cbioportal_client.getGeneticProfiles({'study_id': window.serverVars.cancerStudies})
                 .then(function(_genetic_profiles) {
                     window.tvn_datamanager = new
-                            TVNDataManager.init(window.QuerySession.getQueryGenes(), _genetic_profiles, window.QuerySession.getStudySampleMap());
-                    _tvn_instance.initializeOptions(window.tvn_datamanager.getGenes(), window.tvn_datamanager.getFilterOptionsData());
+                            TVNDataManager.init(window.OQL.genes(window.serverVars.theQuery), _genetic_profiles, window.serverVars.studySampleObj);
+                    _tvn_instance.initializeOptions(window.OQL.genes(window.serverVars.theQuery), window.tvn_datamanager.getFilterOptionsData());
                 });
                     tvn_tab_init = true;
                     $(window).trigger("resize");
