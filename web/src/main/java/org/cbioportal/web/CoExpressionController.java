@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.cbioportal.model.CoExpression;
 import org.cbioportal.service.CoExpressionService;
-import org.cbioportal.service.exception.GeneticProfileNotFoundException;
+import org.cbioportal.service.exception.MolecularProfileNotFoundException;
 import org.cbioportal.web.config.annotation.InternalApi;
 import org.cbioportal.web.parameter.CoExpressionFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -32,26 +33,27 @@ public class CoExpressionController {
     @Autowired
     private CoExpressionService coExpressionService;
 
-    @RequestMapping(value = "/genetic-profiles/{geneticProfileId}/co-expressions/fetch",
+    @PreAuthorize("hasPermission(#molecularProfileId, 'MolecularProfile', 'read')")
+    @RequestMapping(value = "/molecular-profiles/{molecularProfileId}/co-expressions/fetch",
         method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation("Fetch co-expressions in a genetic profile")
+    @ApiOperation("Fetch co-expressions in a molecular profile")
     public ResponseEntity<List<CoExpression>> fetchCoExpressions(
-        @ApiParam(required = true, value = "Genetic Profile ID e.g. acc_tcga_rna_seq_v2_mrna")
-        @PathVariable String geneticProfileId,
+        @ApiParam(required = true, value = "Molecular Profile ID e.g. acc_tcga_rna_seq_v2_mrna")
+        @PathVariable String molecularProfileId,
         @ApiParam(required = true, value = "List of Sample IDs/Sample List ID")
         @Valid @RequestBody CoExpressionFilter coExpressionFilter,
         @ApiParam(required = true, value = "Entrez Gene ID")
         @RequestParam Integer entrezGeneId,
-        @ApiParam(required = true, value = "Threshold")
-        @RequestParam(defaultValue = "0.3") Double threshold) throws GeneticProfileNotFoundException {
+        @ApiParam("Threshold")
+        @RequestParam(defaultValue = "0.3") Double threshold) throws MolecularProfileNotFoundException {
 
         List<CoExpression> coExpressionList;
         if (coExpressionFilter.getSampleListId() != null) {
-            coExpressionList = coExpressionService.getCoExpressions(geneticProfileId,
+            coExpressionList = coExpressionService.getCoExpressions(molecularProfileId,
                 coExpressionFilter.getSampleListId(), entrezGeneId, threshold);
         } else {
-            coExpressionList = coExpressionService.fetchCoExpressions(geneticProfileId,
+            coExpressionList = coExpressionService.fetchCoExpressions(molecularProfileId,
                 coExpressionFilter.getSampleIds(), entrezGeneId, threshold);
         }
 

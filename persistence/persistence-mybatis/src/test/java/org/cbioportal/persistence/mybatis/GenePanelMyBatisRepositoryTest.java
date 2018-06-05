@@ -78,9 +78,9 @@ public class GenePanelMyBatisRepositoryTest {
         List<GenePanelData> result = genePanelMyBatisRepository.getGenePanelData("study_tcga_pub_mrna", 
             "study_tcga_pub_all");
         
-        Assert.assertEquals(2, result.size());
+        Assert.assertEquals(9, result.size());
         GenePanelData genePanelData = result.get(0);
-        Assert.assertEquals("study_tcga_pub_mrna", genePanelData.getGeneticProfileId());
+        Assert.assertEquals("study_tcga_pub_mrna", genePanelData.getMolecularProfileId());
         Assert.assertEquals("TESTPANEL1", genePanelData.getGenePanelId());
         Assert.assertEquals("TCGA-A1-A0SB-01", genePanelData.getSampleId());
     }
@@ -93,7 +93,20 @@ public class GenePanelMyBatisRepositoryTest {
 
         Assert.assertEquals(2, result.size());
         GenePanelData genePanelData = result.get(0);
-        Assert.assertEquals("study_tcga_pub_mrna", genePanelData.getGeneticProfileId());
+        Assert.assertEquals("study_tcga_pub_mrna", genePanelData.getMolecularProfileId());
+        Assert.assertEquals("TESTPANEL1", genePanelData.getGenePanelId());
+        Assert.assertEquals("TCGA-A1-A0SB-01", genePanelData.getSampleId());
+    }
+
+    @Test
+    public void fetchGenePanelDataInMultipleMolecularProfiles() throws Exception {
+
+        List<GenePanelData> result = genePanelMyBatisRepository.fetchGenePanelDataInMultipleMolecularProfiles(Arrays.asList(
+            "study_tcga_pub_mrna", "study_tcga_pub_log2CNA"), Arrays.asList("TCGA-A1-A0SB-01", "TCGA-A1-A0SD-01"));
+
+        Assert.assertEquals(2, result.size());
+        GenePanelData genePanelData = result.get(0);
+        Assert.assertEquals("study_tcga_pub_mrna", genePanelData.getMolecularProfileId());
         Assert.assertEquals("TESTPANEL1", genePanelData.getGenePanelId());
         Assert.assertEquals("TCGA-A1-A0SB-01", genePanelData.getSampleId());
     }

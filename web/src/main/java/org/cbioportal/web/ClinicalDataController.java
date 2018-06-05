@@ -30,11 +30,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,12 +44,13 @@ import java.util.List;
 @Api(tags = "Clinical Data", description = " ")
 public class ClinicalDataController {
 
-    public static final int CLINICAL_DATA_MAX_PAGE_SIZE = 100000;
-    private static final String CLINICAL_DATA_DEFAULT_PAGE_SIZE = "100000";
+    public static final int CLINICAL_DATA_MAX_PAGE_SIZE = 10000000;
+    private static final String CLINICAL_DATA_DEFAULT_PAGE_SIZE = "10000000";
 
     @Autowired
     private ClinicalDataService clinicalDataService;
 
+    @PreAuthorize("hasPermission(#studyId, 'CancerStudy', 'read')")
     @RequestMapping(value = "/studies/{studyId}/samples/{sampleId}/clinical-data", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Get all clinical data of a sample in a study")
@@ -88,6 +89,7 @@ public class ClinicalDataController {
         }
     }
 
+    @PreAuthorize("hasPermission(#studyId, 'CancerStudy', 'read')")
     @RequestMapping(value = "/studies/{studyId}/patients/{patientId}/clinical-data", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Get all clinical data of a patient in a study")
@@ -126,6 +128,7 @@ public class ClinicalDataController {
         }
     }
 
+    @PreAuthorize("hasPermission(#studyId, 'CancerStudy', 'read')")
     @RequestMapping(value = "/studies/{studyId}/clinical-data", method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Get all clinical data in a study")
@@ -163,9 +166,10 @@ public class ClinicalDataController {
         }
     }
 
+    @PreAuthorize("hasPermission(#studyId, 'CancerStudy', 'read')")
     @RequestMapping(value = "/studies/{studyId}/clinical-data/fetch", method = RequestMethod.POST,
         consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation("Fetch all clinical data in a study")
+    @ApiOperation("Fetch clinical data by patient IDs or sample IDs (specific study)")
     public ResponseEntity<List<ClinicalData>> fetchAllClinicalDataInStudy(
         @ApiParam(required = true, value = "Study ID e.g. acc_tcga")
         @PathVariable String studyId,
@@ -190,9 +194,10 @@ public class ClinicalDataController {
         }
     }
 
+    @PreAuthorize("hasPermission(#clinicalDataMultiStudyFilter, 'ClinicalDataMultiStudyFilter', 'read')")
     @RequestMapping(value = "/clinical-data/fetch", method = RequestMethod.POST,
         consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation("Fetch clinical data by patient IDs or sample IDs")
+    @ApiOperation("Fetch clinical data by patient IDs or sample IDs (all studies)")
     public ResponseEntity<List<ClinicalData>> fetchClinicalData(
         @ApiParam("Type of the clinical data")
         @RequestParam(defaultValue = "SAMPLE") ClinicalDataType clinicalDataType,

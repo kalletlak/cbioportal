@@ -23,4 +23,6 @@ public interface SampleListService {
     BaseMeta getMetaSampleListsInStudy(String studyId) throws StudyNotFoundException;
 
     List<String> getAllSampleIdsInSampleList(String sampleListId) throws SampleListNotFoundException;
+
+	List<SampleList> fetchSampleLists(List<String> sampleListIds, String projection);
 }

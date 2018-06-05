@@ -5,15 +5,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.cbioportal.model.Geneset;
-import org.cbioportal.model.GenesetGeneticData;
+import org.cbioportal.model.GenesetMolecularData;
 import org.cbioportal.model.GenesetHierarchyInfo;
-import org.cbioportal.model.GeneticProfile;
+import org.cbioportal.model.MolecularProfile;
 import org.cbioportal.persistence.GenesetHierarchyRepository;
 import org.cbioportal.service.GenesetDataService;
 import org.cbioportal.service.GenesetService;
-import org.cbioportal.service.GeneticDataService;
-import org.cbioportal.service.GeneticProfileService;
+import org.cbioportal.service.MolecularDataService;
+import org.cbioportal.service.MolecularProfileService;
 import org.cbioportal.service.SampleService;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import junit.framework.Assert;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GenesetHierarchyServiceImplTest extends BaseServiceImplTest {
@@ -33,13 +32,13 @@ public class GenesetHierarchyServiceImplTest extends BaseServiceImplTest {
     @Mock
     private GenesetDataService genesetDataService;
     @Mock
-    private GeneticDataService geneticDataService;
+    private MolecularDataService geneticDataService;
     @Mock
     private GenesetService genesetService;
     @Mock
     private SampleService sampleService;
     @Mock
-    private GeneticProfileService geneticProfileService;
+    private MolecularProfileService geneticProfileService;
     @Mock
     private GenesetHierarchyRepository genesetHierarchyRepository;
 
@@ -54,31 +53,31 @@ public class GenesetHierarchyServiceImplTest extends BaseServiceImplTest {
     @Before 
     public void setUp() throws Exception {
 
-        GeneticProfile geneticProfile = new GeneticProfile();
+        MolecularProfile geneticProfile = new MolecularProfile();
         geneticProfile.setCancerStudyIdentifier(STUDY_ID);
-        geneticProfile.setDatatype("GSVA_SCORE");
-        Mockito.when(geneticProfileService.getGeneticProfile(GENETIC_PROFILE_ID)).thenReturn(geneticProfile);
+        geneticProfile.setDatatype("GSVA-SCORE");
+        Mockito.when(geneticProfileService.getMolecularProfile(MOLECULAR_PROFILE_ID)).thenReturn(geneticProfile);
         
         //stub for geneset scores:
-        List<GenesetGeneticData> genesetScoresDataList1 = new ArrayList<GenesetGeneticData>();
+        List<GenesetMolecularData> genesetScoresDataList1 = new ArrayList<GenesetMolecularData>();
         genesetScoresDataList1.add(getSimpleFlatGenesetDataItem(SAMPLE_ID1, GENESET_ID1, "0.2"));
         genesetScoresDataList1.add(getSimpleFlatGenesetDataItem(SAMPLE_ID2, GENESET_ID1, "0.499"));
         genesetScoresDataList1.add(getSimpleFlatGenesetDataItem(SAMPLE_ID3, GENESET_ID1, "0.470"));
         genesetScoresDataList1.add(getSimpleFlatGenesetDataItem(SAMPLE_ID1, GENESET_ID2, "-0.35"));
         genesetScoresDataList1.add(getSimpleFlatGenesetDataItem(SAMPLE_ID2, GENESET_ID2, "0.12"));
         genesetScoresDataList1.add(getSimpleFlatGenesetDataItem(SAMPLE_ID3, GENESET_ID2, "-0.11"));
-        Mockito.when(genesetDataService.fetchGenesetData(GENETIC_PROFILE_ID, Arrays.asList(SAMPLE_ID1, SAMPLE_ID2, SAMPLE_ID3),
+        Mockito.when(genesetDataService.fetchGenesetData(MOLECULAR_PROFILE_ID, Arrays.asList(SAMPLE_ID1, SAMPLE_ID2, SAMPLE_ID3),
                 null))
             .thenReturn(genesetScoresDataList1);
         
         //stubs for related p-values:
-        GeneticProfile pvalueGeneticProfile = new GeneticProfile();
+        MolecularProfile pvalueGeneticProfile = new MolecularProfile();
         pvalueGeneticProfile.setStableId(PVALUE_GENETIC_PROFILE_ID);
-        pvalueGeneticProfile.setDatatype("P_VALUE");
-        Mockito.when(geneticProfileService.getGeneticProfilesReferringTo(GENETIC_PROFILE_ID))
+        pvalueGeneticProfile.setDatatype("P-VALUE");
+        Mockito.when(geneticProfileService.getMolecularProfilesReferringTo(MOLECULAR_PROFILE_ID))
             .thenReturn(Arrays.asList(pvalueGeneticProfile));
 
-        List<GenesetGeneticData> genesetPvaluesDataList1 = new ArrayList<GenesetGeneticData>();
+        List<GenesetMolecularData> genesetPvaluesDataList1 = new ArrayList<GenesetMolecularData>();
         genesetPvaluesDataList1.add(getSimpleFlatGenesetDataItem(SAMPLE_ID1, GENESET_ID1, "0.016"));
         genesetPvaluesDataList1.add(getSimpleFlatGenesetDataItem(SAMPLE_ID2, GENESET_ID1, "0.0359"));
         genesetPvaluesDataList1.add(getSimpleFlatGenesetDataItem(SAMPLE_ID3, GENESET_ID1, "0.0219"));
@@ -145,10 +144,10 @@ public class GenesetHierarchyServiceImplTest extends BaseServiceImplTest {
             .thenReturn(Arrays.asList(geneset2)); //only geneset 2 as child
     }
 
-    private GenesetGeneticData getSimpleFlatGenesetDataItem(String sampleStableId, String genesetId, String value){
+    private GenesetMolecularData getSimpleFlatGenesetDataItem(String sampleStableId, String genesetId, String value){
     
-        GenesetGeneticData item = new GenesetGeneticData();
-        item.setGeneticProfileId(GENETIC_PROFILE_ID);
+        GenesetMolecularData item = new GenesetMolecularData();
+        item.setMolecularProfileId(MOLECULAR_PROFILE_ID);
         item.setGenesetId(genesetId);
         item.setSampleId(sampleStableId);
         item.setValue(value);
@@ -159,7 +158,7 @@ public class GenesetHierarchyServiceImplTest extends BaseServiceImplTest {
     public void fetchCorrelatedGenes() throws Exception {
 
         //50th percentile (median), with thresholds abs_score=0.4 and p-value=0.05:
-        List<GenesetHierarchyInfo> result = genesetHierarchyService.fetchGenesetHierarchyInfo(GENETIC_PROFILE_ID, 50, 0.4, 0.05,
+        List<GenesetHierarchyInfo> result = genesetHierarchyService.fetchGenesetHierarchyInfo(MOLECULAR_PROFILE_ID, 50, 0.4, 0.05,
                 Arrays.asList(SAMPLE_ID1, SAMPLE_ID2, SAMPLE_ID3));
 
         //what we expect: at threshold 0.4 only GENESET_ID1 will qualify, so only the hierarchy related to this 
@@ -172,11 +171,11 @@ public class GenesetHierarchyServiceImplTest extends BaseServiceImplTest {
         Assert.assertEquals(1, result.get(2).getGenesets().size());
         Geneset geneset = result.get(2).getGenesets().get(0);
         Assert.assertEquals(GENESET_ID1, geneset.getGenesetId());
-        Assert.assertEquals(0.470, geneset.getRepresentativeScore());
-        Assert.assertEquals(0.0219, geneset.getRepresentativePvalue());
+        Assert.assertEquals((Double) 0.470, geneset.getRepresentativeScore());
+        Assert.assertEquals((Double) 0.0219, geneset.getRepresentativePvalue());
 
         //90th percentile, with thresholds abs_score=0.3 and p-value=0.05:
-        result = genesetHierarchyService.fetchGenesetHierarchyInfo(GENETIC_PROFILE_ID, 90, 0.3, 0.05,
+        result = genesetHierarchyService.fetchGenesetHierarchyInfo(MOLECULAR_PROFILE_ID, 90, 0.3, 0.05,
                 Arrays.asList(SAMPLE_ID1, SAMPLE_ID2, SAMPLE_ID3));
 
         //what we expect: at threshold 0.3 both GENESET_ID1 & 2 will qualify, so the hierarchy related to these
@@ -192,17 +191,17 @@ public class GenesetHierarchyServiceImplTest extends BaseServiceImplTest {
         Assert.assertEquals(1, result.get(3).getGenesets().size());
         geneset = result.get(2).getGenesets().get(0);
         Assert.assertEquals(GENESET_ID1, geneset.getGenesetId());
-        Assert.assertEquals(0.499, geneset.getRepresentativeScore());
-        Assert.assertEquals(0.0359, geneset.getRepresentativePvalue());
+        Assert.assertEquals((Double) 0.499, geneset.getRepresentativeScore());
+        Assert.assertEquals((Double) 0.0359, geneset.getRepresentativePvalue());
         geneset = result.get(2).getGenesets().get(1);
         Assert.assertEquals(GENESET_ID2, geneset.getGenesetId());
-        Assert.assertEquals(-0.35, geneset.getRepresentativeScore());
-        Assert.assertEquals(0.046, geneset.getRepresentativePvalue());
+        Assert.assertEquals((Double) (-0.35), geneset.getRepresentativeScore());
+        Assert.assertEquals((Double) 0.046, geneset.getRepresentativePvalue());
         //last one is also GENESET_ID2:
         Assert.assertEquals(geneset, result.get(3).getGenesets().get(0));
 
         //40th percentile, with thresholds abs_score=0.1 and (stricter) p-value=0.01:
-        result = genesetHierarchyService.fetchGenesetHierarchyInfo(GENETIC_PROFILE_ID, 40, 0.1, 0.01,
+        result = genesetHierarchyService.fetchGenesetHierarchyInfo(MOLECULAR_PROFILE_ID, 40, 0.1, 0.01,
                 Arrays.asList(SAMPLE_ID1, SAMPLE_ID2, SAMPLE_ID3));
 
         //what we expect: at threshold 0.1 both GENESET_ID1 & 2 will initially qualify, but GENESET_ID1 will finally not
@@ -217,8 +216,8 @@ public class GenesetHierarchyServiceImplTest extends BaseServiceImplTest {
         Assert.assertEquals(1, result.get(3).getGenesets().size());
         geneset = result.get(2).getGenesets().get(0);
         Assert.assertEquals(GENESET_ID2, geneset.getGenesetId());
-        Assert.assertEquals(0.12, geneset.getRepresentativeScore());
-        Assert.assertEquals(0.0019, geneset.getRepresentativePvalue());
+        Assert.assertEquals((Double) 0.12, geneset.getRepresentativeScore());
+        Assert.assertEquals((Double) 0.0019, geneset.getRepresentativePvalue());
         //last one is also GENESET_ID2:
         Assert.assertEquals(geneset, result.get(3).getGenesets().get(0));
     }

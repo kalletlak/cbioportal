@@ -36,40 +36,35 @@
 <%@ page import="java.net.URLEncoder" %>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-
-    <%
+<%
     String siteTitle = GlobalProperties.getTitle();
- 
+
     String selectedCancerStudyId =
-		    (String) request.getAttribute(QueryBuilder.CANCER_STUDY_ID);
-    
-    String selectedSampleIds = 
-                    (String) request.getParameter(QueryBuilder.CASE_IDS);
+        (String) request.getAttribute(QueryBuilder.CANCER_STUDY_ID);
+
     if (siteTitle == null) {
         siteTitle = "cBioPortal for Cancer Genomics";
     }
-  
+
 %>
 
 <%
     request.setAttribute("index.jsp", Boolean.TRUE);
     request.setAttribute("selectedCancerStudyId", selectedCancerStudyId);
-    request.setAttribute("selectedSampleIds", selectedSampleIds);
-    //request.setAttribute(QueryBuilder.HTML_TITLE, siteTitle);
-    //String userMessage = (String) request.getAttribute(QueryBuilder.USER_ERROR_MESSAGE);
 %>
 
 <t:template title="<%=siteTitle%>" cssClass="homePage" defaultRightColumn="true" twoColumn="true" fixedWidth="false">
 
     <jsp:attribute name="head_area">
+        <!-- Include selected_study_variables in the new front-end framework and makre sure rest of legacy still working -->
+        <jsp:include page="global/selected_study_variables.jsp"/>
+        <jsp:include page="global/server_vars.jsp"/>
         <script>
             window.selectedCancerStudyId = '${selectedCancerStudyId}';
             if (window.selectedCancerStudyId === "all") {
                 // This means no study selected
                 window.selectedCancerStudyId = "";
             }
-            
-            window.selectedSampleIds = '${selectedSampleIds}';
 
             window.loadReactApp({ defaultRoute: 'home' });
         </script>
@@ -78,7 +73,7 @@
     <jsp:attribute name="body_area">
         <div id="reactRoot"></div>
     </jsp:attribute>
-    
+
 
 </t:template>
     

@@ -199,6 +199,18 @@ class ClinicalColumnDefsTestCase(PostClinicalDataFileTestCase):
         self.assertEqual(record_list[1].line_number, 4)
         self.assertEqual(record_list[1].column_number, 6)
 
+    def test_lowercase_attribute(self):
+        """Test when attribute is in lower case."""
+        record_list = self.validate('data_clin_coldefs_lowercase_attribute.txt',
+                                    validateData.PatientClinicalValidator)
+        # expecting an debug message followed by the error, and rest 2 info messages
+        self.assertEqual(len(record_list), 4)
+        # error about the lowercase value of sausage column
+        self.assertEqual(record_list[1].levelno, logging.ERROR)
+        self.assertEqual(record_list[1].line_number, 5)
+        self.assertEqual(record_list[1].column_number, 6)
+        self.assertIn('Attribute name not in upper case', record_list[1].getMessage())
+
     def test_hardcoded_attributes(self):
 
         """Test requirements on the data type or level of some attributes."""
@@ -1090,23 +1102,46 @@ class MutationsSpecialCasesTestCase(PostClinicalDataFileTestCase):
         with a warning when Variant_Classification!='IGR'
         """
         # set level according to this test case:
-        self.logger.setLevel(logging.WARNING)
+        self.logger.setLevel(logging.INFO)
         record_list = self.validate('mutations/data_mutations_silent_alternative.maf',
                                     validateData.MutationsExtendedValidator,
                                     extra_meta_fields={
                                             'swissprot_identifier': 'name'})
-        # we expect 1 ERROR and 2 WARNINGs :
-        self.assertEqual(len(record_list), 3)
+        # we expect 1 ERROR, 2 WARNINGs and 5 INFO:
+        self.assertEqual(len(record_list), 8)
 
         # ERROR should be something like: "No Entrez id or gene symbol provided for gene"
-        self.assertIn("no entrez gene id or gene symbol provided", record_list[0].getMessage().lower())
-        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        self.assertIn("no entrez gene id or gene symbol provided", record_list[1].getMessage().lower())
+        self.assertEqual(record_list[1].levelno, logging.ERROR)
         # WARNING should be something like: "Gene specification for this mutation implies intergenic..."
-        self.assertIn("implies intergenic", record_list[1].getMessage().lower())
-        self.assertEqual(record_list[1].levelno, logging.WARNING)
         self.assertIn("implies intergenic", record_list[2].getMessage().lower())
         self.assertEqual(record_list[2].levelno, logging.WARNING)
+        self.assertIn("implies intergenic", record_list[3].getMessage().lower())
+        self.assertEqual(record_list[3].levelno, logging.WARNING)
+        # INFO should be: "this variant (gene symbol 'unknown', entrez gene id 0) will be filtered out"
+        self.assertIn("this variant (gene symbol 'unknown', entrez gene id 0) will be filtered out", record_list[4].getMessage().lower())
+        self.assertEqual(record_list[4].levelno, logging.INFO)
+
+    def test_customized_variants_skipped(self):
         
+        """Test if customized mutations are skipped with a message."""
+        # set level according to this test case:
+        self.logger.setLevel(logging.INFO)
+        old_variant_types = validateData.MutationsExtendedValidator.SKIP_VARIANT_TYPES
+        validateData.MutationsExtendedValidator.SKIP_VARIANT_TYPES = ["5'Flank", "Frame_Shift_Del", "Frame_Shift_Ins"]
+        record_list = self.validate('mutations/data_mutations_some_silent.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={
+                                            'swissprot_identifier': 'name'})
+        # we expect 6 infos: 4 about filtered mutations, 2 general info messages:
+        self.assertEqual(len(record_list), 6)
+        # First 3 INFO messages should be something like: "Line will not be loaded due to the variant classification filter. Filtered types:"
+        for record in record_list[:4]: 
+            self.assertIn("filtered types", record.getMessage().lower())
+        
+        # restore the default skipped variant types
+        validateData.MutationsExtendedValidator.SKIP_VARIANT_TYPES = old_variant_types
+               
     def test_isValidGenePosition(self):
         """Test if proper warnings/errors are given for wrong/blank gene positions 
         (Start_Position and End_Position) change vals."""
@@ -1139,6 +1174,232 @@ class MutationsSpecialCasesTestCase(PostClinicalDataFileTestCase):
         self.assertEqual(record.levelno, logging.ERROR)
         self.assertIn('The end position of this variant is not '
                     'an integer', record.getMessage())
+        
+    def test_absence_custom_values_columns_when_custom_annotation_columns(self):
+        """Test that the validator raises an error when the 
+        cbp_driver_annotation and the cbp_driver_tiers_annotation
+        columns are present but the cbp_driver and the 
+        cbp_driver_tiers columns are not.
+        """
+        # set level according to this test case:
+        self.logger.setLevel(logging.ERROR)
+        record_list = self.validate('mutations/data_mutations_absence_custom_values_columns_when_custom_annotation_columns.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={
+                                            'swissprot_identifier': 'name'})
+        # we expect 5 ERRORs :
+        self.assertEqual(len(record_list), 5)
+        
+        # First 2 ERRORs should be something like: "Column X found without any X column"
+        self.assertIn("found without any", record_list[0].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        self.assertIn("found without any", record_list[1].getMessage().lower())
+        self.assertEqual(record_list[1].levelno, logging.ERROR)
+        
+        # Last 3 ERRORs should be something like: "This line has no value for X and a value for Y. Please, fill the Z column."
+        self.assertIn("please, fill the", record_list[2].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        self.assertIn("please, fill the", record_list[3].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        self.assertIn("please, fill the", record_list[4].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+    
+    def test_absence_custom_annotation_columns_when_custom_values_columns(self):
+        """Test that the validator raises an error when the 
+        cbp_driver and the cbp_driver_tiers columns are present 
+        but the cbp_driver_annotation and the 
+        cbp_driver_tiers_annotation columns are not.
+        """
+        # set level according to this test case:
+        self.logger.setLevel(logging.ERROR)
+        record_list = self.validate('mutations/data_mutations_absence_custom_annotation_columns_when_custom_values_columns.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={
+                                            'swissprot_identifier': 'name'})
+        # we expect 5 ERRORs :
+        self.assertEqual(len(record_list), 5)
+        
+        # First 2 ERRORs should be something like: "Column X found without any Y column"
+        self.assertIn("found without any", record_list[0].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        self.assertIn("found without any", record_list[1].getMessage().lower())
+        self.assertEqual(record_list[1].levelno, logging.ERROR)
+        
+        # Last 3 ERRORs should be something like: "This line has no value for X and a value for Y. Please, fill the annotation column."
+        self.assertIn("please, fill the annotation column", record_list[2].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        self.assertIn("please, fill the annotation column", record_list[3].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        self.assertIn("please, fill the annotation column", record_list[4].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        
+    def test_empty_custom_annotation_fields(self):
+        """Test that the validator raises errors when one multiclass
+        column is empty and the other is full, and that the binary
+        annotation column is full when the binary label column contains
+        "Putative_Driver" or "Putative_Passenger".
+        """
+        # set level according to this test case:
+        self.logger.setLevel(logging.ERROR)
+        record_list = self.validate('mutations/data_mutations_empty_custom_annotation_fields.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={
+                                            'swissprot_identifier': 'name'})
+        # we expect 2 ERRORs :
+        self.assertEqual(len(record_list), 2)
+        
+        # 2 ERRORs should be something like: "This line has no value for X and a value for Y. Please, fill the Z column."
+        self.assertIn("please, fill the", record_list[0].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        self.assertIn("please, fill the", record_list[1].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+    
+    def test_warning_more_than_10_types_in_driver_class(self):
+        """Test that the validator raises a warning when the column
+        cbp_driver_tiers contains more than 10 types.
+        """
+        # set level according to this test case:
+        self.logger.setLevel(logging.WARNING)
+        record_list = self.validate('mutations/data_mutations_more_than_10_types_in_driver_class.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={
+                                            'swissprot_identifier': 'name'})
+        # we expect 3 WARNINGs :
+        self.assertEqual(len(record_list), 3)
+        
+        # WARNINGs should be something like: "cbp_driver_tiers contains more than 10 different values"
+        self.assertIn("cbp_driver_tiers contains more than 10 different tiers.", record_list[0].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.WARNING)
+        self.assertIn("cbp_driver_tiers contains more than 10 different tiers.", record_list[1].getMessage().lower())
+        self.assertEqual(record_list[1].levelno, logging.WARNING)
+        self.assertIn("cbp_driver_tiers contains more than 10 different tiers.", record_list[2].getMessage().lower())
+        self.assertEqual(record_list[2].levelno, logging.WARNING)
+        
+    def test_annotation_more_than_80_characters_in_custom_annotation_columns(self):
+        """Test if the validator raises an error if any value of the annotation
+        columns has more than 80 characters.
+        """
+        # set level according to this test case:
+        self.logger.setLevel(logging.ERROR)
+        record_list = self.validate('mutations/data_mutations_more_than_80_characters_in_custom_annotation_columns.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={
+                                            'swissprot_identifier': 'name'})
+        # we expect 1 ERROR :
+        self.assertEqual(len(record_list), 1)
+        
+        # ERROR should be something like: "cbp_driver_annotation and cbp_driver_tiers_annotation columns do not support annotations longer than 80 characters"
+        self.assertIn("columns do not support annotations longer than 80 characters", record_list[0].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        
+    def test_not_supported_custom_driver_annotation_values(self):
+        """Test if the validator raises an error if any value of the
+        cbp_driver is not Putative_Passenger or
+        Putative_Driver.
+        """
+        # set level according to this test case:
+        self.logger.setLevel(logging.ERROR)
+        record_list = self.validate('mutations/data_mutations_not_supported_custom_driver_annotation_values.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={
+                                            'swissprot_identifier': 'name'})
+        # we expect 1 ERROR :
+        self.assertEqual(len(record_list), 1)
+        
+        # ERROR should be something like: "Only "Putative_Passenger", "Putative_Driver", "NA", "Unknown" and "" (empty) are allowed."
+        self.assertIn('only "putative_passenger", "putative_driver", "na", "unknown" and "" (empty) are allowed.', record_list[0].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+        
+    def test_custom_driver_column_more_than_50_characters(self):
+        """Test if the validator raises an error if any value of the 
+        cbp_driver_tiers column has more than 50 characters.
+        """
+        # set level according to this test case:
+        self.logger.setLevel(logging.ERROR)
+        record_list = self.validate('mutations/data_mutations_custom_tiers_column_more_than_50_characters.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={
+                                            'swissprot_identifier': 'name'})
+        # we expect 1 ERROR :
+        self.assertEqual(len(record_list), 1)
+        
+        # ERROR should be something like: "cbp_driver_tiers column does not support values longer than 50 characters"
+        self.assertIn("does not support values longer than 50 characters", record_list[0].getMessage().lower())
+        self.assertEqual(record_list[0].levelno, logging.ERROR)
+
+    def test_validation_verification_status(self):
+
+        """Assert names are validated in data_mutations_vs.maf."""
+        self.logger.setLevel(logging.WARNING)
+        record_list = self.validate('mutations/data_mutations_vs.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={'swissprot_identifier': 'name'})
+
+        # we expect 2 errors:
+        self.assertEqual(len(record_list), 2)
+
+        record_iterator = iter(record_list)
+        # Validation Status error
+        record = record_iterator.next()
+        self.assertEqual(record.levelno, logging.WARNING)
+        self.assertEqual(record.line_number, 3)
+        self.assertEqual(record.cause, '---')
+        self.assertEqual(record.getMessage(), "Value in 'Validation_Status' not in MAF format")
+        # Verification status error
+        record = record_iterator.next()
+        self.assertEqual(record.levelno, logging.WARNING)
+        self.assertEqual(record.line_number, 4)
+        self.assertEqual(record.cause, 'Test')
+        self.assertEqual(record.getMessage(), "Value in 'Verification_Status' not in MAF format")
+
+    def test_validation_ms(self):
+
+        """Test if warning is given when Mutation_Status column in mutation
+        file contains other than allowed values from MAF format or Wildtype."""
+        self.logger.setLevel(logging.WARNING)
+        record_list = self.validate('mutations/data_mutations_ms.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={'swissprot_identifier': 'name'})
+        # we expect 1 warning
+        self.assertEqual(len(record_list), 1)
+
+        # Check warning message
+        self.assertEqual(record_list[0].levelno, logging.WARNING)
+        self.assertEqual(record_list[0].line_number, 3)
+        self.assertEqual(record_list[0].cause, 'test')
+        self.assertEqual(record_list[0].getMessage(), "Mutation_Status value is not in MAF format")
+
+    def test_mutation_not_loaded_ms(self):
+
+        """Test if info message is given when Mutation_Status columns have either
+        LOH, None or Wildtype. In these cases the mutation is not loaded in cBioPortal."""
+        self.logger.setLevel(logging.INFO)
+        record_list = self.validate('mutations/data_mutations_not_loaded_ms.maf',
+                                    validateData.MutationsExtendedValidator,
+                                    extra_meta_fields={'swissprot_identifier': 'name'})
+
+        # We expect 5 info messages, 3 from not loaded mutations and 2 general lines
+        self.assertEqual(len(record_list), 5)
+        record_iterator = iter(record_list)
+        # Expected info message due to value "None" in Mutation_Status
+        record = record_iterator.next()
+        self.assertEqual(record.levelno, logging.INFO)
+        self.assertEqual(record.line_number, 3)
+        self.assertEqual(record.cause, 'None')
+        self.assertEqual(record.getMessage(), "Mutation will not be loaded due to value in Mutation_Status")
+        # Expected info message due to value "loh" in Mutation_Status
+        record = record_iterator.next()
+        self.assertEqual(record.levelno, logging.INFO)
+        self.assertEqual(record.line_number, 5)
+        self.assertEqual(record.cause, 'loh')
+        self.assertEqual(record.getMessage(), "Mutation will not be loaded due to value in Mutation_Status")
+        # Expected info message due to value "Wildtype" in Mutation_Status
+        record = record_iterator.next()
+        self.assertEqual(record.levelno, logging.INFO)
+        self.assertEqual(record.line_number, 9)
+        self.assertEqual(record.cause, 'Wildtype')
+        self.assertEqual(record.getMessage(), "Mutation will not be loaded due to value in Mutation_Status")
+
 
 class FusionValidationTestCase(PostClinicalDataFileTestCase):
 
@@ -1148,7 +1409,7 @@ class FusionValidationTestCase(PostClinicalDataFileTestCase):
         """Test if duplicate lines are detected"""
         # set level according to this test case:
         self.logger.setLevel(logging.WARNING)
-        record_list = self.validate('data_fusion_duplicate_entry.txt',
+        record_list = self.validate('data_fusions_duplicate_entry.txt',
                                     validateData.FusionValidator)
 
         self.assertEqual(len(record_list), 1)
@@ -1440,6 +1701,32 @@ class CaseListDirTestCase(PostClinicalDataFileTestCase):
         self.assertIn('multiple', record.getMessage().lower())
         self.assertTrue(record.cause.startswith('brca_tcga_pub_all'),
                         "Error is not about the id 'brca_tcga_pub_all'")
+
+    def test_duplicated_sample_id(self):
+        """Test if an warning is issued when one list has duplicate sample id"""
+        self.logger.setLevel(logging.WARNING)
+        validateData.processCaseListDirectory(
+            'test_data/case_lists_duplicated_sampleid',
+            'brca_tcga_pub',
+            self.logger)
+        record_list = self.get_log_records()
+        self.assertEqual(len(record_list), 1)
+        record = record_list.pop()
+        self.assertEqual(record.levelno, logging.WARNING)
+        self.assertIn('duplicate', record.getMessage().lower())
+
+    def test_invalid_category(self):
+        """Test if an error is issued for an invalid case list category"""
+        self.logger.setLevel(logging.ERROR)
+        validateData.processCaseListDirectory(
+            'test_data/case_lists_invalid_category',
+            'brca_tcga_pub',
+            self.logger)
+        record_list = self.get_log_records()
+        self.assertEqual(len(record_list), 1)
+        record = record_list.pop()
+        self.assertEqual(record.levelno, logging.ERROR)
+        self.assertIn('invalid', record.getMessage().lower())
 
     def test_missing_caselists(self):
         """Test if errors are issued if certain case lists are not defined."""

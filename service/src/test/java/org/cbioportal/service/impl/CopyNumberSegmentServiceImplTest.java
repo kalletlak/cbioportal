@@ -1,11 +1,11 @@
 package org.cbioportal.service.impl;
 
-import junit.framework.Assert;
 import org.cbioportal.model.CopyNumberSeg;
 import org.cbioportal.model.meta.BaseMeta;
 import org.cbioportal.persistence.CopyNumberSegmentRepository;
 import org.cbioportal.service.SampleService;
 import org.cbioportal.service.exception.SampleNotFoundException;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -82,10 +82,10 @@ public class CopyNumberSegmentServiceImplTest extends BaseServiceImplTest {
         expectedCopyNumberSegList.add(copyNumberSeg);
 
         Mockito.when(copyNumberSegmentRepository.fetchCopyNumberSegments(Arrays.asList(STUDY_ID), 
-            Arrays.asList(PATIENT_ID), PROJECTION)).thenReturn(expectedCopyNumberSegList);
+            Arrays.asList(PATIENT_ID_1), PROJECTION)).thenReturn(expectedCopyNumberSegList);
 
         List<CopyNumberSeg> result = copyNumberSegmentService.fetchCopyNumberSegments(Arrays.asList(STUDY_ID),
-            Arrays.asList(PATIENT_ID), PROJECTION);
+            Arrays.asList(PATIENT_ID_1), PROJECTION);
 
         Assert.assertEquals(expectedCopyNumberSegList, result);
     }
@@ -95,9 +95,9 @@ public class CopyNumberSegmentServiceImplTest extends BaseServiceImplTest {
 
         BaseMeta expectedBaseMeta = new BaseMeta();
         Mockito.when(copyNumberSegmentRepository.fetchMetaCopyNumberSegments(Arrays.asList(STUDY_ID), 
-            Arrays.asList(PATIENT_ID))).thenReturn(expectedBaseMeta);
+            Arrays.asList(PATIENT_ID_1))).thenReturn(expectedBaseMeta);
         BaseMeta result = copyNumberSegmentService.fetchMetaCopyNumberSegments(Arrays.asList(STUDY_ID), 
-            Arrays.asList(PATIENT_ID));
+            Arrays.asList(PATIENT_ID_1));
 
         Assert.assertEquals(expectedBaseMeta, result);
     }

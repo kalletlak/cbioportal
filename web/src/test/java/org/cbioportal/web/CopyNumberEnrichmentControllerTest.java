@@ -106,12 +106,12 @@ public class CopyNumberEnrichmentControllerTest {
         enrichmentFilter.setUnalteredIds(Arrays.asList("test_sample_id_2"));
 
         mockMvc.perform(MockMvcRequestBuilders.post(
-            "/genetic-profiles/test_genetic_profile_id/copy-number-enrichments/fetch")
+            "/molecular-profiles/test_molecular_profile_id/copy-number-enrichments/fetch")
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(enrichmentFilter)))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].entrezGeneId").value(TEST_ENTREZ_GENE_ID_1))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].hugoGeneSymbol").value(TEST_HUGO_GENE_SYMBOL_1))

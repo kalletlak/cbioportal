@@ -41,12 +41,7 @@
             var mutationsTab = $('#mutation_details');
 
             if (mutationsTab.hasClass('cbioportal-frontend')) {
-                // backwards compatible with the case when mutationDetailLimitReached
-                window.renderMutationsTab(mutationsTab[0], {
-                    genes: QuerySession.getQueryGenes(),
-                    studyId: QuerySession.getCancerStudyIds()[0],
-                    samples: (QuerySession.getCaseSetId() === "-1" ? QuerySession.getSampleIds() : QuerySession.getCaseSetId())
-                });
+                window.renderMutationsTab(mutationsTab[0]);
                 return true;
             }
             return false;

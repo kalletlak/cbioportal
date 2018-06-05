@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -31,6 +32,7 @@ public class FractionGenomeAlteredController {
     @Autowired
     private FractionGenomeAlteredService fractionGenomeAlteredService;
 
+    @PreAuthorize("hasPermission(#studyId, 'CancerStudy', 'read')")
     @RequestMapping(value = "/studies/{studyId}/fraction-genome-altered/fetch",
         method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,7 +42,7 @@ public class FractionGenomeAlteredController {
         @PathVariable String studyId,
         @ApiParam(required = true, value = "List of Sample IDs/Sample List ID")
         @Valid @RequestBody FractionGenomeAlteredFilter fractionGenomeAlteredFilter,
-        @ApiParam(required = true, value = "Cutoff")
+        @ApiParam("Cutoff")
         @RequestParam(defaultValue = "0.2") Double cutoff) {
 
         List<FractionGenomeAltered> fractionGenomeAlteredList;

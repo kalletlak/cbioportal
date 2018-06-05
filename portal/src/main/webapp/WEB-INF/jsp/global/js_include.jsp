@@ -66,7 +66,7 @@
 <script type="text/javascript" src="js/lib/igv_webstart.js?<%=GlobalProperties.getAppVersion()%>"></script>
 <script type="text/javascript" src="js/lib/genomespace.js"></script>
 <script type="text/javascript" src="js/lib/jstat.min.js"></script>
-<script src="https://gsui.genomespace.org/jsui/upload/gsuploadwindow.js" type="text/javascript"></script>
+<%--<script src="https://gsui.genomespace.org/jsui/upload/gsuploadwindow.js" type="text/javascript"></script>-->
 
 
 <%--<script type="text/javascript" src="js/lib/jsmol/JSmol.min.nojq.js?<%=GlobalProperties.getAppVersion()%>"></script>
@@ -103,3 +103,8 @@
 <script type="text/javascript" src="js/src/download-data-form-validation.js"></script>
 <script type="text/javascript" src="js/lib/jstree.js?<%=GlobalProperties.getAppVersion()%>"></script>
 <script type="text/javascript" src="js/api/cbioportal-client.js?<%=GlobalProperties.getAppVersion()%>"></script>
+
+<%--The 3 files make expression tab work--%>
+<script type="text/javascript" src="js/src/cross-cancer-plotly-plots.js?<%=GlobalProperties.getAppVersion()%>"></script>
+<script type="text/javascript" src="js/src/plots-tab/util/stylesheet.js"></script>
+<script type="text/javascript" src="js/src/plots-tab/util/plotsUtil.js"></script>

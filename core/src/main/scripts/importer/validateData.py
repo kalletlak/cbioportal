@@ -769,6 +769,39 @@ class Validator(object):
 
         return identified_entrez_id
 
+    def checkDriverAnnotationColumn(self, driver_value=None, driver_annotation=None):
+        """Ensures that cbp_driver_annotation is filled when the cbp_driver column
+        contains "Putative_Driver" or "Putative_Passenger".
+        """
+        if driver_annotation is None and (driver_value is "Putative_Driver" or driver_value is "Putative_Passenger"):
+            self.logger.error(
+                'This line does not contain a value '
+                'for cbp_driver_annotation, and cbp_driver '
+                'contains "Putative_Driver" or '
+                '"Putative_Passenger".',
+                extra={'line_number': self.line_number,
+                       'cause': driver_annotation})
+        return None
+    
+    def checkDriverTiersColumnsValues(self, driver_tiers_value=None, driver_tiers_annotation=None):
+        """Ensures that there are no mutations with one multiclass column filled and 
+        the other empty.
+        """
+        if driver_tiers_value is None and driver_tiers_annotation is not None:
+            self.logger.error(
+                'This line has no value for cbp_driver_tiers '
+                'and a value for cbp_driver_tiers_annotation. '
+                'Please, fill the cbp_driver_tiers column.',
+                extra={'line_number': self.line_number,
+                       'cause': driver_tiers_value})
+        if driver_tiers_annotation is None and driver_tiers_value is not None:
+            self.logger.error(
+                'This line has no value for cbp_driver_annotation '
+                'and a value for cbp_driver_tiers. Please, fill '
+                'the annotation column.',
+                extra={'line_number': self.line_number,
+                       'cause': driver_tiers_annotation})
+        return None
 
     def _checkRepeatedColumns(self):
         num_errors = 0
@@ -988,6 +1021,8 @@ class MutationsExtendedValidator(Validator):
     ]
 
     NULL_AA_CHANGE_VALUES = ('', 'NULL', 'NA')
+    NULL_DRIVER_VALUES = ('Putative_Passenger', 'Putative_Driver', 'NA', 'Unknown', '')
+    NULL_DRIVER_TIERS_VALUES = ('', 'NA')
 
     # extra unofficial Variant classification values from https://github.com/mskcc/vcf2maf/issues/88:
     EXTRA_VARIANT_CLASSIFICATION_VALUES = ['Splice_Region', 'Fusion']
@@ -1024,7 +1059,12 @@ class MutationsExtendedValidator(Validator):
         'Variant_Classification': 'checkVariantClassification',
         'SWISSPROT': 'checkSwissProt',
         'Start_Position': 'checkStartPosition',
-        'End_Position': 'checkEndPosition'
+        'End_Position': 'checkEndPosition',
+        'cbp_driver': 'checkDriver',
+        'cbp_driver_tiers': 'checkDriverTiers',
+        'cbp_driver_annotation': 'checkFilterAnnotation',
+        'cbp_driver_tiers_annotation': 'checkFilterAnnotation',
+        'Mutation_Status': 'checkMutationStatus'
     }
 
     def __init__(self, *args, **kwargs):
@@ -1034,6 +1074,7 @@ class MutationsExtendedValidator(Validator):
         self.extraCols = []
         self.extra_exists = False
         self.extra = ''
+        self.tiers = set()
 
     def checkHeader(self, cols):
         """Validate header, requiring at least one gene id column."""
@@ -1067,7 +1108,27 @@ class MutationsExtendedValidator(Validator):
                               'Amino_Acid_Change needs to be present.',
                               extra={'line_number': self.line_number})
             num_errors += 1
-
+        
+        # raise errors if the filter_annotations are found without the "filter" columns
+        if 'cbp_driver_annotation' in self.cols and 'cbp_driver' not in self.cols:
+            self.logger.error('Column cbp_driver_annotation '
+                              'found without any cbp_driver '
+                              'column.', extra={'column_number': self.cols.index('cbp_driver_annotation')})
+        if 'cbp_driver_tiers_annotation' in self.cols and 'cbp_driver_tiers' not in self.cols:
+            self.logger.error('Column cbp_driver_tiers_annotation '
+                              'found without any cbp_driver_tiers '
+                              'column.', extra={'column_number': self.cols.index('cbp_driver_tiers_annotation')})
+            
+        # raise errors if the "filter" columns are found without the filter_annotations
+        if 'cbp_driver' in self.cols and 'cbp_driver_annotation' not in self.cols:
+            self.logger.error('Column cbp_driver '
+                              'found without any cbp_driver_annotation '
+                              'column.', extra={'column_number': self.cols.index('cbp_driver')})
+        if 'cbp_driver_tiers' in self.cols and 'cbp_driver_tiers_annotation' not in self.cols:
+            self.logger.error('Column cbp_driver_tiers '
+                              'found without any cbp_driver_tiers_annotation '
+                              'column.', extra={'column_number': self.cols.index('cbp_driver_tiers')})
+            
         return num_errors
 
     def checkLine(self, data):
@@ -1095,7 +1156,6 @@ class MutationsExtendedValidator(Validator):
                 checking_function = getattr(
                     self,
                     self.CHECK_FUNCTION_MAP[col_name])
-                # FIXME: remove the 'data' argument, it's spaghetti
                 if not checking_function(value):
                     self.printDataInvalidStatement(value, col_index)
                 elif self.extra_exists or self.extra:
@@ -1123,6 +1183,34 @@ class MutationsExtendedValidator(Validator):
                 entrez_id = None
         # validate hugo and entrez together:
         self.checkGeneIdentification(hugo_symbol, entrez_id)
+        
+        # parse custom driver annotation values to validate them together
+        driver_value = None
+        driver_annotation = None
+        driver_tiers_value = None
+        driver_tiers_annotation = None
+        if 'cbp_driver' in self.cols:
+            driver_value = data[self.cols.index('cbp_driver')].strip()
+            # treat the empty string as a missing value
+            if driver_value in (''):
+                driver_value = None
+        if 'cbp_driver_annotation' in self.cols:
+            driver_annotation = data[self.cols.index('cbp_driver_annotation')].strip()
+            # treat the empty string as a missing value
+            if driver_annotation in (''):
+                driver_annotation = None
+        if 'cbp_driver_tiers' in self.cols:
+            driver_tiers_value = data[self.cols.index('cbp_driver_tiers')].strip()
+            # treat the empty string as a missing value
+            if driver_tiers_value in (''):
+                driver_tiers_value = None
+        if 'cbp_driver_tiers_annotation' in self.cols:
+            driver_tiers_annotation = data[self.cols.index('cbp_driver_tiers_annotation')].strip()
+            # treat the empty string as a missing value
+            if driver_tiers_annotation in (''):
+                driver_tiers_annotation = None
+        self.checkDriverAnnotationColumn(driver_value, driver_annotation)
+        self.checkDriverTiersColumnsValues(driver_tiers_value, driver_tiers_annotation)
 
         # check if a non-blank amino acid change exists for non-splice sites
         if ('Variant_Classification' not in self.cols or
@@ -1187,14 +1275,26 @@ class MutationsExtendedValidator(Validator):
     def checkVerificationStatus(self, value):
         # if value is not blank, then it should be one of these:
         if self.checkNotBlank(value) and value.lower() not in ('verified', 'unknown', 'na'):
-            return False
+            # Giving only warning instead of error because not used in front end.
+            self.logger.warning(
+                "Value in 'Verification_Status' not in MAF format",
+                extra={'line_number': self.line_number,
+                       'cause':value})
+            # return without error (just warning above)
+            return True
         return True
 
     def checkValidationStatus(self, value):
         # if value is not blank, then it should be one of these:
         if self.checkNotBlank(value) and value.lower() not in ('untested', 'inconclusive',
-                                 'valid', 'invalid', 'na'):
-            return False
+                                 'valid', 'invalid', 'na', 'redacted', 'unknown'):
+            # Giving only warning instead of error because front end can handle unofficial values.
+            self.logger.warning(
+                "Value in 'Validation_Status' not in MAF format",
+                extra={'line_number': self.line_number,
+                       'cause':value})
+            # return without error (just warning above)
+            return True
         return True
 
     def check_t_alt_count(self, value):
@@ -1252,27 +1352,36 @@ class MutationsExtendedValidator(Validator):
         """Test whether the mutation is silent and should be skipped."""
         is_silent = False
         variant_classification = data[self.cols.index('Variant_Classification')]
-
+        if 'variant_classification_filter' in self.meta_dict:
+            self.SKIP_VARIANT_TYPES = [x.strip() 
+                                       for x 
+                                       in self.meta_dict['variant_classification_filter'].split(',')]
+        
         hugo_symbol = data[self.cols.index('Hugo_Symbol')]
         entrez_id = '0'
         if 'Entrez_Gene_Id' in self.cols:
             entrez_id = data[self.cols.index('Entrez_Gene_Id')]
-        if hugo_symbol == 'Unknown' and entrez_id == '0' and variant_classification != 'IGR':
-            # the MAF specification documents the use of Unknown and 0 here
-            # for intergenic mutations, and since the Variant_Classification
-            # column is often invalid, cBioPortal interprets this combination
-            # (or just the symbol if the Entrez column is absent) as such,
-            # but with a warning:
-            self.logger.warning(
-                "Gene specification for this mutation implies "
-                "intergenic even though Variant_Classification is "
-                "not 'IGR'; this variant will be filtered out",
-                extra={'line_number': self.line_number,
-                       'cause': "Gene symbol 'Unknown', Entrez gene id 0"})
+        if hugo_symbol == 'Unknown' and entrez_id == '0':
             is_silent = True
+            if variant_classification in ['IGR', 'Targeted_Region']:
+                self.logger.info("This variant (Gene symbol 'Unknown', Entrez gene ID 0) will be filtered out",
+                                 extra={'line_number': self.line_number,
+                                        'cause': variant_classification})
+            else:
+                # the MAF specification documents the use of Unknown and 0 here
+                # for intergenic mutations, and since the Variant_Classification
+                # column is often invalid, cBioPortal interprets this combination
+                # (or just the symbol if the Entrez column is absent) as such,
+                # but with a warning:
+                self.logger.warning(
+                                    "Gene specification (Gene symbol 'Unknown', Entrez gene ID 0) for this variant "
+                                    "implies intergenic even though Variant_Classification is "
+                                    "not 'IGR' or 'Targeted_Region'; this variant will be filtered out",
+                                    extra={'line_number': self.line_number,
+                                           'cause': variant_classification})
         elif variant_classification in self.SKIP_VARIANT_TYPES:
-            self.logger.info("Validation of line skipped due to cBioPortal's filtering. "
-                             "Filtered types: [%s]",
+            self.logger.info("Line will not be loaded due to the variant "
+                             "classification filter. Filtered types: [%s]",
                              ', '.join(self.SKIP_VARIANT_TYPES),
                              extra={'line_number': self.line_number,
                                     'cause': variant_classification})
@@ -1371,6 +1480,48 @@ class MutationsExtendedValidator(Validator):
         # if no reasons to return with a message were found, return valid
         return True
 
+    def checkDriver(self, value):
+        """Validate the values in the cbp_driver column."""
+        if value not in self.NULL_DRIVER_VALUES:
+            self.extra = 'Only "Putative_Passenger", "Putative_Driver", "NA", "Unknown" and "" (empty) are allowed.'
+            self.extra_exists = True
+            return False
+        return True
+    
+    def checkDriverTiers(self, value):
+        """Report the tiers in the cbp_driver_tiers column (skipping the empty values)."""
+        if value not in self.NULL_DRIVER_TIERS_VALUES:
+            self.logger.info('Values contained in the column cbp_driver_tiers that will appear in the "Mutation Color" '
+                             'menu of the Oncoprint',
+                             extra={'line_number': self.line_number, 'column_number': self.cols.index('cbp_driver_tiers'), 'cause': value})
+            self.tiers.add(value)
+        if len(self.tiers) > 10:
+            self.logger.warning('cbp_driver_tiers contains more than 10 different tiers.',
+                                extra={'line_number': self.line_number, 'column_number': self.cols.index('cbp_driver_tiers'),
+                                       'cause': value})
+        if len(value) > 50:
+            self.extra= 'cbp_driver_tiers column does not support values longer than 50 characters'
+            self.extra_exists = True
+            return False
+        return True
+    
+    def checkFilterAnnotation(self, value):
+        """Check if the annotation values are smaller than 80 characters."""
+        if len(value) > 80:
+            self.extra = 'cbp_driver_annotation and cbp_driver_tiers_annotation columns do not support annotations longer than 80 characters'
+            self.extra_exists = True
+            return False
+        return True
+
+    def checkMutationStatus(self, value):
+        """Check values in mutation status column."""
+        if value.lower() in ['loh', 'none', 'wildtype']:
+            self.logger.info('Mutation will not be loaded due to value in Mutation_Status',
+                                extra={'line_number': self.line_number, 'cause': value})
+        if value.lower() not in ['none', 'germline', 'somatic', 'loh', 'post-transcriptional modification', 'unknown', 'wildtype'] and value != '':
+            self.logger.warning('Mutation_Status value is not in MAF format',
+                                extra={'line_number': self.line_number, 'cause': value})
+        return True
 
 class ClinicalValidator(Validator):
 
@@ -1603,11 +1754,12 @@ class ClinicalValidator(Validator):
                         invalid_values = True
                 elif self.METADATA_LINES[line_index] == 'priority':
                     try:
-                        if int(value) < 1:
+                        if int(value) < 0:
                             raise ValueError()
                     except ValueError:
                         self.logger.error(
-                            'Priority definition is not a positive integer',
+                            'Priority definition should be an integer, and should be '
+                            'greater than or equal to zero',
                             extra={'line_number': line_index + 1,
                                    'column_number': col_index + 1,
                                    'cause': value})
@@ -1648,10 +1800,13 @@ class ClinicalValidator(Validator):
             self.attr_defs = missing_attr_defs
 
         for col_index, col_name in enumerate(self.cols):
+            # Front end can have issues with lower case attribute names as discussed
+            # in https://github.com/cBioPortal/cbioportal/issues/3518
             if not col_name.isupper():
-                self.logger.warning(
-                    "Clinical attribute name not in all caps",
+                self.logger.error(
+                    "Attribute name not in upper case.",
                     extra={'line_number': self.line_number,
+                           'column_number': col_index + 1,
                            'cause': col_name})
             # do not check the special ID columns as attributes,
             # just parse them with the correct data type
@@ -2158,8 +2313,8 @@ class FusionValidator(Validator):
         'Center',
         'Tumor_Sample_Barcode',
         'Fusion',
-        'DNA support',
-        'RNA support',
+        'DNA_support',
+        'RNA_support',
         'Method',
         'Frame']
     REQUIRE_COLUMN_ORDER = True
@@ -2183,8 +2338,8 @@ class FusionValidator(Validator):
                 hugo_symbol = None
         if 'Entrez_Gene_Id' in self.cols:
             entrez_id = data[self.cols.index('Entrez_Gene_Id')].strip()
-            # treat the empty string or 0 as a missing value
-            if entrez_id == '':
+            # treat empty string, 0 or 'NA' as a missing value
+            if entrez_id in ['', '0', 'NA']:
                 entrez_id = None
         # validate hugo and entrez together:
         self.checkGeneIdentification(hugo_symbol, entrez_id)
@@ -2975,14 +3130,52 @@ def processCaseListDirectory(caseListDir, cancerStudyId, logger,
         else:
             stableid_files[stable_id] = case
 
-        sampleIds = meta_dictionary['case_list_ids']
-        sampleIds = set([x.strip() for x in sampleIds.split('\t')])
-        for value in sampleIds:
+        if 'case_list_category' in meta_dictionary:
+            # Valid case list categories
+            VALID_CATEGORIES = ['all_cases_in_study',
+                                'all_cases_with_mutation_data',
+                                'all_cases_with_cna_data',
+                                'all_cases_with_log2_cna_data',
+                                'all_cases_with_methylation_data',
+                                'all_cases_with_mrna_array_data',
+                                'all_cases_with_mrna_rnaseq_data',
+                                'all_cases_with_rppa_data',
+                                'all_cases_with_microrna_data',
+                                'all_cases_with_mutation_and_cna_data',
+                                'all_cases_with_mutation_and_cna_and_mrna_data',
+                                'all_cases_with_gsva_data',
+                                'other']
+
+            # If the case list category is invalid, the importer will crash.
+            if meta_dictionary['case_list_category'] not in VALID_CATEGORIES:
+                logger.error('Invalid case list category',
+                               extra={'filename_': case,
+                               'cause': meta_dictionary['case_list_category']})
+
+        # Check for any duplicate sample IDs
+        sample_ids = [x.strip() for x in meta_dictionary['case_list_ids'].split('\t')]
+        seen_sample_ids = set()
+        dupl_sample_ids = set()
+        for sample_id in sample_ids:
+            if sample_id not in seen_sample_ids:
+                seen_sample_ids.add(sample_id)
+            else:
+                dupl_sample_ids.add(sample_id)
+        # Duplicate samples IDs are removed by the importer, therefore this is
+        # only a warning.
+        if len(dupl_sample_ids) > 0:
+            logger.warning('Duplicate Sample ID in case list',
+                           extra={'filename_': case,
+                           'cause': ', '.join(dupl_sample_ids)})
+
+        for value in seen_sample_ids:
+            # Compare case list sample ids with clinical file
             if value not in DEFINED_SAMPLE_IDS:
                 logger.error(
                     'Sample id not defined in clinical file',
                     extra={'filename_': case,
                            'cause': value})
+            # Check if there are white spaces in the sample id
             if ' ' in value:
                 logger.error(
                     'White space in sample id is not supported',

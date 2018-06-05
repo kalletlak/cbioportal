@@ -7,13 +7,15 @@ import org.cbioportal.model.GenePanel;
 import org.cbioportal.model.GenePanelData;
 import org.cbioportal.service.GenePanelService;
 import org.cbioportal.service.exception.GenePanelNotFoundException;
-import org.cbioportal.service.exception.GeneticProfileNotFoundException;
+import org.cbioportal.service.exception.MolecularProfileNotFoundException;
 import org.cbioportal.web.config.annotation.PublicApi;
 import org.cbioportal.web.parameter.Direction;
 import org.cbioportal.web.parameter.GenePanelDataFilter;
+import org.cbioportal.web.parameter.GenePanelMultipleStudyFilter;
 import org.cbioportal.web.parameter.HeaderKeyConstants;
 import org.cbioportal.web.parameter.PagingConstants;
 import org.cbioportal.web.parameter.Projection;
+import org.cbioportal.web.parameter.SampleMolecularIdentifier;
 import org.cbioportal.web.parameter.sort.GenePanelSortBy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -27,10 +29,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @PublicApi
@@ -82,23 +88,61 @@ public class GenePanelController {
         return new ResponseEntity<>(genePanelService.getGenePanel(genePanelId), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/genetic-profiles/{geneticProfileId}/gene-panel-data/fetch", method = RequestMethod.POST, 
+    @RequestMapping(value = "/gene-panels/fetch", method = RequestMethod.POST,
+        consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation("Get gene panel")
+    public ResponseEntity<List<GenePanel>> fetchGenePanels(
+        @ApiParam(required = true, value = "List of Gene Panel IDs")
+        @Size(min = 1, max = PagingConstants.MAX_PAGE_SIZE)
+        @RequestBody List<String> genePanelIds,
+        @ApiParam("Level of detail of the response")
+        @RequestParam(defaultValue = "SUMMARY") Projection projection) {
+
+        return new ResponseEntity<>(genePanelService.fetchGenePanels(genePanelIds, projection.name()), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasPermission(#molecularProfileId, 'MolecularProfile', 'read')")
+    @RequestMapping(value = "/molecular-profiles/{molecularProfileId}/gene-panel-data/fetch", method = RequestMethod.POST, 
         consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Get gene panel data")
     public ResponseEntity<List<GenePanelData>> getGenePanelData(
-        @ApiParam(required = true, value = "Genetic Profile ID e.g. nsclc_unito_2016_mutations")
-        @PathVariable String geneticProfileId,
+        @ApiParam(required = true, value = "Molecular Profile ID e.g. nsclc_unito_2016_mutations")
+        @PathVariable String molecularProfileId,
         @ApiParam(required = true, value = "List of Sample IDs/Sample List ID and Entrez Gene IDs")
-        @Valid @RequestBody GenePanelDataFilter genePanelDataFilter) throws GeneticProfileNotFoundException {
+        @Valid @RequestBody GenePanelDataFilter genePanelDataFilter) throws MolecularProfileNotFoundException {
 
         List<GenePanelData> genePanelDataList;
         if (genePanelDataFilter.getSampleListId() != null) {
-            genePanelDataList = genePanelService.getGenePanelData(geneticProfileId,
-                genePanelDataFilter.getSampleListId(), genePanelDataFilter.getEntrezGeneIds());
+            genePanelDataList = genePanelService.getGenePanelData(molecularProfileId,
+                genePanelDataFilter.getSampleListId());
         } else {
-            genePanelDataList = genePanelService.fetchGenePanelData(geneticProfileId,
-                genePanelDataFilter.getSampleIds(), genePanelDataFilter.getEntrezGeneIds());
+            genePanelDataList = genePanelService.fetchGenePanelData(molecularProfileId,
+                genePanelDataFilter.getSampleIds());
         }
+
+        return new ResponseEntity<>(genePanelDataList, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasPermission(#genePanelMultipleStudyFilter, 'GenePanelMultipleStudyFilter', 'read')")
+    @RequestMapping(value = "/gene-panel-data/fetch", method = RequestMethod.POST, 
+        consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation("Fetch gene panel data")
+    public ResponseEntity<List<GenePanelData>> fetchGenePanelDataInMultipleMolecularProfiles(
+        @ApiParam(required = true, value = "List of Molecular Profile ID and Sample ID pairs or List of Molecular" + 
+            "Profile IDs and Entrez Gene IDs")
+        @Valid @RequestBody GenePanelMultipleStudyFilter genePanelMultipleStudyFilter) {
+        
+        List<String> molecularProfileIds = new ArrayList<>();
+        List<String> sampleIds = new ArrayList<>();
+
+        for (SampleMolecularIdentifier sampleMolecularIdentifier :
+            genePanelMultipleStudyFilter.getSampleMolecularIdentifiers()) {
+
+            molecularProfileIds.add(sampleMolecularIdentifier.getMolecularProfileId());
+            sampleIds.add(sampleMolecularIdentifier.getSampleId());
+        }
+        List<GenePanelData> genePanelDataList = genePanelService.fetchGenePanelDataInMultipleMolecularProfiles(
+            molecularProfileIds, sampleIds);
 
         return new ResponseEntity<>(genePanelDataList, HttpStatus.OK);
     }
