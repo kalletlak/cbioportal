@@ -124,6 +124,6 @@ The PedcBioPortal for Cancer Genomics is an instance of the [cBioPortal](http://
 <img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/dktk_allgemein_klein.jpeg?raw=true" width="140" height="50" hspace="15" style=padding:5px;">
 </a>
 <a href="https://www.alexslemonade.org" target="_blank" width="140" height="50" style=padding:5px;">
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/alsf-logo.png" width="140" height="50" hspace="15">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/alsf-logo.png?raw=true" width="140" height="50" hspace="15">
 </a>
 
