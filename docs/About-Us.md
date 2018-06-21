@@ -94,14 +94,36 @@ The PedcBioPortal for Cancer Genomics is an instance of the [cBioPortal](http://
 * Starr Cancer Consortium
 
 ## Data/Support for PedcBioPortal
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/chop.png?raw=true" width="140" height="50" hspace="15">
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/su2c_logo.png?raw=true" width="140" height="50" hspace="15">
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/mskcc_logo.jpeg?raw=true" width="140" height="50" hspace="15">
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/df_logo.gif?raw=true" width="140" height="50" hspace="15">
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/pmcp_logo.png?raw=true" width="140" height="50">
+<a href="https://www.chop.edu" target="_blank" width="140" height="50">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/chop.png?raw=true" width="140" height="50" style=padding:5px;" hspace="15">
+</a>
+<a href="https://standuptocancer.org" target="_blank" width="140" height="50">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/su2c_logo.png?raw=true" width="140" height="50" hspace="15" style=padding:5px;">
+</a>
+<a href="https://www.mskcc.org" target="_blank" width="140" height="50">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/mskcc_logo.jpeg?raw=true" width="140" height="50" hspace="15" style=padding:5px;">
+</a>
+<a href="www.dana-farber.org" target="_blank" width="140" height="50">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/df_logo.gif?raw=true" width="140" height="50" hspace="15" style=padding:5px;">
+</a>
 <br/>
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/sbf_logo.jpeg?raw=true" width="140" height="50" hspace="15">
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/treehouse.jpeg?raw=true" width="140" height="50" hspace="15">
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/ucsc.png?raw=true" width="140" height="50" hspace="15">
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/g4gh.jpeg?raw=true" width="140" height="50" hspace="15">
-<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/dktk_allgemein_klein.jpeg?raw=true" width="140" height="80">
+<a href="www.uhn.ca/PrincessMargaret" target="_blank" width="140" height="50">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/pmcp_logo.png?raw=true" width="140" height="50" hspace="15" style=padding:5px;">
+</a>
+<a href="https://www.stbaldricks.org" target="_blank" width="140" height="50">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/sbf_logo.jpeg?raw=true" width="140" height="50" hspace="15" style=padding:5px;">
+</a>
+<a href="https://treehousegenomics.soe.ucsc.edu" target="_blank" width="140" height="50">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/treehouse.jpeg?raw=true" width="140" height="50" hspace="15" style=padding:5px;">
+</a>
+<a href="https://www.ga4gh.org" target="_blank" width="140" height="50">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/g4gh.jpeg?raw=true" width="140" height="50" hspace="15" style=padding:5px;">
+</a>
+<br/>
+<a href="https://www.dkfz.de" target="_blank" width="140" height="50">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/dktk_allgemein_klein.jpeg?raw=true" width="140" height="50" hspace="15" style=padding:5px;">
+</a>
+<a href="https://www.alexslemonade.org" target="_blank" width="140" height="50" style=padding:5px;">
+<img src="https://github.com/d3b-center/pedcbioportal/blob/master/portal/src/main/webapp/images/alsf-logo.png" width="140" height="50" hspace="15">
+</a>
+
