@@ -38,7 +38,6 @@ public class FractionGenomeAlteredControllerTest {
     private static final String TEST_SAMPLE_ID_2 = "test_sample_id_2";
     private static final BigDecimal TEST_VALUE_1 = new BigDecimal(2.1);
     private static final BigDecimal TEST_VALUE_2 = new BigDecimal(3.1);
-    private static final double CUTOFF = 0.2;
 
     @Autowired
     private WebApplicationContext wac;
@@ -77,7 +76,7 @@ public class FractionGenomeAlteredControllerTest {
         fractionGenomeAlteredList.add(fractionGenomeAltered2);
         
         Mockito.when(fractionGenomeAlteredService.fetchFractionGenomeAltered(TEST_STUDY_ID, 
-            Arrays.asList(TEST_SAMPLE_ID_1, TEST_SAMPLE_ID_2), CUTOFF)).thenReturn(fractionGenomeAlteredList);
+            Arrays.asList(TEST_SAMPLE_ID_1, TEST_SAMPLE_ID_2))).thenReturn(fractionGenomeAlteredList);
 
         FractionGenomeAlteredFilter fractionGenomeAlteredFilter = new FractionGenomeAlteredFilter();
         fractionGenomeAlteredFilter.setSampleIds(Arrays.asList(TEST_SAMPLE_ID_1, TEST_SAMPLE_ID_2));
@@ -88,7 +87,7 @@ public class FractionGenomeAlteredControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(fractionGenomeAlteredFilter)))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].studyId").value(TEST_STUDY_ID))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleId").value(TEST_SAMPLE_ID_1))

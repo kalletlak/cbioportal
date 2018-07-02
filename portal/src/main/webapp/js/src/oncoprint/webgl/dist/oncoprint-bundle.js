@@ -2058,6 +2058,17 @@ var OncoprintLegendView = (function() {
 	    root.appendChild(svgfactory.text(display_range[1], 50, 0, 12, 'Arial', 'normal'));
 	    var mesh = 100;
 	    var points = [];
+        var linear_gradient = svgfactory.linearGradient();
+        if (config.range_type === 'NON_POSITIVE') {
+            linear_gradient.appendChild(svgfactory.stop(100, config.negative_color));
+        } else if (config.range_type === 'NON_NEGATIVE') {
+            linear_gradient.appendChild(svgfactory.stop(100, config.positive_color));
+        } else if (config.range_type === 'ALL') {
+        	var offset = Math.abs(display_range[0]) / (Math.abs(display_range[0]) + display_range[1]) * 100;
+            linear_gradient.appendChild(svgfactory.stop(offset, config.negative_color));
+            linear_gradient.appendChild(svgfactory.stop(offset, config.positive_color));
+        }
+        root.appendChild(linear_gradient);
 	    points.push([5, 20]);
 	    for (var i=0; i<mesh; i++) {
 		var t = i/mesh;
@@ -2066,7 +2077,7 @@ var OncoprintLegendView = (function() {
 		points.push([5 + 40*i/mesh, 20-height]);
 	    }
 	    points.push([45, 20]);
-	    root.appendChild(svgfactory.path(points, config.color, config.color));
+        root.appendChild(svgfactory.path(points, null, null, linear_gradient));
 	} else if (config.type === 'gradient') {
 	    var num_decimal_digits = 2;
 	    var display_range = config.range.map(function(x) {
@@ -4388,11 +4399,22 @@ function objectValues(obj) {
 }
 
 var makeNAShapes = function(z) {
-    return [{
-	'type': 'rectangle',
-	'fill': 'rgba(224, 224, 224, 1)',
-	'z': z
-    }];
+    return [
+	{
+	    'type': 'rectangle',
+	    'fill': 'rgba(255,255,255,1)',
+	    'z':z
+	}, {
+	    'type': 'line',
+	    'stroke': 'rgba(190,190,190,1)',
+	    'stroke-width': '1',
+	    'x1': '0%',
+	    'x2': '100%',
+	    'y1':'50%',
+	    'y2':'50%',
+	    'z':z
+	}
+    ];
 };
 var NA_STRING = "na";
 var NA_LABEL = "N/A";
@@ -4765,11 +4787,18 @@ var LinearInterpRuleSet = (function () {
 	this.value_key = params.value_key;
 	this.value_range = params.value_range;
 	this.log_scale = params.log_scale; // boolean
-	this.inferred_value_range;
+    this.type = params.type;
+	this.rangeTypes = {
+		'ALL': 'ALL',                   // all values positive, negative and zero
+		'NON_NEGATIVE': 'NON_NEGATIVE', // value range all positive values inclusive zero (0)
+		'NON_POSITIVE': 'NON_POSITIVE'  // value range all negative values inclusive zero (0)
+	};
 
 	this.makeInterpFn = function () {
 	    var range = this.getEffectiveValueRange();
-
+	    var rangeType = this.getValueRangeType();
+	    var plotType = this.type;
+	    var rangeTypes = this.rangeTypes;
 	    if (this.log_scale) {
 		var shift_to_make_pos = Math.abs(range[0]) + 1;
 		var log_range = Math.log(range[1] + shift_to_make_pos) - Math.log(range[0] + shift_to_make_pos);
@@ -4779,17 +4808,24 @@ var LinearInterpRuleSet = (function () {
 		    return (Math.log(val + shift_to_make_pos) - log_range_lower) / log_range;
 		};
 	    } else {
-		var range_spread = range[1] - range[0];
-		var range_lower = range[0];
 		return function (val) {
-		    val = parseFloat(val);
-		    if (val <= range[0]) {
-			return 0;
-		    } else if (val >= range[1]) {
-			return 1;
-		    } else {
-			return (val - range_lower) / range_spread;
-		    }
+                var range_spread = range[1] - range[0],
+					range_lower = range[0],
+					range_higher = range[1];             
+                if (plotType === 'bar') {
+                    if (rangeType === rangeTypes.NON_POSITIVE) {
+                        // when data only contains non positive values
+                        return (val - range_higher) / range_spread;
+                    } else if (rangeType === rangeTypes.NON_NEGATIVE) {
+                        // when data only contains non negative values
+                        return (val - range_lower) / range_spread;
+                    } else if (rangeType === rangeTypes.ALL) {
+                        range_spread = Math.abs(range[0]) > range[1] ? Math.abs(range[0]) : range[1];
+                        return val / range_spread;
+                    }
+                } else {
+                    return (val - range_lower) / range_spread;
+                }
 		};
 	    }
 	};
@@ -4810,6 +4846,16 @@ var LinearInterpRuleSet = (function () {
 	    ret[1] += ret[1] / 2;
 	}
 	return ret;
+    };
+    LinearInterpRuleSet.prototype.getValueRangeType = function () {
+    	var range = this.getEffectiveValueRange();
+        if (range[0] < 0 && range[1] <=0) {
+        	return this.rangeTypes.NON_POSITIVE;
+        } else if (range[0] >= 0 && range[1] > 0) {
+            return this.rangeTypes.NON_NEGATIVE;
+        } else {
+            return this.rangeTypes.ALL;
+        }
     };
 
     LinearInterpRuleSet.prototype.apply = function (data, cell_width, cell_height, out_active_rules) {
@@ -4863,8 +4909,6 @@ var GradientRuleSet = (function () {
 	}
 	
 	this.value_stop_points = params.value_stop_points;
-
-	this.gradient_rule;
 	this.null_color = params.null_color || "rgba(211,211,211,1)";
     }
     GradientRuleSet.prototype = Object.create(LinearInterpRuleSet.prototype);
@@ -4944,8 +4988,8 @@ var GradientRuleSet = (function () {
 var BarRuleSet = (function () {
     function BarRuleSet(params) {
 	LinearInterpRuleSet.call(this, params);
-	this.bar_rule;
-	this.fill = params.fill || 'rgba(156,123,135,1)';
+		this.fill = params.fill || 'rgba(0,128,0,1)'; // green
+		this.negative_fill = params.negative_fill || 'rgba(255,0,0,1)'; //red
     }
     BarRuleSet.prototype = Object.create(LinearInterpRuleSet.prototype);
 
@@ -4955,6 +4999,10 @@ var BarRuleSet = (function () {
 	}
 	var interpFn = this.makeInterpFn();
 	var value_key = this.value_key;
+        var positive_color = this.fill;
+        var negative_color = this.negative_fill;
+        var yPosFn = this.getYPosPercentagesFn();
+        var cellHeightFn = this.getCellHeightPercentagesFn();
 	this.bar_rule = this.addRule(function (d) {
 	    return d[NA_STRING] !== true;
 	},
@@ -4962,20 +5010,48 @@ var BarRuleSet = (function () {
 			    type: 'rectangle',
 			    y: function (d) {
 				var t = interpFn(d[value_key]);
-				return (1 - t) * 100 + "%";
+                    return yPosFn(t);
 			    },
 			    height: function (d) {
 				var t = interpFn(d[value_key]);
-				return t * 100 + "%";
+                    return cellHeightFn(t);
 			    },
-			    fill: this.fill,
+                fill: function (d) {
+					return d[value_key] < 0 ? negative_color : positive_color;
+                }
 			}],
 		    exclude_from_legend: false,
-		    legend_config: {'type': 'number', 
+                legend_config: {
+            		'type': 'number',
 				    'range': this.getEffectiveValueRange(), 
-				    'color': this.fill,
+					'range_type': this.getValueRangeType(),
+                    'positive_color': positive_color,
+                    'negative_color': negative_color,
 				    'interpFn': interpFn}
 		});
+    };
+    BarRuleSet.prototype.getYPosPercentagesFn = function () {
+    	return function (t) {
+        if (this.getValueRangeType() === this.rangeTypes.NON_POSITIVE) {
+                return 0 + "%";
+		} else if (this.getValueRangeType() === this.rangeTypes.NON_NEGATIVE) {
+                return (1 - t) * 100 + "%";
+        } else if (this.getValueRangeType() === this.rangeTypes.ALL) {
+                return 50 + "%";
+            }
+		}.bind(this);
+	};
+
+    BarRuleSet.prototype.getCellHeightPercentagesFn = function () {
+    	return function (t) {
+            if (this.getValueRangeType() === this.rangeTypes.NON_POSITIVE) {
+                return -t * 100 + "%";
+            } else if (this.getValueRangeType() === this.rangeTypes.NON_NEGATIVE) {
+                return t * 100 + "%";
+            } else if (this.getValueRangeType() === this.rangeTypes.ALL) {
+                return -t * 50 + "%";
+		}
+		}.bind(this);
     };
 
     return BarRuleSet;
@@ -5701,7 +5777,7 @@ var OncoprintTrackInfoView = (function () {
 	    view.minimum_track_height = Math.min(view.minimum_track_height, model.getTrackHeight(tracks[i]));
 	}
 
-	view.width = 40;
+	view.width = 32;
 
 	var label_tops = model.getLabelTops();
 	scroll(view, model.getVertScroll());
@@ -5931,14 +6007,28 @@ var OncoprintTrackOptionsView = (function () {
 	return $('<li>').css({'border-top': '1px solid black'});
     };
 
+    var renderSortArrow = function($sortarrow, model, track_id) {
+	var sortarrow_char = '';
+	if (model.isTrackSortDirectionChangeable(track_id)){
+	    sortarrow_char = {
+		    '1': '<i class="fa fa-signal" aria-hidden="true" title="Sorted ascending"></i>',
+		    '-1': '<i class="fa fa-signal" style="transform: scaleX(-1);" aria-hidden="true" title="Sorted descending"></i>',
+		    '0': ''}[model.getTrackSortDirection(track_id)];
+	}
+	$sortarrow.html(sortarrow_char);
+    }
+
     var renderTrackOptions = function (view, model, track_id) {
-	var $div, $img, $dropdown;
+	var $div, $img, $sortarrow, $dropdown;
 	var top = model.getZoomedTrackTops(track_id);
-	$div = $('<div>').appendTo(view.$buttons_ctr).css({'position': 'absolute', 'left': '0px', 'top': top + 'px'});
+	$div = $('<div>').appendTo(view.$buttons_ctr).css({'position': 'absolute', 'left': '0px', 'top': top + 'px', 'white-space': 'nowrap'});
 	$img = $('<img/>').appendTo($div).attr({'src': 'images/menudots.svg', 'width': view.img_size, 'height': view.img_size}).css({'float': 'left', 'cursor': 'pointer', 'border': '1px solid rgba(125,125,125,0)'});
+	$sortarrow = $('<span>').appendTo($div).css({'position': 'absolute', 'top': Math.floor(view.img_size / 4) + 'px'});
 	$dropdown = $('<ul>').appendTo(view.$dropdown_ctr).css({'position':'absolute', 'width': 120, 'display': 'none', 'list-style-type': 'none', 'padding-left': '6', 'padding-right': '6', 'float': 'right', 'background-color': 'rgb(255,255,255)',
 								'left':'0px', 'top': top + view.img_size + 'px'});
 	view.track_options_$elts[track_id] = {'$div': $div, '$img': $img, '$dropdown': $dropdown};
+
+	renderSortArrow($sortarrow, model, track_id);
 
 	$img.hover(function (evt) {
 	    if (!view.menu_shown[track_id]) {
@@ -5984,6 +6074,7 @@ var OncoprintTrackOptionsView = (function () {
 		$sort_dec_li.css('font-weight', 'normal');
 		$dont_sort_li.css('font-weight', 'normal');
 		view.sortChangeCallback(track_id, 1);
+		renderSortArrow($sortarrow, model, track_id);
 	    });
 	    $sort_dec_li = $makeDropdownOption('Sort Z-a', (model.getTrackSortDirection(track_id) === -1 ? 'bold' : 'normal'), function (evt) {
 		evt.stopPropagation();
@@ -5991,6 +6082,7 @@ var OncoprintTrackOptionsView = (function () {
 		$sort_dec_li.css('font-weight', 'bold');
 		$dont_sort_li.css('font-weight', 'normal');
 		view.sortChangeCallback(track_id, -1);
+		renderSortArrow($sortarrow, model, track_id);
 	    });
 	    $dont_sort_li = $makeDropdownOption('Don\'t sort track', (model.getTrackSortDirection(track_id) === 0 ? 'bold' : 'normal'), function (evt) {
 		evt.stopPropagation();
@@ -5998,6 +6090,7 @@ var OncoprintTrackOptionsView = (function () {
 		$sort_dec_li.css('font-weight', 'normal');
 		$dont_sort_li.css('font-weight', 'bold');
 		view.sortChangeCallback(track_id, 0);
+		renderSortArrow($sortarrow, model, track_id);
 	    });
 	    $dropdown.append($sort_inc_li);
 	    $dropdown.append($sort_dec_li);
@@ -6041,7 +6134,7 @@ var OncoprintTrackOptionsView = (function () {
 	scroll(this, model.getVertScroll());
     }
     OncoprintTrackOptionsView.prototype.getWidth = function () {
-	return 10 + this.img_size;
+	return 18 + this.img_size;
     }
     OncoprintTrackOptionsView.prototype.addTracks = function (model) {
 	renderAllOptions(this, model);
@@ -7298,21 +7391,33 @@ module.exports = {
     bgrect: function(width, height, fill) {
 	return makeSVGElement('rect', {'width':width, 'height':height, 'fill':fill});
     },
-    path: function(points, stroke, fill) {
+    path: function(points, stroke, fill, linearGradient) {
 	points = points.map(function(pt) { return pt.join(","); });
 	points[0] = 'M'+points[0];
 	for (var i=1; i<points.length; i++) {
 	    points[i] = 'L'+points[i];
 	}
+	if (!linearGradient) {
 	stroke = extractColor(stroke);
 	fill = extractColor(fill);
+	}
 	return makeSVGElement('path', {
 	    'd': points.join(" "),
-	    'stroke': stroke.rgb,
-	    'stroke-opacity': stroke.opacity,
-	    'fill': fill.rgb,
-	    'fill-opacity': fill.opacity
+	    'stroke': linearGradient ? 'url(#'+linearGradient.getAttribute('id')+')' : stroke.rgb,
+	    'stroke-opacity': linearGradient ? 0 : stroke.opacity,
+	    'fill': linearGradient ? 'url(#'+linearGradient.getAttribute('id')+')' : fill.rgb,
+	    'fill-opacity': linearGradient ? 1 : fill.opacity
 	});
+    },
+    stop: function (offset, stop_color, stop_opacity) {
+		return makeSVGElement('stop', {
+			'offset': offset + '%',
+			'stop-color': stop_color,
+			'stop-opacity': stop_opacity
+	});
+	},
+	linearGradient: function () {
+        return makeSVGElement('linearGradient', {'id': 'linearGradient'+gradientId()});
     },
     defs: function() {
 	return makeSVGElement('defs');
@@ -7327,11 +7432,9 @@ module.exports = {
 	});
 	for (var i=0; i<=100; i++) {
 	    var color = extractColor(colorFn(i/100));
-	    gradient.appendChild(makeSVGElement('stop', {
-		'offset': i + '%',
-		'stop-color':color.rgb,
-		'stop-opacity': color.opacity
-	    }));
+	    gradient.appendChild(
+	    	this.stop(i, color.rgb, color.opacity)
+		);
 	}
 	return gradient;
     }

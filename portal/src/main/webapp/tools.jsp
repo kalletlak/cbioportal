@@ -74,7 +74,12 @@
         		<li>Public data will be available to everyone who registers. Suggestions on data sets are welcome. Please <a href="mailto:support@d3b.center?subject=Uploading public data">contact us</a> for details.</li>
 			<li>Private data will be accessible by you and your collaborators. Please <a href="mailto:support@d3b.center?subject=Uploading private data">contact us</a> for details.</li>
         </ul>
-        
+
+        <h2>3. Commercial support</h2>
+        <ul>
+            <li><a href="http://thehyve.nl" target="_blank">The Hyve</a> is an open source software company that provides commercial support for cBioPortal. They can help with deployment, data loading, development, consulting and training. Please <a href=http://thehyve.nl/contact/ target="_blank">contact The Hyve</a> for details.</li>
+        </ul>
+
         <hr>
         
         <h2>The following tools are for visualization and analysis of custom datasets</h2>

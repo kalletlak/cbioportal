@@ -143,7 +143,8 @@ META_FIELD_MAP = {
         'data_filename': True,
         'normal_samples_list': False,
         'swissprot_identifier': False,
-        'gene_panel': False
+        'gene_panel': False,
+        'variant_classification_filter': False
     },
     MetaFileTypes.EXPRESSION: {
         'cancer_study_identifier': True,
@@ -244,6 +245,7 @@ META_FIELD_MAP = {
         'profile_name': True,
         'profile_description': True,
         'data_filename': True,
+        'show_profile_in_analysis_tab': True,
         'geneset_def_version': True
     }
 }

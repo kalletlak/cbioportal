@@ -1,21 +1,27 @@
 package org.cbioportal.model;
 
-import java.io.Serializable;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
-public class GenePanelData implements Serializable {
+public class GenePanelData extends UniqueKeyBase {
     
-    private String geneticProfileId;
+    @NotNull
+    private String molecularProfileId;
+    @NotNull
     private String sampleId;
+    @NotNull
+    private String patientId;
+    @NotNull
+    private String studyId;
     private String genePanelId;
-    private List<Integer> entrezGeneIds;
+    @NotNull
+    private Boolean profiled;
 
-    public String getGeneticProfileId() {
-        return geneticProfileId;
+    public String getMolecularProfileId() {
+        return molecularProfileId;
     }
 
-    public void setGeneticProfileId(String geneticProfileId) {
-        this.geneticProfileId = geneticProfileId;
+    public void setMolecularProfileId(String molecularProfileId) {
+        this.molecularProfileId = molecularProfileId;
     }
 
     public String getSampleId() {
@@ -26,6 +32,22 @@ public class GenePanelData implements Serializable {
         this.sampleId = sampleId;
     }
 
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getStudyId() {
+        return studyId;
+    }
+
+    public void setStudyId(String studyId) {
+        this.studyId = studyId;
+    }
+
     public String getGenePanelId() {
         return genePanelId;
     }
@@ -34,11 +56,11 @@ public class GenePanelData implements Serializable {
         this.genePanelId = genePanelId;
     }
 
-    public List<Integer> getEntrezGeneIds() {
-        return entrezGeneIds;
-    }
+	public Boolean getProfiled() {
+		return profiled;
+	}
 
-    public void setEntrezGeneIds(List<Integer> entrezGeneIds) {
-        this.entrezGeneIds = entrezGeneIds;
-    }
+	public void setProfiled(Boolean profiled) {
+		this.profiled = profiled;
+	}
 }

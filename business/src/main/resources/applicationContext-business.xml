@@ -18,6 +18,7 @@
                 <list>
                     <value>file:///${PORTAL_HOME}/portal.properties</value>
                     <value>classpath:/portal.properties</value>
+                    <value>classpath:/maven.properties</value>
                 </list>
             </property>
         </bean>
@@ -63,8 +64,6 @@
 
         <!-- enable component scanning (beware that this does not enable mapper scanning!) -->
         <context:component-scan base-package="org.mskcc.cbio.portal.service" />
-        <context:component-scan base-package="org.cbioportal.persistence" />
-        <context:component-scan base-package="org.cbioportal.service" />
 
         <!-- enable autowire -->
         <context:annotation-config />
@@ -77,11 +76,19 @@
             <property name="dataSource" ref="businessDataSource" />
         </bean>
 
+        <bean id="customObjectFactory" class="org.cbioportal.persistence.mybatis.util.CustomMyBatisObjectFactory" />
+
         <!-- define the SqlSessionFactory -->
         <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
             <property name="dataSource" ref="businessDataSource" />
             <property name="typeAliasesPackage" value="org.mskcc.cbio.portal.model" />
             <property name="typeHandlersPackage" value="org.cbioportal.persistence.mybatis.typehandler" />
+            <property name="objectFactory" ref="customObjectFactory" />
+            <property name="configuration">
+                <bean class="org.apache.ibatis.session.Configuration">
+                    <property name="cacheEnabled" value="${mybatis.cache.enabled:true}" />
+                </bean>
+            </property>
         </bean>
     </beans>
   

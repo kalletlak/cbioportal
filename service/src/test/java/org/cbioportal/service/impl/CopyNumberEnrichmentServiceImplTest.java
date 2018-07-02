@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,19 +44,19 @@ public class CopyNumberEnrichmentServiceImplTest extends BaseServiceImplTest {
         alterationTypes.add(-2);
 
         List<CopyNumberCountByGene> copyNumberSampleCountByGenes = new ArrayList<>();
-        Mockito.when(discreteCopyNumberService.getSampleCountByGeneAndAlterationAndSampleIds(GENETIC_PROFILE_ID, 
-            allSampleIds, null, null)).thenReturn(copyNumberSampleCountByGenes);
+        Mockito.when(discreteCopyNumberService.getSampleCountByGeneAndAlterationAndSampleIds(MOLECULAR_PROFILE_ID, 
+            allSampleIds, null, null, false)).thenReturn(copyNumberSampleCountByGenes);
 
         List<DiscreteCopyNumberData> discreteCopyNumberDataList = new ArrayList<>();
-        Mockito.when(discreteCopyNumberService.fetchDiscreteCopyNumbersInGeneticProfile(GENETIC_PROFILE_ID, 
+        Mockito.when(discreteCopyNumberService.fetchDiscreteCopyNumbersInMolecularProfile(MOLECULAR_PROFILE_ID, 
             alteredSampleIds, null, alterationTypes, "ID")).thenReturn(discreteCopyNumberDataList);
 
         List<AlterationEnrichment> expectedAlterationEnrichments = new ArrayList<>();
         Mockito.when(alterationEnrichmentUtil.createAlterationEnrichments(2, 2, copyNumberSampleCountByGenes,
             discreteCopyNumberDataList, "SAMPLE")).thenReturn(expectedAlterationEnrichments);
 
-        List<AlterationEnrichment> result = copyNumberEnrichmentService.getCopyNumberEnrichments(GENETIC_PROFILE_ID,
-            alteredSampleIds, unalteredSampleIds, alterationTypes, "SAMPLE");
+        List<AlterationEnrichment> result = copyNumberEnrichmentService.getCopyNumberEnrichments(MOLECULAR_PROFILE_ID,
+            alteredSampleIds, unalteredSampleIds, Arrays.asList(ENTREZ_GENE_ID_1), alterationTypes, "SAMPLE");
 
         Assert.assertEquals(result, expectedAlterationEnrichments);
     }

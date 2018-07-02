@@ -30,7 +30,7 @@ import javax.validation.constraints.Min;
 
 import org.cbioportal.model.GenesetHierarchyInfo;
 import org.cbioportal.service.GenesetHierarchyService;
-import org.cbioportal.service.exception.GeneticProfileNotFoundException;
+import org.cbioportal.service.exception.MolecularProfileNotFoundException;
 import org.cbioportal.service.exception.SampleListNotFoundException;
 import org.cbioportal.web.config.annotation.InternalApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -57,6 +58,7 @@ public class GenesetHierarchyController {
     @Autowired
     private GenesetHierarchyService genesetHierarchyService;
 
+    @PreAuthorize("hasPermission(#geneticProfileId, 'GeneticProfile', 'read')")
     @RequestMapping(value = "/geneset-hierarchy/fetch", method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Get gene set hierarchical organization information. I.e. how different gene sets relate to other gene sets, in a hierarchy")
@@ -81,7 +83,7 @@ public class GenesetHierarchyController {
         @ApiParam(required = false, value = "Fill this one if you want to specify a subset of samples:"
         		+ " sampleIds: custom list of samples or patients to query, e.g. [\"TCGA-A1-A0SD-01\", \"TCGA-A1-A0SE-01\"]")
         @RequestBody(required = false) List<String> sampleIds)
-        throws GeneticProfileNotFoundException, SampleListNotFoundException {
+        throws MolecularProfileNotFoundException, SampleListNotFoundException {
 
 	        if (sampleListId != null && sampleListId.trim().length() > 0) {
 	    		return new ResponseEntity<>(

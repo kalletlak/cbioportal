@@ -70,7 +70,7 @@ public class AlterationEnrichmentUtil {
                     Collectors.groupingBy(Alteration::getPatientId)).size());
             }
         }
-        alterationEnrichment.setUnalteredCount(alterationCountByGene.getCount() -
+        alterationEnrichment.setUnalteredCount(alterationCountByGene.getCountByEntity() -
             alterationEnrichment.getAlteredCount());
         alterationEnrichment.setEntrezGeneId(alterationCountByGene.getEntrezGeneId());
         alterationEnrichment.setHugoGeneSymbol(gene.getHugoGeneSymbol());
@@ -107,7 +107,7 @@ public class AlterationEnrichmentUtil {
         int alteredInNoneCount = unalteredCount - alterationEnrichment.getUnalteredCount();
         int alteredOnlyInQueryGenesCount = alteredCount - alterationEnrichment.getAlteredCount();
 
-        double pValue = fisherExactTestCalculator.getCumlativePValue(alteredInNoneCount,
+        double pValue = fisherExactTestCalculator.getCumulativePValue(alteredInNoneCount,
             alterationEnrichment.getUnalteredCount(), alteredOnlyInQueryGenesCount,
             alterationEnrichment.getAlteredCount());
 

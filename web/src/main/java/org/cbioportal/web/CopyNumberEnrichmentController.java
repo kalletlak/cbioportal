@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.cbioportal.model.AlterationEnrichment;
 import org.cbioportal.service.CopyNumberEnrichmentService;
-import org.cbioportal.service.exception.GeneticProfileNotFoundException;
+import org.cbioportal.service.exception.MolecularProfileNotFoundException;
 import org.cbioportal.web.config.annotation.InternalApi;
 import org.cbioportal.web.parameter.CopyNumberEnrichmentEventType;
 import org.cbioportal.web.parameter.EnrichmentFilter;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -34,22 +35,23 @@ public class CopyNumberEnrichmentController {
     @Autowired
     private CopyNumberEnrichmentService copyNumberEnrichmentService;
 
-    @RequestMapping(value = "/genetic-profiles/{geneticProfileId}/copy-number-enrichments/fetch",
+    @PreAuthorize("hasPermission(#molecularProfileId, 'MolecularProfile', 'read')")
+    @RequestMapping(value = "/molecular-profiles/{molecularProfileId}/copy-number-enrichments/fetch",
         method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation("Fetch copy number enrichments in a genetic profile")
+    @ApiOperation("Fetch copy number enrichments in a molecular profile")
     public ResponseEntity<List<AlterationEnrichment>> fetchCopyNumberEnrichments(
-        @ApiParam(required = true, value = "Genetic Profile ID e.g. acc_tcga_mutations")
-        @PathVariable String geneticProfileId,
+        @ApiParam(required = true, value = "Molecular Profile ID e.g. acc_tcga_mutations")
+        @PathVariable String molecularProfileId,
         @ApiParam("Type of the copy number event")
         @RequestParam(defaultValue = "HOMDEL") CopyNumberEnrichmentEventType copyNumberEventType,
         @ApiParam("Type of the enrichment e.g. SAMPLE or PATIENT")
         @RequestParam(defaultValue = "SAMPLE") EnrichmentType enrichmentType,
         @ApiParam(required = true, value = "List of altered and unaltered Sample/Patient IDs")
-        @Valid @RequestBody EnrichmentFilter enrichmentFilter) throws GeneticProfileNotFoundException {
+        @Valid @RequestBody EnrichmentFilter enrichmentFilter) throws MolecularProfileNotFoundException {
 
-        return new ResponseEntity<>(copyNumberEnrichmentService.getCopyNumberEnrichments(geneticProfileId,
-            enrichmentFilter.getAlteredIds(), enrichmentFilter.getUnalteredIds(),
+        return new ResponseEntity<>(copyNumberEnrichmentService.getCopyNumberEnrichments(molecularProfileId,
+            enrichmentFilter.getAlteredIds(), enrichmentFilter.getUnalteredIds(), enrichmentFilter.getQueryGenes(),
             copyNumberEventType.getAlterationTypes(), enrichmentType.name()), HttpStatus.OK);
     }
 }

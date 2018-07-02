@@ -1,3 +1,99 @@
+## June 20, 2018
+ *   The seventh phase of the cBioPortal architectural upgrade is now complete: The _Enrichments_ and _Co-Expression_ tabs have been moved to the new architecture.
+ *   Supported merged gene tracks in OncoPrint and [Onco Query Language](http://www.cbioportal.org/onco_query_lang_desc.jsp) -- see [example](http://www.cbioportal.org/index.do?session_id=5b2bedca498eb8b3d566ab60)
+ 
+![image](https://user-images.githubusercontent.com/840895/41738366-def14850-755f-11e8-8a7c-deb789dc03da.png)
+
+## May 10, 2018
+ *   Enhanced OncoPrint to show germline mutations -- see [example](http://www.cbioportal.org/index.do?session_id=5af5a304498eb8b3d56615b6)
+ 
+ ![image](https://user-images.githubusercontent.com/840895/39926636-c3304d8c-54fd-11e8-9cb7-76430c8772d7.png)
+
+## April 17, 2018
+ *   **Added data**  of 3732 samples from 4 TARGET studies:
+     *   [Pediatric Acute Lymphoid Leukemia - Phase II (TARGET, 2018)](http://www.cbioportal.org/study?id=all_phase2_target_2018_pub#summary) *1978 samples*
+     *   [Pediatric Acute Myeloid Leukemia (TARGET, 2018)](http://www.cbioportal.org/study?id=aml_target_2018_pub#summary) *1025 samples*
+     *   [Pediatric Rhabdoid Tumor (TARGET, 2018)](http://www.cbioportal.org/study?id=rt_target_2018_pub#summary) *72 samples*
+     *   [Pediatric Wilms' Tumor (TARGET, 2018)](http://www.cbioportal.org/study?id=wt_target_2018_pub#summary) *657 samples*    
+ *   **Added data**  of 3416 samples from 10 published studies:
+     *    [Prostate Adenocarcinoma (MSKCC/DFCI, Nature Genetics 2018)](http://www.cbioportal.org/study?id=prad_p1000#summary) *1013 samples*
+     *    [Prostate Adenocarcinoma (EurUrol, 2017)](http://www.cbioportal.org/study?id=prad_eururol_2017#summary) *65 samples*
+     *    [Non-Small Cell Lung Cancer (MSK, JCO 2018)](http://www.cbioportal.org/study?id=nsclc_pd1_msk_2018#summary) *240 samples*
+     *    [Small-Cell Lung Cancer (Multi-Institute 2017)](http://www.cbioportal.org/study?id=sclc_cancercell_gardner_2017#summary) *20 samples*
+     *    [The Angiosarcoma Project (Provisional, February 2018)](http://www.cbioportal.org/study?id=angs_project_painter_2018#summary) *14 samples*
+     *    [Acute Lymphoblastic Leukemia (St Jude, Nat Genet 2016)](http://www.cbioportal.org/study?id=all_stjude_2016#summary) *73 samples*
+     *    [Updated Segment data and Allele Frequencies for The Metastatic Breast Cancer Project (Provisional, October 2017)](http://www.cbioportal.org/study?id=brca_mbcproject_wagle_2017#summary) *103 samples*
+     *    [Colorectal Cancer (MSK, Cancer Cell 2018)](http://www.cbioportal.org/study?id=crc_msk_2018#summary) *1134 samples*
+     *    [Metastatic Esophagogastric Cancer (MSK,Cancer Discovery 2017)](http://www.cbioportal.org/study?id=egc_msk_2017#summary) *341 samples*
+     * [Bladder Cancer (TCGA, Cell 2017)](http://www.cbioportal.org/study?id=blca_tcga_pub_2017#summary) *413 samples*
+
+## April 05, 2018
+ *   **Added data** from the TCGA PanCanAtlas project with >10,000 samples from 33 tumor types:
+     *   [Adrenocortical Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=acc_tcga_pan_can_atlas_2018)
+     *   [Bladder Urothelial Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=blca_tcga_pan_can_atlas_2018)
+     *   [Breast Invasive Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=brca_tcga_pan_can_atlas_2018)
+     *   [Cervical Squamous Cell Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=cesc_tcga_pan_can_atlas_2018)
+     *   [Colon Adenocarcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=coad_tcga_pan_can_atlas_2018)
+     *   [Cholangiocarcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=chol_tcga_pan_can_atlas_2018)
+     *   [Diffuse Large B-Cell Lymphoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=dlbc_tcga_pan_can_atlas_2018)
+     *   [Esophageal Adenocarcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=esca_tcga_pan_can_atlas_2018)
+     *   [Glioblastoma Multiforme (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=gbm_tcga_pan_can_atlas_2018)
+     *   [Head and Neck Squamous Cell Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=hnsc_tcga_pan_can_atlas_2018)
+     *   [Kidney Chromophobe (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=kich_tcga_pan_can_atlas_2018)
+     *   [Kidney Renal Clear Cell Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=kirc_tcga_pan_can_atlas_2018)
+     *   [Kidney Renal Papillary Cell Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=kirp_tcga_pan_can_atlas_2018)
+     *   [Acute Myeloid Leukemia (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=laml_tcga_pan_can_atlas_2018)
+     *   [Brain Lower Grade Glioma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=lgg_tcga_pan_can_atlas_2018)
+     *   [Liver Hepatocellular Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=lihc_tcga_pan_can_atlas_2018)
+     *   [Lung Adenocarcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=luad_tcga_pan_can_atlas_2018)
+     *   [Lung Squamous Cell Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=lusc_tcga_pan_can_atlas_2018)
+     *   [Mesothelioma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=meso_tcga_pan_can_atlas_2018)
+     *   [Ovarian Serous Cystadenocarcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=ov_tcga_pan_can_atlas_2018)
+     *   [Pancreatic Adenocarcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=paad_tcga_pan_can_atlas_2018)
+     *   [Pheochromocytoma and Paraganglioma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=pcpg_tcga_pan_can_atlas_2018)
+     *   [Prostate Adenocarcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=prad_tcga_pan_can_atlas_2018)
+     *   [Rectum Adenocarcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=read_tcga_pan_can_atlas_2018)
+     *   [Sarcoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=sarc_tcga_pan_can_atlas_2018)
+     *   [Skin Cutaneous Melanoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=skcm_tcga_pan_can_atlas_2018)
+     *   [Stomach Adenocarcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=stad_tcga_pan_can_atlas_2018)
+     *   [Testicular Germ Cell Tumors (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=tgct_tcga_pan_can_atlas_2018)
+     *   [Thyroid Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=thca_tcga_pan_can_atlas_2018)
+     *   [Thymoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=thym_tcga_pan_can_atlas_2018)
+     *   [Uterine Corpus Endometrial Carcinoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=ucec_tcga_pan_can_atlas_2018)
+     *   [Uterine Carcinosarcoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=ucs_tcga_pan_can_atlas_2018)
+     *   [Uveal Melanoma (TCGA, PanCancer Atlas)](http://www.cbioportal.org/study?id=uvm_tcga_pan_can_atlas_2018)
+
+## March 20, 2018
+ *   The sixth phase of the cBioPortal architectural upgrade is now complete: The _Download_ tab has been moved to the new architecture.
+ *   Data can now be downloaded in [tabular format](http://blog.thehyve.nl/blog/downloading-data-from-the-cbioportal-oncoprint-view) from OncoPrint.
+ *   Added an option to download an SVG file on the _Cancer Type Summary_ tab.
+
+ ![image](https://ptpb.pw/jMli.png)
+
+## January 15, 2018
+ *   The fifth phase of the cBioPortal architectural upgrade is now complete: The OncoPrint and Survival tabs have been moved to the new architecture.
+
+## November 20, 2017
+ *   You can now combine multiple studies and view them on the study summary page. [Example: liver cancer studies](http://www.cbioportal.org/study?id=liad_inserm_fr_2014%2Chcc_inserm_fr_2015%2Clihc_amc_prv%2Clihc_riken%2Clihc_tcga)
+ *   You can now bookmark or share your selected samples as virtual studies with the _share_ icon on the study summary page. [Example: a virtual study of breast tumors](http://www.cbioportal.org/study?id=5a12fd57498eb8b3d5605cd4)
+ *   Cross-study query reimplemented: Now you can view an OncoPrint of multiple studies. [Example: querying NSCLC tumors from 5 studies](http://www.cbioportal.org/index.do?session_id=5a135bee498eb8b3d5605d01)
+ 
+ ![image](https://user-images.githubusercontent.com/840895/33045546-3c8a636c-ce1b-11e7-9f52-7060c89a8dfd.png)
+ 
+## October 17, 2017
+ *   The fourth phase of the cBioPortal architectural upgrade is now complete: The _Mutual Exclusivity_ and _Cancer Type Summary_ tabs have been moved to the new architecture.
+ *   Updated protein structure alignment data in Mutations tab are now retrieved from Genome Nexus via the [G2S web service](https://g2s.genomenexus.org/).
+
+## October 2, 2017
+ *   **Added data** of 1646 samples from 7 published studies:
+     *   [NGS in Anaplastic Oligodendroglioma and Anaplastic Oligoastrocytomas tumors (MSK, Neuro Oncol 2017)](http://www.cbioportal.org/study?id=odg_msk_2017#summary)   *22 samples*
+     *   [MSK-IMPACT Clinical Sequencing Cohort for Non-Small Cell Cancer (MSK, Cancer Discovery 2017)](http://www.cbioportal.org/study?id=lung_msk_2017) *915 samples*
+     *   [Paired-exome sequencing of acral melanoma (TGEN, Genome Res 2017)](http://www.cbioportal.org/study?id=mel_tsam_liang_2017#summary) *38 samples*
+     *   [MSK-IMPACT Clinical Sequencing Cohort in Prostate Cancer (MSK, JCO Precision Oncology 2017)](http://www.cbioportal.org/study?id=prad_mskcc_2017#summary) *504 samples*
+     *   [Whole-exome sequences (WES) of pretreatment melanoma tumors (UCLA, Cell 2016)](http://www.cbioportal.org/study?id=skcm_ucla_2016#summary) *39 samples*
+     *   [Next generation sequencing (NGS) of pre-treatment metastatic melanoma samples (MSK, JCO Precision Oncology 2017)](http://www.cbioportal.org/study?id=skcm_vanderbilt_mskcc_2015#summary) *66 samples*
+     *   [Targeted gene sequencing in 62 high-grade primary Unclassified Renal Cell Carcinoma (MSK, Nature 2016)](http://cbioportal.org/study?id=urcc_mskcc_2016#summary) *62 samples*
+ *   **Updated data** for [MSK-IMPACT Clinical Sequencing Cohort (MSK, Nat Med 2017)](http://www.cbioportal.org/study?id=msk_impact_2017) with overall survival data.
 ## August 3, 2017
  *   The third phase of the cBioPortal architectural upgrade is now complete: The _Mutations_ tab now has a fresh look and faster performance -- see [example](http://www.cbioportal.org/index.do?session_id=598386e5498e5df2e29376ab&show_samples=false&#mutation_details&)
  

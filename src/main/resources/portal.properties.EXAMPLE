@@ -1,6 +1,5 @@
 # app name
 app.name=cbioportal
-app.version=${timestamp}
 
 # database
 db.user=cbio_user
@@ -10,8 +9,6 @@ db.portal_db_name=cbioportal
 db.driver=com.mysql.jdbc.Driver
 db.connection_string=jdbc:mysql://localhost/
 db.tomcat_resource_name=jdbc/cbioportal
-# this is the *expected* DB version (expected by the code). Don't set it manually, it is filled by maven:
-db.version=${db.version}
 # this should normally be set to false. In some cases you could set this to true (e.g. for testing a feature of a newer release that is not related to the schema change in expected db version above):
 db.suppress_schema_version_mismatch_errors=false
 
@@ -30,6 +27,7 @@ skin.documentation.markdown=true
 skin.documentation.faq=FAQ.md
 skin.documentation.about=About-Us.md
 skin.documentation.skin.news=News.md
+skin.documentation.oql=Onco-Query-Language.md
 
 # setting controlling the logos
 skin.right_logo=
@@ -126,7 +124,6 @@ mdacc.heatmap.study.url=//bioinformatics.mdanderson.org/TCGA/NGCHMPortal/?
 
 # patient view settings
 patient_view_placeholder=false
-patient_view_genomic_overview_cna_cutoff=0.2,1.5
 digitalslidearchive.iframe.url=http://cancer.digitalslidearchive.net/index_mskcc.php?slide_name=
 digitalslidearchive.meta.url=http://cancer.digitalslidearchive.net/local_php/get_slide_list_from_db_groupid_not_needed.php?slide_name_filter=
 tumor_image.url=http://cbio.mskcc.org/cancergenomics/tcga-tumor-images/
@@ -142,7 +139,7 @@ show.oncokb=true
 
 # Enable Chang's hotspot list (true, false)
 show.hotspot=true
-hotspots.url=http://cancerhotspots.org/api/
+hotspots.url=https://www.cancerhotspots.org/api/
 
 # Enable Civic variant annotation (true, false)
 show.civic=false
@@ -166,6 +163,8 @@ pathway_commons.url=http://www.pathwaycommons.org/pc2
 
 # bitly, please use your bitly user and apiKey
 bitly.url=http://api.bit.ly/shorten?login=[bitly.user]&apiKey=[bitly.apiKey]&
+# the new API uses the v3 of bitly API, and a java library to make the API call, so you only need to provide the access token  
+bitly.access.token=
 
 # google analytics
 google_analytics_profile_id=
@@ -202,3 +201,18 @@ ucsc.build=hg19
 
 # default view in oncoprint (sample, patient (default))
 oncoprint.defaultview=patient
+
+# OncoPrint driver mutation annotations
+# oncoprint.custom_driver_annotation.binary.menu_label=Custom driver annotation
+# oncoprint.custom_driver_annotation.tiers.menu_label=Custom driver tiers
+# oncoprint.custom_driver_annotation.default=true
+# oncoprint.custom_driver_tiers_annotation.default=true
+# oncoprint.oncokb_hotspots.default=custom
+# oncoprint.hide_vus.default=false
+
+# Custom gene sets
+# querypage.setsofgenes.location=file:/<path>
+#
+# Disable cache (for non authorized portals this can sometimes avoid running
+# out of memory with relatively little performance loss)
+# mybatis.cache.enabled=false

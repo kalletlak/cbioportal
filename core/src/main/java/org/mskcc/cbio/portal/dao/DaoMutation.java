@@ -80,10 +80,16 @@ public final class DaoMutation {
                     mutation.getValidationMethod(),
                     mutation.getScore(),
                     mutation.getBamFile(),
-                    Integer.toString(mutation.getTumorAltCount()),
-                    Integer.toString(mutation.getTumorRefCount()),
-                    Integer.toString(mutation.getNormalAltCount()),
-                    Integer.toString(mutation.getNormalRefCount()));
+                    (mutation.getTumorAltCount() == null) ? null : Integer.toString(mutation.getTumorAltCount()),
+                    (mutation.getTumorRefCount() == null) ? null : Integer.toString(mutation.getTumorRefCount()),
+                    (mutation.getNormalAltCount() == null) ? null : Integer.toString(mutation.getNormalAltCount()),
+                    (mutation.getNormalRefCount() == null) ? null : Integer.toString(mutation.getNormalRefCount()),
+                    //AminoAcidChange column is not used
+                    null,
+                    mutation.getDriverFilter(),
+                    mutation.getDriverFilterAnn(),
+                    mutation.getDriverTiersFilter(),
+                    mutation.getDriverTiersFilterAnn());
             return result;
         }
     }
@@ -1466,39 +1472,141 @@ public final class DaoMutation {
         }
     }
     
-    public static Set<ExtendedMutation.MutationEvent> getAllMutationEventsTemp(long entrezGeneId, String chr, long startPosition, long endPosition, String proteinChange, String tumorSeqAllele, String mutationType)
-    	    throws DaoException
-    	  {
-    	    Connection con = null;
-    	    PreparedStatement pstmt = null;
-    	    ResultSet rs = null;
-    	    Set<ExtendedMutation.MutationEvent> events = new HashSet<ExtendedMutation.MutationEvent>();
-    	    try
-    	    {
-    	      con = JdbcUtil.getDbConnection(DaoMutation.class);
-    	      pstmt = con.prepareStatement("SELECT * FROM mutation_event WHERE ENTREZ_GENE_ID=? and CHR=? and START_POSITION=? and END_POSITION=? and PROTEIN_CHANGE=? and MUTATION_TYPE=?");
-    	      
-    	      pstmt.setLong(1, entrezGeneId);
-    	      pstmt.setString(2, chr);
-    	      pstmt.setLong(3, startPosition);
-    	      pstmt.setLong(4, endPosition);
-    	      pstmt.setString(5, proteinChange);
-    	      pstmt.setString(6, mutationType);
-    	      rs = pstmt.executeQuery();
-    	      while (rs.next())
-    	      {
-    	        ExtendedMutation.MutationEvent event = extractMutationEvent(rs);
-    	        events.add(event);
-    	      }
-    	    }
-    	    catch (SQLException e)
-    	    {
-    	      throw new DaoException(e);
-    	    }
-    	    finally
-    	    {
-    	      JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
-    	    }
-    	    return events;
-}
+    /**
+     * Gets all tiers in alphabetical order.
+     *
+     * @param
+     * @return Ordered list of tiers.
+     * @throws DaoException Database Error.
+     */
+    public static List<String> getTiers(String _cancerStudyStableIds) throws DaoException {
+	String[] cancerStudyStableIds = _cancerStudyStableIds.split(",");
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<String> tiers = new ArrayList<String>();
+        ArrayList<GeneticProfile> geneticProfiles = new ArrayList<>();
+	for (String cancerStudyStableId: cancerStudyStableIds) {
+		geneticProfiles.addAll(DaoGeneticProfile.getAllGeneticProfiles(
+			DaoCancerStudy.getCancerStudyByStableId(cancerStudyStableId).getInternalId()
+		));
+	}
+        for (GeneticProfile geneticProfile : geneticProfiles) {
+            if (geneticProfile.getGeneticAlterationType().equals(GeneticAlterationType.MUTATION_EXTENDED)) {
+                try {
+                    con = JdbcUtil.getDbConnection(DaoMutation.class);
+                    pstmt = con.prepareStatement(
+                            "SELECT DISTINCT DRIVER_TIERS_FILTER FROM mutation "
+                            + "WHERE DRIVER_TIERS_FILTER is not NULL AND DRIVER_TIERS_FILTER <> '' AND GENETIC_PROFILE_ID=? "
+                            + "ORDER BY DRIVER_TIERS_FILTER");
+                    pstmt.setLong(1, geneticProfile.getGeneticProfileId());
+                    rs = pstmt.executeQuery();
+                    while (rs.next()) {
+                        tiers.add(rs.getString("DRIVER_TIERS_FILTER"));
+                    }
+                } catch (SQLException e) {
+                    throw new DaoException(e);
+                } finally {
+                    JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
+                }
+            }
+        }
+        
+        return tiers;
+    }
+    
+    /**
+     * Returns the number of tiers in the cancer study..
+     *
+     * @param
+     * @return Ordered list of tiers.
+     * @throws DaoException Database Error.
+     */
+    public static int numTiers(String _cancerStudyStableIds) throws DaoException {
+        List<String> tiers = getTiers(_cancerStudyStableIds);
+        return tiers.size();
+    }
+    
+    /**
+     * Returns true if there are "Putative_Driver" or "Putative_Passenger" values in the
+     * binary annotation column. Otherwise, it returns false.
+     *
+     * @param
+     * @return Ordered list of tiers.
+     * @throws DaoException Database Error.
+     */
+    public static boolean hasDriverAnnotations(String _cancerStudyStableIds) throws DaoException {
+	String[] cancerStudyStableIds = _cancerStudyStableIds.split(",");
+	Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<String> driverValues = new ArrayList<String>();
+        ArrayList<GeneticProfile> geneticProfiles = new ArrayList<>();
+	for (String cancerStudyStableId: cancerStudyStableIds) {
+		geneticProfiles.addAll(
+			DaoGeneticProfile.getAllGeneticProfiles(DaoCancerStudy.getCancerStudyByStableId(cancerStudyStableId).getInternalId())
+		);
+	}
+        for (GeneticProfile geneticProfile : geneticProfiles) {
+            if (geneticProfile.getGeneticAlterationType().equals(GeneticAlterationType.MUTATION_EXTENDED)) {
+                try {
+                    con = JdbcUtil.getDbConnection(DaoMutation.class);
+                    pstmt = con.prepareStatement(
+                            "SELECT DISTINCT DRIVER_FILTER FROM mutation "
+                            + "WHERE DRIVER_FILTER is not NULL AND DRIVER_FILTER <> '' AND GENETIC_PROFILE_ID=? ");
+                    pstmt.setLong(1, geneticProfile.getGeneticProfileId());
+                    rs = pstmt.executeQuery();
+                    while (rs.next()) {
+                        driverValues.add(rs.getString("DRIVER_FILTER"));
+                    }
+                } catch (SQLException e) {
+                    throw new DaoException(e);
+                } finally {
+                    JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
+                }
+            }
+        }
+        if (driverValues.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+    
+	public static Set<ExtendedMutation.MutationEvent> getAllMutationEventsTemp(long entrezGeneId, String chr,
+			long startPosition, long endPosition, String proteinChange, String tumorSeqAllele, String mutationType)
+			throws DaoException {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		Set<ExtendedMutation.MutationEvent> events = new HashSet<ExtendedMutation.MutationEvent>();
+		try {
+			con = JdbcUtil.getDbConnection(DaoMutation.class);
+			pstmt = con.prepareStatement(
+					"SELECT * FROM mutation_event "
+					+ "WHERE ENTREZ_GENE_ID=? and "
+					+ "CHR=? and "
+					+ "START_POSITION=? and "
+					+ "END_POSITION=? and "
+					+ "PROTEIN_CHANGE=? and "
+					+ "MUTATION_TYPE=?");
+
+			pstmt.setLong(1, entrezGeneId);
+			pstmt.setString(2, chr);
+			pstmt.setLong(3, startPosition);
+			pstmt.setLong(4, endPosition);
+			pstmt.setString(5, proteinChange);
+			pstmt.setString(6, mutationType);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				ExtendedMutation.MutationEvent event = extractMutationEvent(rs);
+				events.add(event);
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
+		}
+		return events;
+	}
+    
 }

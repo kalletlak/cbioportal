@@ -66,7 +66,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
-import org.cbioportal.model.GenesetGeneticData;
+import org.cbioportal.model.GenesetMolecularData;
 import org.cbioportal.service.GenesetDataService;
 import org.mskcc.cbio.portal.dao.DaoGeneset;
 
@@ -129,8 +129,8 @@ public class TestIntegrationTest {
                     countWarnings++;
                 }
             }
-            //check that there no warnings:
-            assertEquals(0, countWarnings);
+            //check that there are only warnings for empty positions in fake data:
+            assertEquals(1, countWarnings);
             
             //check that ALL data really got into DB correctly. In the spirit of integration tests,
             //we want to query via the same service layer as the one used by the web API here.
@@ -142,13 +142,19 @@ public class TestIntegrationTest {
             List<String> geneticProfileStableIds = new ArrayList<String>();
             geneticProfileStableIds.add("study_es_0_mutations");
             List<Mutation> mutations = mutationMapperLegacy.getMutationsDetailed(geneticProfileStableIds,null,null,null);
-            //there are 13 records in the mutation file, of which 3 are filtered, and there are 3 extra records added from fusion
-            //so we expect 13 records in DB:
-            assertEquals(13, mutations.size());
+            //there are 31 records in the mutation file, of which 3 are filtered, and there are 3 extra records added from fusion
+            //so we expect 31 records in DB:
+            assertEquals(31, mutations.size());
 
             //===== Check FUSION data ========
-            // Are there fusion entries in mutation profile? true
-            assertEquals(mutations.get(12).getMutationEvent().getMutationType(), "Fusion");
+            // Are there 4 fusion entries in mutation profile, but one is off panel, so only 3 should be imported
+            int countFusions = 0;
+            for (Mutation mutation : mutations) {
+                if (mutation.getMutationEvent().getMutationType().equals("Fusion")) {
+                    countFusions++;
+                }
+            }
+            assertEquals(countFusions, 3);
 
             // Is there a seperate fusion profile? -> false
             GeneticProfileMapperLegacy geneticProfileMapperLegacy = applicationContext.getBean(GeneticProfileMapperLegacy.class);
@@ -288,7 +294,7 @@ public class TestIntegrationTest {
             //        GO_ATP_DEPENDENT_CHROMATIN_REMODELING  -0.293861251463613  -0.226227563676626  -0.546556962547473  -0.0811115513543749  0.56919171543422
             //using new api:
             GenesetDataService genesetDataService = applicationContext.getBean(GenesetDataService.class);
-            List<GenesetGeneticData> genesetData = genesetDataService.fetchGenesetData("study_es_0_gsva_scores", "study_es_0_all",  Arrays.asList(testGeneset));
+            List<GenesetMolecularData> genesetData = genesetDataService.fetchGenesetData("study_es_0_gsva_scores", "study_es_0_all",  Arrays.asList(testGeneset));
             assertEquals(5, genesetData.size());
 
             genesetData = genesetDataService.fetchGenesetData("study_es_0_gsva_scores", Arrays.asList("TCGA-A1-A0SB-01", "TCGA-A1-A0SH-01"), Arrays.asList(testGeneset));

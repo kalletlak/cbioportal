@@ -4,7 +4,7 @@
   <parent>
     <artifactId>master</artifactId>
     <groupId>org.mskcc.cbio</groupId>
-    <version>1.8.1</version>
+    <version>1.14.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>core</artifactId>
@@ -215,9 +215,15 @@
     <!-- Mockito -->
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
+      <artifactId>mockito-core</artifactId>
       <version>1.9.5</version>
       <scope>test</scope>
+        <exclusions>
+            <exclusion>
+                <artifactId>hamcrest-core</artifactId>
+                <groupId>org.hamcrest</groupId>
+            </exclusion>
+        </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -445,6 +451,7 @@
                   <excludes>
                     <exclude>**/portal.properties.*</exclude>
                     <exclude>**/log4j.properties.*</exclude>
+                    <exclude>**/maven.properties.*</exclude>
                     <exclude>**/*.EXAMPLE</exclude>
                   </excludes>
                 </resource>
@@ -468,6 +475,7 @@
         <filtering>true</filtering>
         <includes>
             <include>**/portal.properties</include>
+            <include>**/maven.properties</include>
         </includes>
       </resource>
     </resources>
@@ -491,7 +499,7 @@
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
-                                    <ignore></ignore>
+                                    <ignore />
                                 </action>
                             </pluginExecution>
                         </pluginExecutions>
