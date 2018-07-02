@@ -89,7 +89,7 @@
                 	window.cbioportal_client.getGeneticProfiles({'study_id': window.serverVars.cancerStudies})
                 .then(function(_genetic_profiles) {
                     window.tvn_datamanager = new
-                            TVNDataManager.initwindow.OQL.genes(window.serverVars.theQuery), _genetic_profiles, window.serverVars.studySampleObj);
+                            TVNDataManager.init(window.OQL.genes(window.serverVars.theQuery), _genetic_profiles, window.serverVars.studySampleObj);
                     _tvn_instance.initializeOptions(window.OQL.genes(window.serverVars.theQuery), window.tvn_datamanager.getFilterOptionsData());
                 });
                     tvn_tab_init = true;
