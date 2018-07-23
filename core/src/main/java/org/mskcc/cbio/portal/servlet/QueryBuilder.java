@@ -519,7 +519,10 @@ public class QueryBuilder extends HttpServlet {
                 inputStudySampleMap.keySet().parallelStream().forEach((String _cancerStudyId) -> {
                     try {
                         for(SampleList sampleList:GetSampleLists.getSampleLists(_cancerStudyId)) {
-							if (sampleList.getSampleListCategory().equals(sampleListCategory)) {
+							if (sampleList.getSampleListCategory().equals(sampleListCategory)
+									//fixes https://github.com/cBioPortal/cbioportal/issues/4502
+									|| (SampleListCategory.ALL_CASES_IN_STUDY.equals(sampleListCategory)
+											&& sampleList.getStableId().equals(_cancerStudyId + "_all"))) {
 								List<String> sampleIds = sampleList.getSampleList();
 								if (inputStudySampleMap.get(_cancerStudyId).size() > 0) {
 									sampleIds.retainAll(inputStudySampleMap.get(_cancerStudyId));
