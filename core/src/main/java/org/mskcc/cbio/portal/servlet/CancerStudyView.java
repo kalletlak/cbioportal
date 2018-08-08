@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,6 +70,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -306,11 +308,20 @@ public class CancerStudyView extends HttpServlet {
         if (studyIds == null) {
             // if study is null check for study_sample_map request parameter
             String studySampleMapString = request.getParameter(STUDY_SAMPLE_MAP);
+           
+            if(studySampleMapString == null) {
+            		String bodyParams = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+            		final ObjectNode node = new ObjectMapper().readValue(bodyParams, ObjectNode.class);
+            		
+            		if (node.has(STUDY_SAMPLE_MAP)) {
+            		    studySampleMapString = node.get(STUDY_SAMPLE_MAP).toString();
+            		}
+            }
             if (studySampleMapString == null) {
                 request.setAttribute(ERROR, "No such cancer study");
             } else {
                 // Decode study_sample_map string
-                studySampleMapString = java.net.URLDecoder.decode(studySampleMapString, "UTF-8");
+                studySampleMapString = StringEscapeUtils.unescapeHtml(studySampleMapString);
                 ObjectMapper mapper = new ObjectMapper();
                 inputStudyMap = mapper.readValue(studySampleMapString,
                     new TypeReference<Map<String, HashSet<String>>>() {
