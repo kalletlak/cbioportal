@@ -156,13 +156,14 @@
                   </legend>
                   <div id="content">
                   <p>
-                      The PedcBioPortal for Childhood Cancer Genomics is an instance of <a href="http://www.cbioportal.org/">cBioPortal</a> 
-                      supporting the curation and pan-cancer integration of public, pediatric cancer 
-                      genomics data sets as well as 'open science' initiatives of consortia-based 
-                      efforts including the <a href="https://cbttc.org/">Children's Brain Tumor Tissue Consortium (CBTTC)</a>, 
-                      the <a href="http://www.pnoc.us/">Pediatric NeuroOncology Consortium (PNOC)</a>, and the <a href="http://www.stbaldricks.org/">St. Baldrick Pediatric</a>&nbsp;<a href="http://www.standup2cancer.org/pediatrics">Stand Up 2 Cancer Dream Team</a>. 
+                      The PedcBioPortal for Childhood Cancer Genomics is an instance of <a href="http://www.cbioportal.org">cBioPortal</a> 
+                      supporting the curation and pan-cancer integration of public, pediatric cancer genomics data sets as well as 
+                      'open science' initiatives integrated within the <a href="https://kidsfirstdrc.org">Kids First Data Resource Center</a> 
+                      as well as data from consortia-based efforts including the <a href="https://cbttc.org/">Children's Brain Tumor Tissue Consortium (CBTTC)</a>, 
+                      the <a href="http://www.pnoc.us/">Pediatric NeuroOncology Consortium (PNOC)</a>, and the 
+                      <a href="http://www.stbaldricks.org/">St. Baldrick Pediatric</a>&nbsp;<a href="http://www.standup2cancer.org/pediatrics">Stand Up 2 Cancer Dream Team</a>. 
                       PedcBioPortal is an integrated platform linking data visualization to available biospecimens and cloud-based computation. 
-                      All public data generated under these and other partnered initiatives are also available for access at <a href="http://www.cbioportal.org/">cBioPortal</a>. 
+                      All public data generated under these and other partnered initiatives are also available for access at <a href="http://www.cbioportal.org/">cBioPortal</a>.
                   </p>
 				  </div>
                   <p>
