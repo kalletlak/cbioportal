@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 # ------------------------------------------------------------------------------
 # Common components used by various cbioportal scripts.
@@ -43,7 +43,7 @@ class MetaFileTypes(object):
     CANCER_TYPE = 'meta_cancer_type'
     SAMPLE_ATTRIBUTES = 'meta_clinical_sample'
     PATIENT_ATTRIBUTES = 'meta_clinical_patient'
-    CNA = 'meta_CNA'
+    CNA_DISCRETE = 'meta_CNA'
     CNA_LOG2 = 'meta_log2CNA'
     CNA_CONTINUOUS = 'meta_contCNA'
     SEG = 'meta_segment'
@@ -91,7 +91,7 @@ META_FIELD_MAP = {
         'datatype': True,
         'data_filename': True
     },
-    MetaFileTypes.CNA: {
+    MetaFileTypes.CNA_DISCRETE: {
         'cancer_study_identifier': True,
         'genetic_alteration_type': True,
         'datatype': True,
@@ -255,7 +255,7 @@ IMPORTER_CLASSNAME_BY_META_TYPE = {
     MetaFileTypes.CANCER_TYPE: IMPORT_CANCER_TYPE_CLASS,
     MetaFileTypes.SAMPLE_ATTRIBUTES: "org.mskcc.cbio.portal.scripts.ImportClinicalData",
     MetaFileTypes.PATIENT_ATTRIBUTES: "org.mskcc.cbio.portal.scripts.ImportClinicalData",
-    MetaFileTypes.CNA: "org.mskcc.cbio.portal.scripts.ImportProfileData",
+    MetaFileTypes.CNA_DISCRETE: "org.mskcc.cbio.portal.scripts.ImportProfileData",
     MetaFileTypes.CNA_LOG2: "org.mskcc.cbio.portal.scripts.ImportProfileData",
     MetaFileTypes.CNA_CONTINUOUS: "org.mskcc.cbio.portal.scripts.ImportProfileData",
     MetaFileTypes.SEG: "org.mskcc.cbio.portal.scripts.ImportCopyNumberSegmentData",
@@ -448,7 +448,7 @@ class CollapsingLogMessageHandler(logging.handlers.MemoryHandler):
 
         aggregated_buffer = []
         # for each list of same-message records
-        for record_list in grouping_dict.values():
+        for record_list in list(grouping_dict.values()):
             # make a dict to collect the fields for the aggregate record
             aggregated_field_dict = {}
             # for each field found in (the first of) the records
@@ -511,7 +511,7 @@ def get_meta_file_type(meta_dictionary, logger, filename):
         ("PROTEIN_LEVEL", "Z-SCORE"): MetaFileTypes.PROTEIN,
         ("PROTEIN_LEVEL", "CONTINUOUS"): MetaFileTypes.PROTEIN,
         # cna
-        ("COPY_NUMBER_ALTERATION", "DISCRETE"): MetaFileTypes.CNA,
+        ("COPY_NUMBER_ALTERATION", "DISCRETE"): MetaFileTypes.CNA_DISCRETE,
         ("COPY_NUMBER_ALTERATION", "CONTINUOUS"): MetaFileTypes.CNA_CONTINUOUS,
         ("COPY_NUMBER_ALTERATION", "LOG2-VALUE"): MetaFileTypes.CNA_LOG2,
         ("COPY_NUMBER_ALTERATION", "SEG"): MetaFileTypes.SEG,
@@ -575,7 +575,7 @@ def validate_types_and_id(meta_dictionary, logger, filename):
                 data_line_nr += 1
                 # skip header, so if line is not header then process as tab separated:
                 if (data_line_nr > 1):
-                    line_cols = csv.reader([line], delimiter='\t').next()
+                    line_cols = next(csv.reader([line], delimiter='\t'))
                     genetic_alteration_type = line_cols[0]
                     data_type = line_cols[1]
                     # add to map:
@@ -631,8 +631,8 @@ def parse_metadata_file(filename,
     logger.debug('Starting validation of meta file', extra={'filename_': filename})
 
     # Read meta file
-    meta_dictionary = {}
-    with open(filename, 'rU') as metafile:
+    meta_dictionary = OrderedDict()
+    with open(filename, 'r') as metafile:
         for line_index, line in enumerate(metafile):
             # skip empty lines:
             if line.strip() == '':
@@ -644,7 +644,7 @@ def parse_metadata_file(filename,
                     extra={'filename_': filename,
                            'line_number': line_index + 1})
                 meta_dictionary['meta_file_type'] = None
-                return meta_dictionary
+                return dict(meta_dictionary)
             key_value = line.split(':', 1)
             if len(key_value) == 2:
                 meta_dictionary[key_value[0]] = key_value[1].strip()
@@ -658,7 +658,7 @@ def parse_metadata_file(filename,
         meta_dictionary['meta_file_type'] = meta_file_type
         # if type could not be inferred, no further validations are possible
         if meta_file_type is None:
-            return meta_dictionary
+            return dict(meta_dictionary)
 
 
     # Check for missing fields for this specific meta file type
@@ -675,7 +675,7 @@ def parse_metadata_file(filename,
     if missing_fields:
         # all further checks would depend on these fields being present
         meta_dictionary['meta_file_type'] = None
-        return meta_dictionary
+        return dict(meta_dictionary)
 
     # validate genetic_alteration_type, datatype, stable_id
     stable_id_mandatory = META_FIELD_MAP[meta_file_type].get('stable_id',
@@ -685,7 +685,7 @@ def parse_metadata_file(filename,
         if not valid_types_and_id:
             # invalid meta file type
             meta_dictionary['meta_file_type'] = None
-            return meta_dictionary
+            return dict(meta_dictionary)
 
     # check for extra unrecognized fields
     for field in meta_dictionary:
@@ -714,11 +714,33 @@ def parse_metadata_file(filename,
                    'cause': meta_dictionary['cancer_study_identifier']})
         # not a valid meta file in this study
         meta_dictionary['meta_file_type'] = None
-        return meta_dictionary
+        return dict(meta_dictionary)
 
     # type-specific validations
-    
-    if meta_file_type == MetaFileTypes.EXPRESSION:
+
+    # Validate length of attributes in meta study file
+    # TODO: do this for all other meta files as well
+    meta_study_attribute_size_dict = {'cancer_study_identifier': 255,
+                                      'type_of_cancer': 63,
+                                      'name': 255,
+                                      'description': 1024,
+                                      'citation': 200,
+                                      'pmid': 20,
+                                      'groups': 200,
+                                      'short_name': 64
+                                      }
+    if meta_file_type == MetaFileTypes.STUDY:
+        for attribute in meta_study_attribute_size_dict:
+            if attribute in meta_dictionary:
+                if len(meta_dictionary[attribute]) > meta_study_attribute_size_dict[attribute]:
+                    logger.error("The maximum length of the '%s' "
+                                 "value is %s" % (attribute,
+                                                  meta_study_attribute_size_dict[attribute]),
+                                 extra={'filename_': filename,
+                                        'cause': meta_dictionary[attribute] + ' (%s)' % len(meta_dictionary[attribute])}
+                                 )
+                                 
+     if meta_file_type == MetaFileTypes.EXPRESSION:
    		#TODO: need to update this. should set normal reference id depending on genetic_alteration_type and datatype
 	    if 'normals_tissue_reference_id' in META_FIELD_MAP[meta_file_type] and meta_dictionary.get('normals_tissue_reference_id',False):
 	    	if meta_dictionary['normals_tissue_reference_id'] not in ['gtex','hgu133plus2']:
@@ -727,18 +749,27 @@ def parse_metadata_file(filename,
 	            extra={'filename_': filename,
 	                   'cause': meta_dictionary['normals_tissue_reference_id']})
 	        	# not a valid meta file in this study
-	        	meta_file_type = None
-	        	return meta_dictionary, meta_file_type	
-        
+	        	meta_dictionary['meta_file_type'] = None
+
     if meta_file_type in (MetaFileTypes.SEG, MetaFileTypes.GISTIC_GENES):
-        if genome_name is not None and meta_dictionary['reference_genome_id'] != genome_name:
+        # Todo: Restore validation for reference genome in segment files
+        # Validation can be restored to normal when hg18 data on public portal and data hub has been
+        # liftovered to hg19. It was decided in the data hub call of August 14 2018 to remove validation until then.
+        valid_segment_reference_genomes = ['hg18', 'hg19']
+        if meta_dictionary['reference_genome_id'] not in valid_segment_reference_genomes:
             logger.error(
                 'Reference_genome_id is not %s',
-                genome_name,
+                ' or '.join(valid_segment_reference_genomes),
                 extra={'filename_': filename,
                        'cause': meta_dictionary['reference_genome_id']})
-            #meta_file_type = None
             meta_dictionary['meta_file_type'] = None
+        elif meta_dictionary['reference_genome_id'] == 'hg18':
+            logger.warning(
+                'Reference_genome_id is hg18. This is temporary approved to be loaded in cBioPortal, until the data '
+                'curation team has converted hg18 coordinates to hg19 in public datasets with liftOver. When this is '
+                'done, validation will be restored to only allow reference genome hg19.',
+                extra={'filename_': filename})
+
     if meta_file_type == MetaFileTypes.MUTATION:
         if ('swissprot_identifier' in meta_dictionary and
                 meta_dictionary['swissprot_identifier'] not in ('name',
@@ -803,7 +834,7 @@ def run_java(*args):
     while process.poll() is None:
         line = process.stdout.readline()
         if line != '' and line.endswith('\n'):
-            print >> OUTPUT_FILE, line.strip()
+            print(line.strip(), file=OUTPUT_FILE)
             ret.append(line[:-1])
     ret.append(process.returncode)
     # if cmd line parameters error:

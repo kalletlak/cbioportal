@@ -32,12 +32,9 @@
 
 package org.mskcc.cbio.portal.util;
 
-import org.mskcc.cbio.portal.servlet.QueryBuilder;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -81,6 +78,12 @@ public class GlobalProperties {
     public static final String FILTER_GROUPS_BY_APPNAME = "filter_groups_by_appname";
     public static final String INCLUDE_NETWORKS = "include_networks";
     public static final String GOOGLE_ANALYTICS_PROFILE_ID = "google_analytics_profile_id";
+    
+    
+    private static String frontendSentryEndpoint;
+    @Value("${sentryjs.frontend_project_endpoint:null}")
+    public void setfrontendSentryEndpoint(String property) { frontendSentryEndpoint = property; }
+    
     public static final String GENOMESPACE = "genomespace";
 
     public static final String APP_NAME = "app.name";
@@ -149,6 +152,14 @@ public class GlobalProperties {
     @Value("${session.service.url:}") // default is empty string
     public void setSessionServiceURL(String property) { sessionServiceURL = property; }
 
+    private static String sessionServiceUser;
+    @Value("${session.service.user:}") // default is empty string
+    public void setSessionServiceUser(String property) { sessionServiceUser = property; }
+
+    private static String sessionServicePassword;
+    @Value("${session.service.password:}") // default is empty string
+    public void setSessionServicePassword(String property) { sessionServicePassword = property; }
+
     private static String frontendConfig;
     @Value("${frontend.config:}") // default is empty string
     public void setFrontendConfig(String property) { frontendConfig = property; }
@@ -170,8 +181,7 @@ public class GlobalProperties {
 
     // footer
     public static final String SKIN_FOOTER = "skin.footer";
-    public static final String DEFAULT_SKIN_FOOTER = " | <a href=\"http://www.mskcc.org/mskcc/html/44.cfm\">MSKCC</a>" +
-            " | <a href=\"http://cancergenome.nih.gov/\">TCGA</a>";
+    public static final String DEFAULT_SKIN_FOOTER = ""; // default is in cbioportal-frontend repo
 
     // login contact
     public static final String SKIN_LOGIN_CONTACT_HTML = "skin.login.contact_html";
@@ -253,6 +263,10 @@ public class GlobalProperties {
     @Value("${show.civic:false}") // default is false
     public void setShowCivic(String property) { showCivic = Boolean.parseBoolean(property); }
 
+    private static boolean sitemaps;
+    @Value("${sitemaps:false}") // default is false
+    public void setSitemaps(String property) { sitemaps = Boolean.parseBoolean(property); }
+
     private static boolean showGenomeNexus;
     @Value("${show.genomenexus:true}") // default is true
     public void setShowGenomeNexus(String property) { showGenomeNexus = Boolean.parseBoolean(property); }
@@ -323,8 +337,48 @@ public class GlobalProperties {
     public void setPedcbioUtilsUrl(String property) { pedcbioUtilsUrl = property; }
 
     private static Log LOG = LogFactory.getLog(GlobalProperties.class);
-    private static Properties portalProperties = initializeProperties(PORTAL_PROPERTIES_FILE_NAME);
+    private static ConfigPropertyResolver portalProperties = new ConfigPropertyResolver();
     private static Properties mavenProperties = initializeProperties(MAVEN_PROPERTIES_FILE_NAME);
+
+    /**
+     * Minimal portal property resolver that takes system property overrides.
+     *
+     * Provides properties from runtime or the baked-in
+     * portal.properties config file, but takes overrides from <code>-D</code>
+     * system properties.
+     */
+    private static class ConfigPropertyResolver {
+        private Properties configFileProperties;
+        /**
+         * Finds the config file for properties not overridden by system props.
+         *
+         * Either the runtime or buildtime portal.properties file.
+         */
+        public ConfigPropertyResolver() {
+            configFileProperties = initializeProperties(PORTAL_PROPERTIES_FILE_NAME);
+        }
+        /**
+         * Finds the property with the specified key, or returns the default.
+         */
+        public String getProperty(String key, String defaultValue) {
+            String propertyValue = configFileProperties.getProperty(key, defaultValue);
+            return System.getProperty(key, propertyValue);
+        }
+        /**
+         * Finds the property with the specified key, or returns null.
+         */
+        public String getProperty(String key) {
+            return getProperty(key, null);
+        }
+        /**
+        * Tests if a property has been specified for this key.
+        *
+        * @return true iff the property was specified, even if blank.
+        */
+        public boolean containsKey(String key) {
+            return getProperty(key) != null;
+        }
+    }
 
     private static Properties initializeProperties(String propertiesFileName)
     {
@@ -423,7 +477,8 @@ public class GlobalProperties {
 
     public static boolean usersMustAuthenticate()
     {
-        return (!authenticate.isEmpty() && !authenticate.equals("false"));
+        // authentication for social_auth is optional
+        return (!authenticate.isEmpty() && !authenticate.equals("false") && !authenticate.equals("social_auth"));
     }
 
     public static String authenticationMethod()
@@ -577,8 +632,13 @@ public class GlobalProperties {
     public static String getEmailContact()
     {
         String emailAddress = portalProperties.getProperty(SKIN_EMAIL_CONTACT);
-        return (emailAddress == null) ? DEFAULT_EMAIL_CONTACT :
-            ("<span class=\"mailme\" title=\"Contact us\">" + emailAddress + "</span>");
+        if (emailAddress == null)
+            emailAddress = DEFAULT_EMAIL_CONTACT;
+        return (
+                "<span class=\"mailme\" title=\"Contact us\">" +
+                emailAddress +
+                "</span>"
+        );
     }
 
     public static boolean includeNetworks()
@@ -589,6 +649,11 @@ public class GlobalProperties {
     public static String getGoogleAnalyticsProfileId()
     {
         return portalProperties.getProperty(GOOGLE_ANALYTICS_PROFILE_ID);
+    }
+    
+    public static String getFrontendSentryEndpoint()
+    {
+        return (frontendSentryEndpoint == null) ? null : frontendSentryEndpoint.trim();
     }
 
     public static boolean genomespaceEnabled()
@@ -713,13 +778,13 @@ public class GlobalProperties {
 
     public static String getLinkToPatientView(String caseId, String cancerStudyId)
     {
-        return "case.do#/patient?caseId=" + caseId
+        return "patient?caseId=" + caseId
                  + "&studyId=" + cancerStudyId;
     }
 
     public static String getLinkToSampleView(String caseId, String cancerStudyId)
     {
-        return "case.do#/patient?sampleId=" + caseId
+        return "patient?sampleId=" + caseId
                  + "&studyId=" + cancerStudyId;
     }
 
@@ -793,6 +858,16 @@ public class GlobalProperties {
         return sessionServiceURL;
     }
 
+    public static String getSessionServiceUser()
+    {
+        return sessionServiceUser;
+    }
+
+    public static String getSessionServicePassword()
+    {
+        return sessionServicePassword;
+    }
+
     public static String getOncoKBPublicApiUrl()
     {
         String oncokbApiUrl = portalProperties.getProperty(ONCOKB_PUBLIC_API_URL);
@@ -833,7 +908,7 @@ public class GlobalProperties {
     {
         return pedcbioUtilsUrl;
     }
- 
+    
     public static String getOncoKBApiUrl()
     {
         String oncokbApiUrl = portalProperties.getProperty(ONCOKB_API_URL);
@@ -893,6 +968,10 @@ public class GlobalProperties {
         }else{
             return true;
         }
+    }
+
+    public static boolean showSitemaps() {
+       return sitemaps;
     }
 
     public static boolean showCivic() {

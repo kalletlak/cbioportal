@@ -102,9 +102,13 @@ public class ImportFusionData {
                         StableIdUtil.getSampleId(barCode));
                 // can be null in case of 'normal' sample:
                 if (sample == null) {
-                    assert StableIdUtil.isNormal(barCode);
-                    line = buf.readLine();
-                    continue;
+                    if (StableIdUtil.isNormal(barCode)) {
+                        line = buf.readLine();
+                        continue;
+                    }
+                    else {
+                        throw new RuntimeException("Unknown sample id '" + barCode + "' found in tab-delimited file: " + this.fusionFile.getCanonicalPath());
+                    }
                 }
                 //  Assume we are dealing with Entrez Gene Ids (this is the best / most stable option)
                 String geneSymbol = record.getHugoGeneSymbol();
@@ -138,6 +142,7 @@ public class ImportFusionData {
                     // TODO we may need get mutation type from the file
                     // instead of defining a constant
                     mutation.setMutationType(FUSION);
+                    mutation.setMutationStatus(record.getFusionStatus().toUpperCase());
                     MutationEvent event =
                         existingEvents.containsKey(mutation.getEvent()) ?
                         existingEvents.get(mutation.getEvent()) :

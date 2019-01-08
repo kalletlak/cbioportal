@@ -107,21 +107,30 @@ public class MutationServiceImpl implements MutationService {
     @Override
     public List<MutationCountByGene> getSampleCountByEntrezGeneIdsAndSampleIds(String molecularProfileId,
                                                                                List<String> sampleIds,
-                                                                               List<Integer> entrezGeneIds,
-                                                                               boolean includeFrequency)
+                                                                               List<Integer> entrezGeneIds)
         throws MolecularProfileNotFoundException {
 
-        MolecularProfile molecularProfile = validateMolecularProfile(molecularProfileId);
+        validateMolecularProfile(molecularProfileId);
 
         List<MutationCountByGene> result = mutationRepository.getSampleCountByEntrezGeneIdsAndSampleIds(
             molecularProfileId, sampleIds, entrezGeneIds);
-        
-        if (includeFrequency) {
-            geneFrequencyCalculator.calculate(molecularProfile, sampleIds, result, SEQUENCED_LIST_SUFFIX);
-        }
 
         return result;
     }
+
+    @Override
+	public List<MutationCountByGene> getSampleCountInMultipleMolecularProfiles(List<String> molecularProfileIds,
+			List<String> sampleIds, List<Integer> entrezGeneIds, boolean includeFrequency) {
+        
+        List<MutationCountByGene> result = mutationRepository.getSampleCountInMultipleMolecularProfiles(
+            molecularProfileIds, sampleIds, entrezGeneIds);
+        
+        if (includeFrequency) {
+            geneFrequencyCalculator.calculate(molecularProfileIds, sampleIds, result);
+        }
+
+        return result;
+	}
 
     @Override
     public List<MutationCountByGene> getPatientCountByEntrezGeneIdsAndSampleIds(String molecularProfileId,
@@ -133,25 +142,6 @@ public class MutationServiceImpl implements MutationService {
 
         return mutationRepository.getPatientCountByEntrezGeneIdsAndSampleIds(molecularProfileId, patientIds, 
             entrezGeneIds);
-    }
-
-    @Override
-    public List<MutationCount> getMutationCountsInMolecularProfileBySampleListId(String molecularProfileId,
-                                                                                 String sampleListId)
-        throws MolecularProfileNotFoundException {
-
-        validateMolecularProfile(molecularProfileId);
-
-        return mutationRepository.getMutationCountsInMolecularProfileBySampleListId(molecularProfileId, sampleListId);
-    }
-
-    @Override
-    public List<MutationCount> fetchMutationCountsInMolecularProfile(String molecularProfileId, List<String> sampleIds)
-        throws MolecularProfileNotFoundException {
-
-        validateMolecularProfile(molecularProfileId);
-
-        return mutationRepository.fetchMutationCountsInMolecularProfile(molecularProfileId, sampleIds);
     }
 
     @Override
@@ -174,8 +164,9 @@ public class MutationServiceImpl implements MutationService {
 
         MolecularProfile molecularProfile = molecularProfileService.getMolecularProfile(molecularProfileId);
 
-        if (!molecularProfile.getMolecularAlterationType()
-            .equals(MolecularProfile.MolecularAlterationType.MUTATION_EXTENDED)) {
+        if (!(molecularProfile.getMolecularAlterationType()
+            .equals(MolecularProfile.MolecularAlterationType.MUTATION_EXTENDED) || molecularProfile.getMolecularAlterationType()
+            .equals(MolecularProfile.MolecularAlterationType.MUTATION_UNCALLED))) {
 
             throw new MolecularProfileNotFoundException(molecularProfileId);
         }
