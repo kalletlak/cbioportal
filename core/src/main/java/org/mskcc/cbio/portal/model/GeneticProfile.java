@@ -51,7 +51,6 @@ public class GeneticProfile implements Serializable {
     private String targetLine;
     private boolean showProfileInAnalysisTab;
     private Properties otherMetadataFields;
-    private String normalsTissueReferenceId;
 
     public GeneticProfile() {
       super();
@@ -193,14 +192,6 @@ public class GeneticProfile implements Serializable {
         }
     }
     
-    public String getNormalsTissueReferenceId() {
-		return normalsTissueReferenceId;
-	}
-
-	public void setNormalsTissueReferenceId(String normalsTissueReferenceId) {
-		this.normalsTissueReferenceId = normalsTissueReferenceId;
-	}
-
 	@Override
     public String toString() {
        return ToStringBuilder.reflectionToString(this);

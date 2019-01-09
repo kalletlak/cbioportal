@@ -299,7 +299,7 @@ public final class DaoCancerStudy {
                     "( `CANCER_STUDY_IDENTIFIER`, `NAME`, "
                     + "`DESCRIPTION`, `PUBLIC`, `TYPE_OF_CANCER_ID`, "
                     + "`PMID`, `CITATION`, `GROUPS`, `SHORT_NAME`, `STATUS`, "
-                    + "`IMPORT_DATE`, `IS_ADULT_CANCER` ) "
+                    + "`IMPORT_DATE`, `IS_PEDIATRIC_CANCER` ) "
                     + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                     Statement.RETURN_GENERATED_KEYS);
             pstmt.setString(1, stableId);
@@ -321,7 +321,7 @@ public final class DaoCancerStudy {
             //TODO - use this field in parts of the system that build up the list of studies to display in home page:
             pstmt.setInt(10, Status.UNAVAILABLE.ordinal());
             pstmt.setDate(11, java.sql.Date.valueOf(LocalDate.now()));
-            pstmt.setBoolean(12, cancerStudy.getIsAdultCancer());
+            pstmt.setBoolean(12, cancerStudy.getIsPediatricCancer());
             pstmt.executeUpdate();
             rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
@@ -608,7 +608,7 @@ public final class DaoCancerStudy {
         cancerStudy.setShortName(rs.getString("SHORT_NAME"));
         cancerStudy.setInternalId(rs.getInt("CANCER_STUDY_ID"));
         cancerStudy.setImportDate(rs.getDate("IMPORT_DATE"));
-        cancerStudy.setIsAdultCancer(rs.getBoolean("IS_ADULT_CANCER"));
+        cancerStudy.setIsPediatricCancer(rs.getBoolean("IS_PEDIATRIC_CANCER"));
         return cancerStudy;
     }
 

@@ -77,7 +77,7 @@ META_FIELD_MAP = {
         'pmid': False,
         'groups': False,
         'add_global_case_list': False,
-        'is_adult_cancer': False
+        'is_pediatric_cancer': False
     },
     MetaFileTypes.SAMPLE_ATTRIBUTES: {
         'cancer_study_identifier': True,
@@ -156,8 +156,7 @@ META_FIELD_MAP = {
         'profile_name': True,
         'profile_description': True,
         'data_filename': True,
-        'gene_panel': False,
-        'normals_tissue_reference_id':False
+        'gene_panel': False
     },
     MetaFileTypes.METHYLATION: {
         'cancer_study_identifier': True,
@@ -740,17 +739,6 @@ def parse_metadata_file(filename,
                                         'cause': meta_dictionary[attribute] + ' (%s)' % len(meta_dictionary[attribute])}
                                  )
                                  
-     if meta_file_type == MetaFileTypes.EXPRESSION:
-   		#TODO: need to update this. should set normal reference id depending on genetic_alteration_type and datatype
-	    if 'normals_tissue_reference_id' in META_FIELD_MAP[meta_file_type] and meta_dictionary.get('normals_tissue_reference_id',False):
-	    	if meta_dictionary['normals_tissue_reference_id'] not in ['gtex','hgu133plus2']:
-	    		logger.error(
-	            "normal reference id is expected in ['gtex','hgu133plus2']",
-	            extra={'filename_': filename,
-	                   'cause': meta_dictionary['normals_tissue_reference_id']})
-	        	# not a valid meta file in this study
-	        	meta_dictionary['meta_file_type'] = None
-
     if meta_file_type in (MetaFileTypes.SEG, MetaFileTypes.GISTIC_GENES):
         # Todo: Restore validation for reference genome in segment files
         # Validation can be restored to normal when hg18 data on public portal and data hub has been

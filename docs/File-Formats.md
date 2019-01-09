@@ -436,7 +436,6 @@ The expression metadata file should contain the following fields:
 7. **profile_description**: A description of the expression data, e.g., "Expression levels (Agilent microarray).".
 8. **data_filename**: your datafile
 9. **gene_panel (Optional)**:  gene panel stable id
-10. **normals_tissue_reference_id(optional)**: A normal dataset to which this profile data can be compared to. For now is should be one in ['gtex','hgu133plus2'].
 
 #### Supported stable_id values for MRNA_EXPRESSION
 For historical reasons, cBioPortal expects the `stable_id` to be one of those listed in the following static set.
