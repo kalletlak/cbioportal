@@ -3,10 +3,12 @@ package org.mskcc.cbio.portal.web.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.cbioportal.web.parameter.VirtualStudy;
+import org.cbioportal.web.parameter.Session;
+import org.cbioportal.web.parameter.SessionData;
 import org.cbioportal.web.parameter.VirtualStudyData;
+import org.cbioportal.weblegacy.mixin.SessionDataMixin;
+import org.cbioportal.weblegacy.mixin.SessionMixin;
 import org.cbioportal.weblegacy.mixin.VirtualStudyDataMixin;
-import org.cbioportal.weblegacy.mixin.VirtualStudyMixin;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +22,8 @@ public class CustomObjectMapper extends ObjectMapper {
         super.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         super.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
         Map<Class<?>, Class<?>> mixinMap = new HashMap<>();
-        mixinMap.put(VirtualStudy.class, VirtualStudyMixin.class);
+        mixinMap.put(Session.class, SessionMixin.class);
+        mixinMap.put(SessionData.class, SessionDataMixin.class);
         mixinMap.put(VirtualStudyData.class, VirtualStudyDataMixin.class);
         super.setMixIns(mixinMap);
     }

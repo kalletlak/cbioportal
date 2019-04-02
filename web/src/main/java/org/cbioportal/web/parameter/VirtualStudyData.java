@@ -1,11 +1,16 @@
 package org.cbioportal.web.parameter;
 
-import java.util.HashSet;
+import java.io.Serializable;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class VirtualStudyData {
-
+public class VirtualStudyData extends SessionData implements Serializable {
+    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    
 	private String name;
 
 	private String description;
@@ -13,14 +18,6 @@ public class VirtualStudyData {
 	private Set<VirtualStudySamples> studies;
 
 	private StudyViewFilter studyViewFilter;
-
-	private String owner = "anonymous";
-
-	private Set<String> origin = new HashSet<>();
-
-	private Long created = System.currentTimeMillis();
-
-	private Set<String> users = new HashSet<>();
 
 	private Float version = 1.0f;
 
@@ -48,39 +45,12 @@ public class VirtualStudyData {
 		this.studies = studies;
 	}
 
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-
+	@Override
 	public Set<String> getOrigin() {
-		if (origin == null || origin.size() == 0) {
+		if (super.getOrigin() == null || super.getOrigin().size() == 0) {
 			return studies.stream().map(map -> map.getId()).collect(Collectors.toSet());
 		}
-		return origin;
-	}
-
-	public void setOrigin(Set<String> origin) {
-		this.origin = origin;
-	}
-
-	public Long getCreated() {
-		return created;
-	}
-
-	public void setCreated(Long created) {
-		this.created = created;
-	}
-
-	public Set<String> getUsers() {
-		return users;
-	}
-
-	public void setUsers(Set<String> users) {
-		this.users = users;
+		return super.getOrigin();
 	}
 
 	public Float getVersion() {
