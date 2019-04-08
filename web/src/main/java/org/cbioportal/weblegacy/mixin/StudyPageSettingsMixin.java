@@ -4,11 +4,9 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class SessionDataMixin {
+public class StudyPageSettingsMixin {
     @JsonIgnore
-    private String source;
-    @JsonIgnore
-    private String type;
+    private String version;
     @JsonIgnore
     private String owner;
     @JsonIgnore

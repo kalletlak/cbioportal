@@ -2,7 +2,6 @@ package org.mskcc.cbio.portal.web;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +20,9 @@ import org.apache.commons.logging.LogFactory;
 import org.cbioportal.web.parameter.PagingConstants;
 import org.cbioportal.web.parameter.Session;
 import org.cbioportal.web.parameter.SessionData;
+import org.cbioportal.web.parameter.SessionType;
+import org.cbioportal.web.parameter.SettingsData;
+import org.cbioportal.web.parameter.SettingsIdentifier;
 import org.cbioportal.web.parameter.StudyPageSettings;
 import org.cbioportal.web.parameter.VirtualStudyData;
 import org.json.simple.JSONObject;
@@ -42,11 +44,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -67,94 +68,103 @@ public class ProxySessionServiceController {
     private String sessionServicePassword;
     
     
+    private Boolean isBasicAuthEnabled() {
+        return isSessionServiceEnabled() && sessionServicePassword != null && !sessionServicePassword.equals("");
+    }
+
+    private Boolean isSessionServiceEnabled() {
+        return !StringUtils.isEmpty(sessionServiceURL);
+    }
+
+    private HttpHeaders getHttpHeaders() {
+        return new HttpHeaders() {
+            {
+                if (isBasicAuthEnabled()) {
+                    String auth = sessionServiceUser + ":" + sessionServicePassword;
+                    byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
+                    String authHeader = "Basic " + new String(encodedAuth);
+                    set("Authorization", authHeader);
+                }
+                set("Content-Type", "application/json");
+            }
+        };
+    }
+
+    private boolean isAuthorized() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return !(authentication == null || (authentication instanceof AnonymousAuthenticationToken));
+    }
+
+    private String userName() {
+        return ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+    }
+    
     @RequestMapping(value = "/{type}/{id}", method = RequestMethod.GET)
-    public @ResponseBody Object getSession(
-            @PathVariable SessionType type, 
-            @PathVariable String      id,
-            HttpServletResponse       response) throws IOException {
-        
+    public ResponseEntity<Session> getSession(@PathVariable SessionType type, @PathVariable String id,
+            HttpServletResponse response) {
+
         try {
             RestTemplate restTemplate = new RestTemplate();
 
             // add basic authentication in header
             HttpEntity<String> headers = new HttpEntity<String>(getHttpHeaders());
-            ResponseEntity<HashMap> responseEntity = restTemplate.exchange(sessionServiceURL + type + "/" + id,
-                                                                        HttpMethod.GET,
-                                                                        headers,
-                                                                        HashMap.class);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(sessionServiceURL + type + "/" + id,
+                    HttpMethod.GET, headers, String.class);
             
-            if (type.equals(SessionType.virtual_study) || type.equals(SessionType.group)) {
-                ObjectMapper mapper = new ObjectMapper()
-                        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                
-                String virtualStudyStr = mapper.writeValueAsString(responseEntity.getBody());
-                
-                return mapper.readValue(virtualStudyStr, Session.class);
-                
-            }
-            return responseEntity.getBody();
+            ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                    false);
+            
+            Session session = mapper.readValue(responseEntity.getBody(), Session.class);
+
+            return new ResponseEntity<>(session, HttpStatus.OK);
+
         } catch (Exception exception) {
-            response.sendError(HttpStatus.NOT_FOUND.value());
+            exception.printStackTrace();
+            LOG.error(exception);
+            return new ResponseEntity<Session>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return null;
     }
 
-    private Boolean isBasicAuthEnabled() {
-        return sessionServiceUser != null && !sessionServiceUser.equals("") && sessionServicePassword != null && !sessionServicePassword.equals("");
-    }
-    
-    private Boolean isSessionServiceEnabled() {
-    	return !StringUtils.isEmpty(sessionServiceURL);
-    }
-
-    private HttpHeaders getHttpHeaders() {
-        return new HttpHeaders() {{
-            if (isBasicAuthEnabled()) {
-                String auth = sessionServiceUser + ":" + sessionServicePassword;
-                byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
-                String authHeader = "Basic " + new String(encodedAuth);
-                set( "Authorization", authHeader);
-            }
-            set( "Content-Type", "application/json");
-        }};
-     }
-    
     @RequestMapping(value = "/virtual_study", method = RequestMethod.GET)
-    public @ResponseBody List<Session> getUserStudies() throws JsonProcessingException {
-        List<Session> virtualStudies = new ArrayList<Session>();
-        if (isSessionServiceEnabled()
-                && isAuthorized()) {
+    public ResponseEntity<List<Session>> getUserStudies() throws JsonProcessingException {
+        
+        if (isSessionServiceEnabled() && isAuthorized()) {
+            try {
 
-            Map<String, String> map = new HashMap<>();
-            map.put("data.users", userName());
+                Map<String, String> map = new HashMap<>();
+                map.put("data.users", userName());
 
-            ObjectMapper mapper = new ObjectMapper();
-            String query = mapper.writeValueAsString(map);
+                ObjectMapper mapper = new ObjectMapper();
+                String query = mapper.writeValueAsString(map);
 
-            RestTemplate restTemplate = new RestTemplate();
+                RestTemplate restTemplate = new RestTemplate();
 
-            HttpEntity<Object> httpEntity = new HttpEntity<Object>(query, getHttpHeaders());
+                HttpEntity<Object> httpEntity = new HttpEntity<Object>(query, getHttpHeaders());
 
-            ResponseEntity<List<Session>> responseEntity = restTemplate.exchange(
-                    sessionServiceURL + "virtual_study/query?field=data.users&value="+ userName(),
-                    HttpMethod.GET, httpEntity, new ParameterizedTypeReference<List<Session>>() {
-                    });
+                ResponseEntity<List<Session>> responseEntity = restTemplate.exchange(
+                        sessionServiceURL + "virtual_study/query?field=data.users&value=" + userName(), HttpMethod.GET,
+                        httpEntity, new ParameterizedTypeReference<List<Session>>() {
+                        });
 
-            virtualStudies = responseEntity.getBody();
+                return new ResponseEntity<>(responseEntity.getBody(), HttpStatus.OK);
+            } catch (Exception exception) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
-        return virtualStudies;
-
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
     
     @RequestMapping(value = "/{type}", method = RequestMethod.POST)
-    public ResponseEntity<HashMap> addSession(@PathVariable SessionType type,
+    public ResponseEntity<Session> addSession(@PathVariable SessionType type,
                                                @RequestBody  JSONObject  body) throws IOException {
         
         return addSession(type, Optional.empty(), body);
     }
     
+    
+    
     @RequestMapping(value = "/virtual_study/save", method = RequestMethod.POST)
-    public ResponseEntity<HashMap> addUserSavedVirtualStudy(@RequestBody  JSONObject body) throws IOException {
+    public ResponseEntity<Session> addUserSavedVirtualStudy(@RequestBody  JSONObject body) throws IOException {
         
         return addSession(SessionType.virtual_study, Optional.of(SessionOperation.save), body);
     }
@@ -163,17 +173,13 @@ public class ProxySessionServiceController {
     public void updateUsersInVirtualStudy(@PathVariable SessionType type, @PathVariable String id,
             @PathVariable Operation operation, HttpServletResponse response) throws IOException {
 
-        // updates only allowed for type group for now
-        List<SessionType> validSessionTypes = Arrays.asList(SessionType.virtual_study, SessionType.group);
-
-        if (validSessionTypes.contains(type) && isSessionServiceEnabled()
-                && isAuthorized()) {
-
+        if (isSessionServiceEnabled() && isAuthorized()) {
             ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                     false);
             String virtualStudyStr = mapper.writeValueAsString(getSession(type, id, response));
             Session virtualStudy = mapper.readValue(virtualStudyStr, Session.class);
-            Set<String> users = virtualStudy.getData().getUsers();
+            VirtualStudyData virtualStudyData = (VirtualStudyData) virtualStudy.getData();
+            Set<String> users = virtualStudyData.getUsers();
             
             switch (operation) {
                 case add: {
@@ -185,21 +191,20 @@ public class ProxySessionServiceController {
                     break;
                 }
             }
-            virtualStudy.getData().setUsers(users);
+            virtualStudyData.setUsers(users);
             RestTemplate restTemplate = new RestTemplate();
-            HttpEntity<Object> httpEntity = new HttpEntity<Object>(virtualStudy.getData(), getHttpHeaders());
+            HttpEntity<VirtualStudyData> httpEntity = new HttpEntity<>(virtualStudyData, getHttpHeaders());
 
             restTemplate.put(sessionServiceURL + type + "/" + id, httpEntity);
             
             response.sendError(HttpStatus.OK.value());
-            
         } else {
             response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value());
         }
 
     }
     
-	private ResponseEntity<HashMap> addSession(SessionType type, Optional<SessionOperation> operation, JSONObject body) {
+	private ResponseEntity<Session> addSession(SessionType type, Optional<SessionOperation> operation, JSONObject body) {
 		try {
 			HttpEntity httpEntity = null;
 			ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
@@ -235,13 +240,13 @@ public class ProxySessionServiceController {
 			// (Jackson 2 is on classpath)
 			// was String when default converter StringHttpMessageConverter was used
 			RestTemplate restTemplate = new RestTemplate();
-			ResponseEntity<HashMap> resp =  restTemplate.exchange(sessionServiceURL + type, HttpMethod.POST,
-					httpEntity, HashMap.class);
+			ResponseEntity<Session> resp =  restTemplate.exchange(sessionServiceURL + type, HttpMethod.POST,
+					httpEntity, Session.class);
 			
 			return new ResponseEntity<>(resp.getBody(), resp.getStatusCode());
 
 		} catch (IOException e) {
-			LOG.error(e);
+		    e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -278,45 +283,39 @@ public class ProxySessionServiceController {
 		return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
 	}
 	
-    @RequestMapping(value = "/settings/{page}", method = RequestMethod.POST)
-    public void updateUserPageSettings(@PathVariable SessionPage page, @RequestBody StudyPageSettings studyPageSettings,
+    @RequestMapping(value = "/settings", method = RequestMethod.POST)
+    public void updateUserPageSettings(@RequestBody SettingsData settingsData,
             HttpServletResponse response) throws IOException {
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
+            ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                    false).setSerializationInclusion(Include.NON_NULL);
             if (isSessionServiceEnabled() && isAuthorized()) {
-
                 Map<String, Object> map = new HashMap<>();
-                map.put("data.users",
-                        ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                                .getUsername());
-                map.put("data.origin", studyPageSettings.getOrigin());
+                map.put("data.users", userName());
+                map.put("data.page", settingsData.getPage());
+                map.put("data.origin", settingsData.getOrigin());
 
-                ObjectMapper mapper = new ObjectMapper();
-                String query = mapper.writeValueAsString(map);
-
+                String query = objectMapper.writeValueAsString(map);
+                
                 RestTemplate restTemplate = new RestTemplate();
 
                 HttpEntity<String> httpEntity = new HttpEntity<String>(query, getHttpHeaders());
 
-                ResponseEntity<String> responseEntity = restTemplate.exchange(
+                ResponseEntity<List<Session>> responseEntity = restTemplate.exchange(
                         sessionServiceURL + SessionType.settings + "/query/fetch", HttpMethod.POST, httpEntity,
-                        String.class);
-
-                List<Session> sessions = objectMapper.readValue(responseEntity.getBody(),
-                        new TypeReference<List<Session>>() {
-                        });
+                        new ParameterizedTypeReference<List<Session>>(){});
+                
+                List<Session> sessions = responseEntity.getBody();
 
                 // sort last updated in descending order
                 sessions.sort((Session s1, Session s2) -> {
-                    return s1.getData().getLastUpdated() > s2.getData().getLastUpdated() ? -1 : 1;
+                    return ((StudyPageSettings)s1.getData()).getLastUpdated() > ((StudyPageSettings)s2.getData()).getLastUpdated() ? -1 : 1;
                 });
                 JSONParser parser = new JSONParser();
-                JSONObject jsonObject = (JSONObject) parser.parse(objectMapper.writeValueAsString(studyPageSettings));
+                JSONObject jsonObject = (JSONObject) parser.parse(objectMapper.writeValueAsString(settingsData));
 
                 if (sessions.isEmpty()) {
-
                     addSession(SessionType.settings, null, jsonObject);
 
                 } else {
@@ -346,22 +345,20 @@ public class ProxySessionServiceController {
 
 			ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
 					false);
-			String sessionString = mapper.writeValueAsString(getSession(type, id, response));
+			String sessionString = mapper.writeValueAsString(getSession(type, id, response).getBody());
 			
-			if(type.equals(SessionType.group)) {
-			    Session virtualStudy = mapper.readValue(sessionString, Session.class);
-
-	            String user = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-	                    .getUsername();
+			Session session = mapper.readValue(sessionString, Session.class);
+			if(session.getType().equals(SessionType.group)) {
+			    VirtualStudyData virtualStudyData = (VirtualStudyData) session.getData();
 	            //only allow owner to update virtual study
-	            if (user.equals(virtualStudy.getData().getOwner()) && virtualStudy.getType().equals(type.toString())) {
+	            if (userName().equals(virtualStudyData.getOwner()) && session.getType().equals(type)) {
 
 	                VirtualStudyData updatedVirtualStudyData = mapper.readValue(body.toString(), VirtualStudyData.class);
-	                updatedVirtualStudyData.setCreated(virtualStudy.getData().getCreated());
-	                updatedVirtualStudyData.setOwner(virtualStudy.getData().getOwner());
-	                updatedVirtualStudyData.setUsers(virtualStudy.getData().getUsers());
+	                updatedVirtualStudyData.setCreated(virtualStudyData.getCreated());
+	                updatedVirtualStudyData.setOwner(virtualStudyData.getOwner());
+	                updatedVirtualStudyData.setUsers(virtualStudyData.getUsers());
 
-	                virtualStudy.setData(updatedVirtualStudyData);
+	                session.setData(updatedVirtualStudyData);
 	                RestTemplate restTemplate = new RestTemplate();
 	                HttpEntity<Object> httpEntity = new HttpEntity<Object>(updatedVirtualStudyData, getHttpHeaders());
 	                
@@ -370,23 +367,17 @@ public class ProxySessionServiceController {
 	            } else {
 	                response.setStatus(HttpStatus.UNAUTHORIZED.value());
 	            }
-			    
             } else {
-                Session session = mapper.readValue(sessionString, Session.class);
-
-                String user = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                        .getUsername();
+                StudyPageSettings studyPageSettings = (StudyPageSettings) session.getData();
                 StudyPageSettings updatedPageSettings = mapper.readValue(body.toString(), StudyPageSettings.class);
                 // only allow owner to update his session and see if the origin(studies) are same
-                if (user.equals(session.getData().getOwner()) && session.getType().equals(type.toString())
-                        && sameOrigin(session.getData().getOrigin(), updatedPageSettings.getOrigin())) {
+                if (userName().equals(studyPageSettings.getOwner()) && session.getType().equals(type)
+                        && sameOrigin(studyPageSettings.getOrigin(), updatedPageSettings.getOrigin())) {
 
-                    updatedPageSettings.setCreated(session.getData().getCreated());
-                    updatedPageSettings.setOwner(session.getData().getOwner());
-                    updatedPageSettings.setUsers(session.getData().getUsers());
-                    updatedPageSettings.setOrigin(session.getData().getOrigin());
-
-                    session.setData(updatedPageSettings);
+                    updatedPageSettings.setCreated(studyPageSettings.getCreated());
+                    updatedPageSettings.setOwner(studyPageSettings.getOwner());
+                    updatedPageSettings.setUsers(studyPageSettings.getUsers());
+                    updatedPageSettings.setOrigin(studyPageSettings.getOrigin());
 
                     RestTemplate restTemplate = new RestTemplate();
                     HttpEntity<Object> httpEntity = new HttpEntity<Object>(updatedPageSettings, getHttpHeaders());
@@ -404,7 +395,7 @@ public class ProxySessionServiceController {
 	}
 	
 	
-	boolean sameOrigin(Set<String> set1, Set<String> set2){
+	private boolean sameOrigin(Set<String> set1, Set<String> set2){
         if(set1 == null || set2 ==null){
             return false;
         }
@@ -414,18 +405,8 @@ public class ProxySessionServiceController {
         return set1.containsAll(set2);
     }
 	
-    private boolean isAuthorized() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return !(authentication == null || (authentication instanceof AnonymousAuthenticationToken));
-    }
-
-    private String userName() {
-        return ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-    }
-
-    @RequestMapping(value = "/settings/{page}/fetch", method = RequestMethod.POST)
-    public ResponseEntity<SessionData> getStudyPageUserSettings(@PathVariable SessionPage page,
-            @Size(min = 1, max = PagingConstants.MAX_PAGE_SIZE) @RequestBody List<String> studyIds,
+    @RequestMapping(value = "/settings/fetch", method = RequestMethod.POST)
+    public ResponseEntity<SessionData> getStudyPageUserSettings( @RequestBody SettingsIdentifier settingsIdentifier,
             HttpServletResponse response) {
 
         try {
@@ -433,7 +414,8 @@ public class ProxySessionServiceController {
 
                 Map<String, Object> map = new HashMap<>();
                 map.put("data.users", userName());
-                map.put("data.origin", studyIds);
+                map.put("data.page", settingsIdentifier.getPage());
+                map.put("data.origin", settingsIdentifier.getOrigin());
 
                 ObjectMapper mapper = new ObjectMapper();
                 String query = mapper.writeValueAsString(map);
@@ -447,14 +429,14 @@ public class ProxySessionServiceController {
                         new ParameterizedTypeReference<List<Session>>() {
                         });
 
-                List<Session> studyPageSettings = responseEntity.getBody();
+                List<Session> sessions = responseEntity.getBody();
 
                 // sort last updated in descending order
-                studyPageSettings.sort((Session s1, Session s2) -> {
-                    return s1.getData().getLastUpdated() > s2.getData().getLastUpdated() ? -1 : 1;
+                sessions.sort((Session s1, Session s2) -> {
+                    return ((StudyPageSettings)s1.getData()).getLastUpdated() > ((StudyPageSettings)s2.getData()).getLastUpdated() ? -1 : 1;
                 });
 
-                return new ResponseEntity<>(studyPageSettings.isEmpty() ? null : studyPageSettings.get(0).getData(),
+                return new ResponseEntity<>(sessions.isEmpty() ? null : (SessionData)sessions.get(0).getData(),
                         HttpStatus.OK);
             }
             return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
@@ -465,14 +447,6 @@ public class ProxySessionServiceController {
     }
 }
 
-enum SessionType {
-    main_session,
-    virtual_study,
-    group,
-    comparison_session,
-    settings;
-}
-
 enum Operation {
     add,
     delete;
@@ -481,8 +455,4 @@ enum Operation {
 enum SessionOperation {
     save,
     share;
-}
-
-enum SessionPage {
-    study_view;
 }

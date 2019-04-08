@@ -1,5 +1,7 @@
 package org.cbioportal.web.parameter;
 
+import java.util.HashMap;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -11,8 +13,10 @@ public class Session {
 
     private String id;
     private String source;
-    private String type;
-    private SessionData data;
+    private SessionType type;
+    
+    //replace Object with SessionData once model for main_session and comparison_session are finalized
+    private Object data;
 
     public String getId() {
         return id;
@@ -22,15 +26,17 @@ public class Session {
         this.id = id;
     }
 
-    public SessionData getData() {
+    public Object getData() {
         return data;
     }
-
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
+    
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type", visible = true)
     @JsonSubTypes({ @Type(value = StudyPageSettings.class, name = "settings"),
+            @Type(value = HashMap.class, name = "main_session"),
+            @Type(value = HashMap.class, name = "comparison_session"),
             @Type(value = VirtualStudyData.class, name = "virtual_study"),
             @Type(value = VirtualStudyData.class, name = "group") })
-    public void setData(SessionData data) {
+    public void setData(Object data) {
         this.data = data;
     }
 
@@ -42,11 +48,11 @@ public class Session {
         this.source = source;
     }
 
-    public String getType() {
+    public SessionType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(SessionType type) {
         this.type = type;
     }
 

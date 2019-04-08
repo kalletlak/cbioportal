@@ -2,8 +2,10 @@ package org.cbioportal.web.parameter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.validation.constraints.Size;
 
@@ -18,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-public class StudyPageSettings extends SessionData implements Serializable {
+public class StudyPageSettings extends SettingsData implements Serializable {
     
     /**
      * 
@@ -147,7 +149,7 @@ public class StudyPageSettings extends SessionData implements Serializable {
         private List<Group> groups;
         private Layout layout;
         private Boolean patientAttribute;
-
+        
         public String getId() {
             return id;
         }
@@ -200,6 +202,56 @@ public class StudyPageSettings extends SessionData implements Serializable {
     
     
     private List<ChartSetting> chartSettings = new ArrayList<ChartSetting>();
+    
+    private String owner = "anonymous";
+
+    private Set<String> origin = new HashSet<>();
+
+    private Long created = System.currentTimeMillis();
+    
+    private Long lastUpdated = System.currentTimeMillis();
+    
+    private Set<String> users = new HashSet<>();
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public Set<String> getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(Set<String> origin) {
+        this.origin = origin;
+    }
+
+    public Long getCreated() {
+        return created;
+    }
+
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+
+    public Long getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Long lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public Set<String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<String> users) {
+        this.users = users;
+    }
 
     public List<ChartSetting> getChartSettings() {
         return chartSettings;
