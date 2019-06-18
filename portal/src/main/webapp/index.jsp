@@ -38,12 +38,16 @@
         window.localdev = localStorage.localdev === 'true';
         window.localdist = localStorage.localdist === 'true';
         window.heroku = localStorage.heroku;
+        window.netlify = localStorage.netlify;
         
         if (window.localdev || window.localdist) {
             window.frontendConfig.frontendUrl = "//localhost:3000/"
             localStorage.setItem("e2etest", "true");
         } else if (window.heroku) {
             window.frontendConfig.frontendUrl = ['//',localStorage.heroku,'.herokuapp.com','/'].join('');
+            localStorage.setItem("e2etest", "true");
+        } else if (window.netlify) {
+            window.frontendConfig.frontendUrl = ['//',localStorage.netlify,'.netlify.com','/'].join('');
             localStorage.setItem("e2etest", "true");
         } else if('<%=GlobalProperties.getFrontendUrl()%>'){
             window.frontendConfig.frontendUrl = '<%=GlobalProperties.getFrontendUrl()%>';
@@ -55,9 +59,7 @@
 
     </script>
      
-    <script type="text/javascript" src="//<%=baseUrl%>/js/src/load-frontend.js?<%=GlobalProperties.getAppVersion()%>"></script> 
-    
-    
+    <script type="text/javascript" src="//<%=baseUrl%>/js/src/load-frontend.js?<%=GlobalProperties.getAppVersion()%>"></script>
           
     <script>
         window.frontendConfig.customTabs && window.frontendConfig.customTabs.forEach(function(tab){
@@ -68,13 +70,14 @@
             }
         });
     </script>
-
-
+    
     <script>
             loadReactApp(window.frontendConfig);
     </script>
     
     <%@include file="./tracking_include.jsp" %>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" />
 
 </head>
 

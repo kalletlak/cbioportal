@@ -15,6 +15,9 @@ The PedcBioPortal for Cancer Genomics is an instance of the [cBioPortal](http://
 * Manda Wilson
 * Avery Wang
 * Jing Su
+* Ramyasree Madupuri
+* Gaofei Zhao
+* Xiang Li
 * Nikolaus Schultz
 
 ## Dana-Farber Cancer Institute
@@ -43,6 +46,7 @@ The PedcBioPortal for Cancer Genomics is an instance of the [cBioPortal](http://
 * Fedde Schaeffer
 * Sander Tan
 * Oleguer Plantalech
+* Pim van Nierop
 * Riza Nugraha
 * Sjoerd van Hagen
 * Kees van Bochove
@@ -50,7 +54,7 @@ The PedcBioPortal for Cancer Genomics is an instance of the [cBioPortal](http://
 ## Bilkent University
 * Ugur Dogrusoz
 * Istemi Bahceci
-* Leonard Dervishi
+* Kaan Sancak
 
 ## Weill Cornell Medicine
 * Alexandros Sigaras
@@ -61,6 +65,7 @@ The PedcBioPortal for Cancer Genomics is an instance of the [cBioPortal](http://
 * Caitlin Byrne
 * Hsiao-Wei Chen
 * Fred Criscuolo
+* Leonard Dervishi
 * Gideon Dresdner
 * Andy Dufilie
 * Catherine Del Vecchio Fitz

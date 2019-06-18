@@ -91,7 +91,7 @@
                 <artifactItem>
                   <groupId>com.github.jsimone</groupId>
                   <artifactId>webapp-runner</artifactId>
-                  <version>8.0.24.0</version>
+                  <version>8.5.37.1</version>
                   <destFileName>webapp-runner.jar</destFileName>
                 </artifactItem>
               </artifactItems>
@@ -107,9 +107,9 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>com.github.d3b-center</groupId>
+                  <groupId>${frontend.groupId}</groupId>
                   <artifactId>cbioportal-frontend</artifactId>
-                  <version>753b851ca9b890f5e72b99842e8b92d713be6318</version>
+                  <version>${frontend.version}</version>
                   <type>jar</type>
                   <outputDirectory>.</outputDirectory>
                   <excludes>*index*</excludes>

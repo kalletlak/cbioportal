@@ -30,13 +30,17 @@
         String[] propNameArray = {
             "app.version",
             "app.name",
+            "dat.uuid.revoke_other_tokens",
+            "dat.method",
             "oncoprint.custom_driver_annotation.binary.menu_label",
             "disabled_tabs",            
             "civic.url",
-            "oncoprint.custom_driver_annotation.default",
-            "oncoprint.oncokb_hotspots.default",
+            "oncoprint.custom_driver_annotation.binary.default",
+            "oncoprint.oncokb.default",
+            "oncoprint.hotspots.default",
             "genomenexus.url",
             "google_analytics_profile_id",
+            "analytics_report_url",
             "oncoprint.hide_vus.default",
             "mycancergenome.show",
             "oncokb.public_api.url",
@@ -69,6 +73,7 @@
             "skin.documentation.news",
             "skin.documentation.oql",
             "skin.query.max_tree_depth",
+            "skin.quick_select_buttons",
             "skin.right_logo",
             "skin.right_nav.show_data_sets",
             "skin.right_nav.show_examples",
@@ -83,13 +88,18 @@
             "skin.show_tutorials_tab",
             "skin.show_web_api_tab",
             "skin.show_tweet_button",
+            "quick_search.enabled",
+            "default_cross_cancer_study_session_id",
+            "default_cross_cancer_study_list",
+            "default_cross_cancer_study_list_name",
             "skin.description",
             "skin.title",
             "skin.authorization_message",
             "session.url_length_threshold",
             "bitly.api_key",
             "bitly.user",
-            "bitly.access.token"
+            "bitly.access.token",
+            "oncoprint.custom_driver_annotation.tiers.default"
            
         }; 
     
@@ -124,7 +134,9 @@
         obj.put("frontendConfigOverride",GlobalProperties.getFrontendConfig());
         
         obj.put("authenticationMethod",GlobalProperties.authenticationMethod());
-                  
+        
+        obj.put("mskWholeSlideViewerToken", GlobalProperties.getMskWholeSlideViewerToken());
+
         String enableOncoKBandHotspots = "";
         switch(GlobalProperties.enableOncoKBandHotspots()){
             case "true":

@@ -152,6 +152,25 @@
               </dependency>
             </dependencies>
           </plugin>
+          <!-- Generate test DB schema without key `UQ_MUTATION_EVENT_DETAILS` to accommodate H2 MySQL driver not supporting partial indexes -->
+          <plugin>
+            <artifactId>exec-maven-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <version>1.6.0</version>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <id>Generate Test DB schema</id>
+                <phase>integration-test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>${basedir}/db-scripts/src/main/resources/gen-cgds-test-schema.sh</executable>
+                </configuration>
+              </execution>
+            </executions>
+        </plugin>
           <plugin>
             <groupId>pl.project13.maven</groupId>
             <artifactId>git-commit-id-plugin</artifactId>
@@ -251,6 +270,8 @@
   </profiles>
 
   <properties>
+    <frontend.version>v3.0.1</frontend.version>
+    <frontend.groupId>com.github.cbioportal</frontend.groupId>
     <slf4j.version>1.6.6</slf4j.version>
     <spring.version>4.3.14.RELEASE</spring.version>
     <spring.context.support.version>4.3.14.RELEASE</spring.context.support.version>
@@ -271,18 +292,18 @@
 
     <final.war.name>cbioportal</final.war.name>
 
-  <db.test.driver>com.mysql.jdbc.Driver</db.test.driver>
+    <db.test.driver>com.mysql.jdbc.Driver</db.test.driver>
     <!-- For MySQL < 5.5 change 'default_storage_engine' to 'storage_engine' -->
-  <db.test.url>jdbc:mysql://127.0.0.1:3306/cgds_test?sessionVariables=default_storage_engine=InnoDB</db.test.url>
-    <db.test.username>cbioportal_user</db.test.username>
-    <db.test.password>texas1234</db.test.password>
+    <db.test.url>jdbc:mysql://127.0.0.1:3306/cgds_test?sessionVariables=default_storage_engine=InnoDB</db.test.url>
+    <db.test.username>cbio_user</db.test.username>
+    <db.test.password>somepassword</db.test.password>
 
     <!--For tomcat instances, the scope to tomcat catalina lib should be provided. this prop is used in portal module.-->
     <tomcat.catalina.scope>provided</tomcat.catalina.scope>
     <tomcat.session.timeout>720</tomcat.session.timeout>
 
     <!-- THIS SHOULD BE KEPT IN SYNC TO VERSION IN CGDS.SQL -->
-    <db.version>2.7.3</db.version>
+    <db.version>2.9.0</db.version>
   </properties>
 
   <modules>
@@ -303,6 +324,16 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
+      <version>${spring.security.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+      <version>${spring.security.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
       <version>${spring.security.version}</version>
     </dependency>
     <!-- apache commons logging -->

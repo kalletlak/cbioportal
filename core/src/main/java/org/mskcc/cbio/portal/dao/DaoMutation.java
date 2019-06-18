@@ -1564,42 +1564,40 @@ public final class DaoMutation {
         }
         return false;
     }
-    
-	public static Set<ExtendedMutation.MutationEvent> getAllMutationEventsTemp(long entrezGeneId, String chr,
-			long startPosition, long endPosition, String proteinChange, String tumorSeqAllele, String mutationType)
-			throws DaoException {
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		Set<ExtendedMutation.MutationEvent> events = new HashSet<ExtendedMutation.MutationEvent>();
-		try {
-			con = JdbcUtil.getDbConnection(DaoMutation.class);
-			pstmt = con.prepareStatement(
-					"SELECT * FROM mutation_event "
-					+ "WHERE ENTREZ_GENE_ID=? and "
-					+ "CHR=? and "
-					+ "START_POSITION=? and "
-					+ "END_POSITION=? and "
-					+ "PROTEIN_CHANGE=? and "
-					+ "MUTATION_TYPE=?");
 
-			pstmt.setLong(1, entrezGeneId);
-			pstmt.setString(2, chr);
-			pstmt.setLong(3, startPosition);
-			pstmt.setLong(4, endPosition);
-			pstmt.setString(5, proteinChange);
-			pstmt.setString(6, mutationType);
-			rs = pstmt.executeQuery();
-			while (rs.next()) {
-				ExtendedMutation.MutationEvent event = extractMutationEvent(rs);
-				events.add(event);
-			}
-		} catch (SQLException e) {
-			throw new DaoException(e);
-		} finally {
-			JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
-		}
-		return events;
-	}
-    
+    /**
+     * Returns true if there are duplicates in `mutation_event`.
+     * Compares count(*) of records in `mutation_event` against the count(distinct ...)
+     * records based on the fields specified below.
+     *
+     * If the counts do not match then SQL statement returns 0 (false), otherwise returns 1 (true).
+     * @return
+     * @throws DaoException
+     */
+    public static boolean hasDuplicateMutationEvents() throws DaoException {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        Integer sqlQueryResult = -1; // default = -1 to indicate mismatched counts from db table
+        try {
+            con = JdbcUtil.getDbConnection(DaoMutation.class);
+            pstmt = con.prepareStatement(
+                    "SELECT "
+                    + "(SELECT COUNT(*) FROM mutation_event) = "
+                    + "(SELECT COUNT(DISTINCT ENTREZ_GENE_ID, CHR, START_POSITION, END_POSITION, TUMOR_SEQ_ALLELE, PROTEIN_CHANGE, MUTATION_TYPE) FROM mutation_event)");
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                sqlQueryResult = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
+        }
+        if (sqlQueryResult == -1) {
+            throw new DaoException("Error occurred while executing SQL query to detect duplicate records in `mutation_event`");
+        }
+        return !(sqlQueryResult > 0);
+    }
 }

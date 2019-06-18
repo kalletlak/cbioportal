@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
+ * Copyright (c) 2015 - 2018 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -72,9 +72,6 @@ public class GlobalProperties {
     private static String authenticate;
     @Value("${authenticate:false}") // default is false
     public void setAuthenticate(String property) { authenticate = property; }
-    private static String authorization;
-    @Value("${authorization:false}") // default is false
-    public void setAuthorization(String property) { authorization = property; }
     public static final String FILTER_GROUPS_BY_APPNAME = "filter_groups_by_appname";
     public static final String INCLUDE_NETWORKS = "include_networks";
     public static final String GOOGLE_ANALYTICS_PROFILE_ID = "google_analytics_profile_id";
@@ -111,6 +108,7 @@ public class GlobalProperties {
     public static final String SKIN_RIGHT_NAV_SHOW_DATA_SETS = "skin.right_nav.show_data_sets";
     public static final String SKIN_RIGHT_NAV_SHOW_EXAMPLES = "skin.right_nav.show_examples";
     public static final String SKIN_RIGHT_NAV_SHOW_TESTIMONIALS = "skin.right_nav.show_testimonials";
+    public static final String SKIN_RIGHT_NAV_SHOW_WHATS_NEW = "skin.right_nav.show_whats_new";
     private static String skinAuthorizationMessage;
     @Value("${skin.authorization_message:Access to this portal is only available to authorized users.}")
     public void setSkinAuthorizationMessage(String property) { skinAuthorizationMessage = property; }
@@ -144,7 +142,6 @@ public class GlobalProperties {
     public static final String STUDY_VIEW_MDACC_HEATMAP_URL = "mdacc.heatmap.study.url";
     public static final String STUDY_VIEW_MDACC_HEATMAP_META_URL = "mdacc.heatmap.study.meta.url";
 
-    public static final String ONCOKB_API_URL = "oncokb.api.url";
     public static final String ONCOKB_PUBLIC_API_URL = "oncokb.public_api.url";
     public static final String SHOW_ONCOKB = "show.oncokb";
 
@@ -241,7 +238,7 @@ public class GlobalProperties {
     public void setSuppressSchemaVersionMismatchErrors(String property) { suppressSchemaVersionMismatchErrors = Boolean.parseBoolean(property); }
     
     public static final String DARWIN_AUTH_URL = "darwin.auth_url";
-    public static final String DARWIN_RESPONSE_URL = "darwin.response_url";
+    public static final String DDP_RESPONSE_URL = "ddp.response_url";
     public static final String CIS_USER = "cis.user";
     public static final String DISABLED_TABS = "disabled_tabs";
     public static final String BITLY_USER = "bitly.user";
@@ -259,6 +256,8 @@ public class GlobalProperties {
     
     public static final String SETSOFGENES_LOCATION = "querypage.setsofgenes.location";
 
+    public static final String MSK_WHOLE_SLIDE_VIEWER_SECRET_KEY = "msk.whole.slide.viewer.secret.key";
+
     private static boolean showCivic;
     @Value("${show.civic:false}") // default is false
     public void setShowCivic(String property) { showCivic = Boolean.parseBoolean(property); }
@@ -271,6 +270,13 @@ public class GlobalProperties {
     @Value("${show.genomenexus:true}") // default is true
     public void setShowGenomeNexus(String property) { showGenomeNexus = Boolean.parseBoolean(property); }
 
+    private static boolean datRevokeOtherTokens;
+    @Value("${dat.uuid.revoke_other_tokens:true}") // default is true
+    public void setDatRevokeOtherTokens(String property) { datRevokeOtherTokens = Boolean.parseBoolean(property);}
+
+    private static String datMethod;
+    @Value("${dat.method:none}") // default is 'none'
+    public void setDatMethod(String property) { datMethod = property;}
 	/*
      * Trim whitespace of url and append / if it does not exist. Return empty
      * string otherwise.
@@ -294,8 +300,8 @@ public class GlobalProperties {
     
     public static final String BINARY_CUSTOM_DRIVER_ANNOTATION_MENU_LABEL = "oncoprint.custom_driver_annotation.binary.menu_label";
     public static final String TIERS_CUSTOM_DRIVER_ANNOTATION_MENU_LABEL = "oncoprint.custom_driver_annotation.tiers.menu_label";
-    public static final String ENABLE_DRIVER_ANNOTATIONS = "oncoprint.custom_driver_annotation.default";
-    public static final String ENABLE_TIERS = "oncoprint.custom_driver_tiers_annotation.default";
+    public static final String ENABLE_DRIVER_ANNOTATIONS = "oncoprint.custom_driver_annotation.binary.default";
+    public static final String ENABLE_TIERS = "oncoprint.custom_driver_annotation.tiers.default";
     public static final String ENABLE_ONCOKB_AND_HOTSPOTS_ANNOTATIONS = "oncoprint.oncokb_hotspots.default";
     public static final String HIDE_PASSENGER_MUTATIONS = "oncoprint.hide_vus.default";
 
@@ -475,6 +481,7 @@ public class GlobalProperties {
 		return (studies.length > 0) ? Arrays.asList(studies) : Collections.<String>emptyList();
 	}
 
+    // CHANGES TO THIS LIST MUST BE PROPAGATED TO 'CacheMapUtil'
     public static boolean usersMustAuthenticate()
     {
         // authentication for social_auth is optional
@@ -500,9 +507,6 @@ public class GlobalProperties {
             return "anonymousUser";
         }
     }
-	public static boolean usersMustBeAuthorized() {
-        return Boolean.parseBoolean(authorization);
-	}
 
     public static String getAppName()
     {
@@ -736,6 +740,12 @@ public class GlobalProperties {
         return showFlag == null || Boolean.parseBoolean(showFlag);
     }
 
+    public static boolean showRightNavWhatsNew()
+    {
+        String showFlag = portalProperties.getProperty(SKIN_RIGHT_NAV_SHOW_WHATS_NEW);
+        return showFlag == null || Boolean.parseBoolean(showFlag);
+    }
+
     public static String getAuthorizationMessage()
     {
         return skinAuthorizationMessage;
@@ -790,8 +800,7 @@ public class GlobalProperties {
 
     public static String getLinkToCancerStudyView(String cancerStudyId)
     {
-        return "study?" + org.mskcc.cbio.portal.servlet.CancerStudyView.ID
-                + "=" + cancerStudyId;
+        return "study?id=" + cancerStudyId;
     }
 
     public static String getLinkToIGVForBAM(String cancerStudyId, String caseId, String locus)
@@ -877,7 +886,6 @@ public class GlobalProperties {
                     showOncokb = "true";
         }
         
-        // This only applies if there is no oncokb.api.url property in the portal.properties file.
         // Empty string should be used if you want to disable the OncoKB annotation.
         if(oncokbApiUrl == null || oncokbApiUrl.isEmpty()) {
             oncokbApiUrl = "oncokb.org/api/v1";
@@ -907,37 +915,6 @@ public class GlobalProperties {
     public static String getPedcbioUtilsUrl()
     {
         return pedcbioUtilsUrl;
-    }
-    
-    public static String getOncoKBApiUrl()
-    {
-        String oncokbApiUrl = portalProperties.getProperty(ONCOKB_API_URL);
-        String showOncokb = portalProperties.getProperty(SHOW_ONCOKB);
-
-        if(showOncokb == null || showOncokb.isEmpty()) {
-            showOncokb = "true";
-        }
-        // This only applies if there is no oncokb.api.url property in the portal.properties file.
-        // Empty string should be used if you want to disable the OncoKB annotation.
-        if(oncokbApiUrl == null) {
-            oncokbApiUrl = "http://oncokb.org/legacy-api/";
-        }
-
-        //Test connection of OncoKB website.
-        if(!oncokbApiUrl.isEmpty() && showOncokb.equals("true")) {
-            try {
-                URL url = new URL(oncokbApiUrl+"access");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                if(conn.getResponseCode() != 200) {
-                    oncokbApiUrl = "";
-                }
-                conn.disconnect();
-                return oncokbApiUrl;
-            } catch (Exception e) {
-                return "";
-            }
-        }
-        return "";
     }
 
     public static String getCivicUrl() {
@@ -1052,15 +1029,15 @@ public class GlobalProperties {
         return darwinAuthUrl;
     }
     
-    public static String getDarwinResponseUrl() {
-        String darwinResponseUrl = "";
-        if (portalProperties.containsKey(DARWIN_RESPONSE_URL)) {
+    public static String getDdpResponseUrl() {
+        String ddpResponseUrl = "";
+        if (portalProperties.containsKey(DDP_RESPONSE_URL)) {
             try{
-                darwinResponseUrl = portalProperties.getProperty(DARWIN_RESPONSE_URL);
+                ddpResponseUrl = portalProperties.getProperty(DDP_RESPONSE_URL);
             }
             catch (NullPointerException e) {}
         }
-        return darwinResponseUrl;
+        return ddpResponseUrl;
     }
     
     public static List<String[]> getPriorityStudies() {
@@ -1220,5 +1197,29 @@ public class GlobalProperties {
     public static String getQuerySetsOfGenes() {
         String fileName = portalProperties.getProperty(SETSOFGENES_LOCATION, null);
         return readFile(fileName);
+    }
+
+    public static String getMskWholeSlideViewerToken()
+    {
+        // this token is for the msk portal 
+        // the token is generated based on users' timestamp to let the slide viewer know whether the token is expired and then decide whether to allow the user to login the viewer
+        // every time when we refresh the page or goto the new page, a new token should be generated
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String secretKey = portalProperties.getProperty(MSK_WHOLE_SLIDE_VIEWER_SECRET_KEY);
+        String timeStamp = String.valueOf(System.currentTimeMillis());
+        
+        if(authentication != null && authentication.isAuthenticated() && secretKey != null && !secretKey.isEmpty()) {           
+            return "{ \"token\":\"" + MskWholeSlideViewerTokenGenerator.generateTokenByHmacSHA256(authentication.getName(), secretKey, timeStamp) + "\", \"time\":\"" + timeStamp + "\"}";
+        } else {
+            return null;
+        }
+    }
+
+    public static Boolean getRevokeOtherTokens() {
+        return datRevokeOtherTokens;
+    }
+
+    public static String getDatMethod() {
+        return datMethod;
     }
 }
