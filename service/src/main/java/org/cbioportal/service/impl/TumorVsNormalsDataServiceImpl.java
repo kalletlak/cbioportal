@@ -195,7 +195,6 @@ public class TumorVsNormalsDataServiceImpl implements TumorVsNormalsDataService 
 					// if input z_score flag is true
 					Double value2 = zScore ? ((value - meanVal) / deviationVal) : value;
 
-					System.out.println(y.getSampleId() + "  " + value2);
 					y.setValue(value2);
 					return y;
 				}).collect(Collectors.toList()));

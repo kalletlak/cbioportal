@@ -167,17 +167,6 @@
         <url-pattern>/data_download</url-pattern>
         <url-pattern>/cross_cancer.do</url-pattern>
     </filter-mapping>
-    
-    <filter>
-        <filter-name>EventsLoggignFilter</filter-name>
-        <filter-class>org.mskcc.cbio.portal.util.EventsLoggignFilter</filter-class>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>EventsLoggignFilter</filter-name>
-        <url-pattern>/WEB-INF/jsp/visualize.jsp</url-pattern>
-         <dispatcher>FORWARD</dispatcher>
-    </filter-mapping>
 
     <filter>
         <filter-name>ResettableHttpServletRequestFilter</filter-name>
