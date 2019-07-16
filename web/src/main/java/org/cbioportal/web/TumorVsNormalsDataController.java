@@ -36,7 +36,7 @@ public class TumorVsNormalsDataController {
 	@Autowired
 	private TumorVsNormalsDataService tumorVsNormalsDataService;
 
-	@PreAuthorize("hasPermission(#molecularProfileId, 'MolecularProfile', 'read')")
+	@PreAuthorize("hasPermission(#molecularProfileId, 'MolecularProfileId', 'read')")
 	@RequestMapping(
 			value = "/molecular-profiles/{molecularProfileId}/tvn/fetch",
 			method = RequestMethod.POST,
