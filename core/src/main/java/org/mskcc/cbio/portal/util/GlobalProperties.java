@@ -327,10 +327,6 @@ public class GlobalProperties {
     @Value("${harvest.url:}") // default is empty string
     public void setHarvestUrl(String property) { harvestUrl = property; }
     
-    private static String pedcbioUtilsUrl;
-    @Value("${pedcbio_utils.url:}") // default is empty string
-    public void setPedcbioUtilsUrl(String property) { pedcbioUtilsUrl = property; }
-
     private static Log LOG = LogFactory.getLog(GlobalProperties.class);
     private static ConfigPropertyResolver portalProperties = new ConfigPropertyResolver();
     private static Properties mavenProperties = initializeProperties(MAVEN_PROPERTIES_FILE_NAME);
@@ -892,11 +888,6 @@ public class GlobalProperties {
         return harvestUrl;
     }
     
-    public static String getPedcbioUtilsUrl()
-    {
-        return pedcbioUtilsUrl;
-    }
-
     public static String getCivicUrl() {
         return civicUrl;
     }
