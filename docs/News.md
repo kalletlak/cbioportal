@@ -1,3 +1,15 @@
+## July 2, 2019
+*   **Added data** consistng of 785 samples from 4 studies:
+    *  [Non-Small Cell Lung Cancer (TRACERx, NEJM 2017)](https://www.cbioportal.org/study/summary?id=nsclc_tracerx_2017) *327 samples* 
+    *  [Acute myeloid leukemia or myelodysplastic syndromes (WashU, 2016)](https://www.cbioportal.org/study/summary?id=mnm_washu_2016) *136 samples* 
+    *  [Basal Cell Carcinoma (UNIGE, Nat Genet 2016)](https://www.cbioportal.org/study/summary?id=bcc_unige_2016) *293 samples* 
+    *  [Colon Adenocarcinoma (CaseCCC, PNAS 2015)](https://www.cbioportal.org/study/summary?id=coad_caseccc_2015) *29 samples* 
+
+## June 19, 2019
+* **New Feature**: Show *Genome Aggregation Database (gnomAD)* population frequencies in the mutations table - see [example](http://bit.ly/2ISHgiu):
+    
+    ![gnomad feature news](https://user-images.githubusercontent.com/1334004/59794400-e07c9c00-92a6-11e9-97ea-a79bfc8f3885.gif)
+
 ## June 12, 2019
  *   **Added data**  of 1350 samples from 3 studies:
      *  [Pheochromocytoma and Paraganglioma (TCGA, Cell 2017)](https://www.cbioportal.org/study?id=pcpg_tcga_pub) *178 samples*
