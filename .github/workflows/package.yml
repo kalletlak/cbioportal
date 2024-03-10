@@ -3,7 +3,7 @@ name: Docker Build and Push
 on:
   push:
     branches:
-      - main  # Adjust this branch name as per your requirement
+      - test-build  # Adjust this branch name as per your requirement
 
 jobs:
   build:
