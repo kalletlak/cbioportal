@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - test-build  # Adjust this branch name as per your requirement
+      - dynamic-survival
 
 jobs:
   build:
