@@ -25,8 +25,27 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build the Docker image
-        run: docker build -f docker/web/Dockerfile -t ghcr.io/${{ github.repository_owner }}/cbioportal:latest .
+      # The following two actions are required to build multi-platform images
+      # buildx is an extension of docker build, QUEM is used to convert the binary to varies architecture
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Push Docker image to GitHub Container Registry
-        run: docker push ghcr.io/${{ github.repository_owner }}/cbioportal:latest
+      - name: Publish Docker Image on Tag
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/cbioportal:latest
+          platforms: linux/amd64,linux/arm64
+          file: docker/web/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha
+
+
+#      - name: Build the Docker image
+#        run: docker build -f docker/web/Dockerfile -t ghcr.io/${{ github.repository_owner }}/cbioportal:latest .
+#
+#      - name: Push Docker image to GitHub Container Registry
+#        run: docker push ghcr.io/${{ github.repository_owner }}/cbioportal:latest
