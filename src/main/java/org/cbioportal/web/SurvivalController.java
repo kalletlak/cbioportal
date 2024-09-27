@@ -9,11 +9,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.cbioportal.model.ClinicalData;
+import org.cbioportal.model.ClinicalDataCountItem;
 import org.cbioportal.service.ClinicalEventService;
 import org.cbioportal.web.config.annotation.InternalApi;
+import org.cbioportal.web.parameter.ClinicalDataCountFilter;
 import org.cbioportal.web.parameter.PatientIdentifier;
 import org.cbioportal.web.parameter.SurvivalRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +39,7 @@ import java.util.List;
 @Tag(name = "Survival", description = " ")
 public class SurvivalController {
     private final ClinicalEventService clinicalEventService;
-    
+
     @Autowired
     public SurvivalController(ClinicalEventService clinicalEventService) {
         this.clinicalEventService = clinicalEventService;
@@ -59,6 +62,15 @@ public class SurvivalController {
         // prevent reference to this attribute in the swagger-ui interface. this attribute is needed for the @PreAuthorize tag above.
         @Valid @RequestAttribute(required = false, value = "interceptedSurvivalRequest") SurvivalRequest interceptedSurvivalRequest) {
 
+        return new ResponseEntity<>(cachedSurvivalData(interceptedSurvivalRequest),
+                                    HttpStatus.OK);
+    }
+
+    @Cacheable(
+        cacheResolver = "staticRepositoryCacheOneResolver",
+        condition = "@cacheEnabledConfig.getEnabled()"
+    )
+    public List<ClinicalData> cachedSurvivalData(SurvivalRequest interceptedSurvivalRequest) {
         List<String> studyIds = new ArrayList<>();
         List<String> patientIds = new ArrayList<>();
         for (PatientIdentifier patientIdentifier : interceptedSurvivalRequest.getPatientIdentifiers()) {
@@ -66,11 +78,9 @@ public class SurvivalController {
             patientIds.add(patientIdentifier.getPatientId());
         }
 
-        List<ClinicalData> result = clinicalEventService.getSurvivalData(studyIds,
-            patientIds,
-            interceptedSurvivalRequest.getAttributeIdPrefix(),
-            interceptedSurvivalRequest);
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return clinicalEventService.getSurvivalData(studyIds,
+                                                                         patientIds,
+                                                                         interceptedSurvivalRequest.getAttributeIdPrefix(),
+                                                                         interceptedSurvivalRequest);
     }
 }
