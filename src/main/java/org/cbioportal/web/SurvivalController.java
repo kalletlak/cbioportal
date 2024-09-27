@@ -9,10 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.cbioportal.model.ClinicalData;
-import org.cbioportal.model.ClinicalDataCountItem;
 import org.cbioportal.service.ClinicalEventService;
 import org.cbioportal.web.config.annotation.InternalApi;
-import org.cbioportal.web.parameter.ClinicalDataCountFilter;
 import org.cbioportal.web.parameter.PatientIdentifier;
 import org.cbioportal.web.parameter.SurvivalRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +69,7 @@ public class SurvivalController {
         condition = "@cacheEnabledConfig.getEnabled()"
     )
     public List<ClinicalData> cachedSurvivalData(SurvivalRequest interceptedSurvivalRequest) {
+
         List<String> studyIds = new ArrayList<>();
         List<String> patientIds = new ArrayList<>();
         for (PatientIdentifier patientIdentifier : interceptedSurvivalRequest.getPatientIdentifiers()) {
@@ -79,8 +78,8 @@ public class SurvivalController {
         }
 
         return clinicalEventService.getSurvivalData(studyIds,
-                                                                         patientIds,
-                                                                         interceptedSurvivalRequest.getAttributeIdPrefix(),
-                                                                         interceptedSurvivalRequest);
+                                                    patientIds,
+                                                    interceptedSurvivalRequest.getAttributeIdPrefix(),
+                                                    interceptedSurvivalRequest);
     }
 }
