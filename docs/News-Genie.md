@@ -1,4 +1,26 @@
 # Genie News
+## January 07, 2025
+*   **Public Release 17.0 of AACR Project GENIE:**
+    *   The first set of cancer genomic data aggregated through AACR Project Genomics Evidence Neoplasia Information Exchange (GENIE) was released to the global community in January 2017. The current release, GENIE 17.0-public now contains over 229,000 sequenced samples from over 196,000 patients, making the AACR Project GENIE registry among the largest fully public cancer genomic data sets.
+    *  The public release 17.0 version of AACR GENIE has 1402 samples retracted that were present in AACR GENIE 16.1-public. 
+    *  More detailed information can be found in the [AACR GENIE release notes](https://www.synapse.org/Synapse:syn64501161) and the data releases page from [Sage Bionetworks](https://www.synapse.org/Synapse:syn21683345).
+## October 04, 2024
+*   **Public Release 16.1 of AACR Project GENIE:**
+    *  The public release 16.1 version of AACR GENIE has 12 samples retracted that were present in AACR GENIE 16.0-public. 
+    *  More detailed information can be found in the [AACR GENIE release notes](https://www.synapse.org/Synapse:syn63645769) and the data releases page from [Sage Bionetworks](https://www.synapse.org/Synapse:syn63645356).
+## July 10, 2024
+*   **Public Release 16.0 of AACR Project GENIE:**
+    *   The first set of cancer genomic data aggregated through AACR Project Genomics Evidence Neoplasia Information Exchange (GENIE) was released to the global community in January 2017. The current release, GENIE 16.0-public now contains over 214,000 sequenced samples from over 184,000 patients, making the AACR Project GENIE registry among the largest fully public cancer genomic data sets.
+    *  The public release 16.0 version of AACR GENIE has 439 samples retracted that were present in AACR GENIE 15.1-public. 
+    *  More detailed information can be found in the [AACR GENIE release notes](https://www.synapse.org/Synapse:syn61484037) and the data releases page from [Sage Bionetworks](https://www.synapse.org/Synapse:syn61512346).
+## April 3, 2024
+*   **Public Release 15.1 of AACR Project GENIE:**
+    *  The public release 15.1 version of AACR GENIE has 61 samples retracted that were present in AACR GENIE 15.0-public. 
+    *  More detailed information can be found in the [AACR GENIE release notes](https://www.synapse.org/#!Synapse:syn55234828) and the data releases page from [Sage Bionetworks](https://www.synapse.org/#!Synapse:syn55234548).
+## January 9, 2024
+*   **Public Release 15.0 of AACR Project GENIE:**
+    *   The first set of cancer genomic data aggregated through AACR Project Genomics Evidence Neoplasia Information Exchange (GENIE) was released to the global community in January 2017. The current release, GENIE 15.0-public now contains over 198,000 sequenced samples from over 172,000 patients, making the AACR Project GENIE registry among the largest fully public cancer genomic data sets.
+    *   More detailed information can be found in the [AACR GENIE Data Guide](https://www.synapse.org/#!Synapse:syn7222066/wiki/409237).  In addition to accessing the data via the cBioPortal, users can download the data directly from [Sage Bionetworks](http://synapse.org/genie). Users will need to create an account for either site and agree to the [terms of access](https://www.synapse.org/#!Synapse:syn50898929).
 ## November 9, 2023
 *   **Public Release 14.1 of AACR Project GENIE:**
     *  The public release 14.1 version of AACR GENIE has 10 samples retracted that were present in AACR GENIE 14.0-public. 
