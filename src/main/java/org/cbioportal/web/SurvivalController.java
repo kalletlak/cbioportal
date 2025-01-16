@@ -65,11 +65,10 @@ public class SurvivalController {
     }
 
     @Cacheable(
-        cacheResolver = "staticRepositoryCacheOneResolver",
+        cacheResolver = "generalRepositoryCacheResolver",
         condition = "@cacheEnabledConfig.getEnabled()"
     )
     public List<ClinicalData> cachedSurvivalData(SurvivalRequest interceptedSurvivalRequest) {
-
         List<String> studyIds = new ArrayList<>();
         List<String> patientIds = new ArrayList<>();
         for (PatientIdentifier patientIdentifier : interceptedSurvivalRequest.getPatientIdentifiers()) {

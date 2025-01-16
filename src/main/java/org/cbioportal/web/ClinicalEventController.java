@@ -16,12 +16,7 @@ import org.cbioportal.service.exception.PatientNotFoundException;
 import org.cbioportal.service.exception.StudyNotFoundException;
 import org.cbioportal.web.config.InternalApiTags;
 import org.cbioportal.web.config.annotation.InternalApi;
-import org.cbioportal.web.parameter.ClinicalEventAttributeRequest;
-import org.cbioportal.web.parameter.Direction;
-import org.cbioportal.web.parameter.HeaderKeyConstants;
-import org.cbioportal.web.parameter.PagingConstants;
-import org.cbioportal.web.parameter.PatientIdentifier;
-import org.cbioportal.web.parameter.Projection;
+import org.cbioportal.web.parameter.*;
 import org.cbioportal.web.parameter.sort.ClinicalEventSortBy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -150,7 +145,7 @@ public class ClinicalEventController {
     }
 
     @Cacheable(
-        cacheResolver = "staticRepositoryCacheOneResolver",
+        cacheResolver = "generalRepositoryCacheResolver",
         condition = "@cacheEnabledConfig.getEnabled()"
     )
     public List<ClinicalEvent> cachedClinicalEventsMeta(ClinicalEventAttributeRequest interceptedClinicalEventAttributeRequest) {
